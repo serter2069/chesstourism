@@ -39,10 +39,10 @@ jobs:
       - name: Deploy API
         run: |
           cd api
+          cp /var/www/chesstourism/.env .env
           npm ci
           npx prisma generate || true
           npx prisma migrate deploy || true
           npm run build
-          cp /var/www/chesstourism/.env .env
           pm2 restart chesstourism-api || pm2 start dist/index.js --name chesstourism-api
           sudo chown -R www-data:www-data /var/www/chesstourism/web/
