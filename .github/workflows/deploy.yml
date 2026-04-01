@@ -1,0 +1,47 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main, development]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate version.json
+        run: |
+          mkdir -p dist
+          cat > dist/version.json << EOF
+          {
+            "version": "$(git rev-parse --short HEAD)",
+            "commit": "$(git rev-parse HEAD)",
+            "branch": "${{ github.ref_name }}",
+            "deployed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+
+      - name: Build frontend (Expo web)
+        run: |
+          npm ci
+          npx expo export -p web --output-dir dist
+
+      - name: Deploy frontend
+        run: |
+          rsync -av --delete dist/ /var/www/chesstourism/web/
+
+      - name: Deploy API
+        run: |
+          cd api
+          npm ci
+          npx prisma generate
+          npx prisma migrate deploy
+          npm run build
+          pm2 restart chesstourism-api || pm2 start dist/index.js --name chesstourism-api
+          sudo chown -R www-data:www-data /var/www/chesstourism/web/
