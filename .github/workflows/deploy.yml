@@ -15,6 +15,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Fix web dir permissions before deploy
+        run: |
+          sudo mkdir -p /var/www/chesstourism/web
+          sudo chown -R github-runner:www-data /var/www/chesstourism/web
+          sudo chmod -R g+rw /var/www/chesstourism/web
+
       - name: Generate version.json
         run: |
           mkdir -p dist
@@ -45,4 +51,8 @@ jobs:
           npx prisma migrate deploy || true
           npm run build
           pm2 restart chesstourism-api || pm2 start dist/index.js --name chesstourism-api
-          sudo chown -R www-data:www-data /var/www/chesstourism/web/
+
+      - name: Fix final permissions
+        run: |
+          sudo chown -R github-runner:www-data /var/www/chesstourism/web/
+          sudo chmod -R g+rw /var/www/chesstourism/web/
