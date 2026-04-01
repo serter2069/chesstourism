@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChesTourism — Brand Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #EBEBEB;
+      font-family: 'Inter', sans-serif;
+      color: #1a1a1a;
+      padding: 40px 24px 60px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #111;
+    }
+    .page-header .subtitle {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #666;
+      letter-spacing: 0.2px;
+    }
+    .page-header .domain {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    /* VARIANT CARD */
+    .variant {
+      background: var(--bg);
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      overflow: hidden;
+      font-family: var(--font), sans-serif;
+      color: var(--text);
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      height: 190px;
+      overflow: hidden;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 70%, transparent) 60%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px 22px;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--btn-text, #fff);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      width: fit-content;
+    }
+    .hero h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .hero-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--btn-text, #fff);
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font), sans-serif;
+    }
+    .btn-outline {
+      background: transparent;
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.7);
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font), sans-serif;
+    }
+
+    /* VARIANT LABEL */
+    .variant-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px 0;
+    }
+    .variant-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .variant-num {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* SWATCHES */
+    .swatches {
+      display: flex;
+      gap: 6px;
+      padding: 12px 20px;
+    }
+    .swatch {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .swatch-color {
+      width: 100%;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.07);
+    }
+    .swatch-hex {
+      font-size: 9px;
+      color: var(--muted);
+      font-family: 'Inter', monospace;
+      letter-spacing: 0.3px;
+    }
+    .swatch-label {
+      font-size: 8px;
+      color: var(--muted);
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* CARDS */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 14px 14px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .card-type {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .card-meta {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .card-badge {
+      display: inline-block;
+      margin-top: 8px;
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* MOOD */
+    .mood {
+      padding: 4px 20px 16px;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--muted);
+      border-top: 1px solid rgba(0,0,0,0.05);
+      margin: 0 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>ChesTourism — Brand Preview</h1>
+    <div class="subtitle">10 style variants &middot; All minimalist &amp; light</div>
+    <div class="domain">chesstourism.smartlaunchhub.com</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const CHESS_IMG = 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=900&q=75&fit=crop';
+
+    const variants = [
+      {
+        num: 1, name: 'Ivory Classic',
+        primary: '#1B3A6B', accent: '#C8A84C', bg: '#FBF8F3',
+        surface: '#F2EDE4', text: '#1B3A6B', muted: '#8A7B5A',
+        font: 'Playfair Display', btnText: '#1B3A6B',
+        mood: 'Prestigious, timeless — the heritage of classical chess.'
+      },
+      {
+        num: 2, name: 'Sky Open',
+        primary: '#2472A4', accent: '#E07030', bg: '#FFFFFF',
+        surface: '#F4F8FC', text: '#1A2E40', muted: '#7A8FA0',
+        font: 'Inter', btnText: '#fff',
+        mood: 'Clean, international — chess without borders.'
+      },
+      {
+        num: 3, name: 'Stone & Amber',
+        primary: '#2C3E50', accent: '#E6A817', bg: '#F8F4EE',
+        surface: '#EDE8DF', text: '#2C3E50', muted: '#7D7060',
+        font: 'Libre Baskerville', btnText: '#1A1A1A',
+        mood: 'Grounded, refined — strategy carved in stone.'
+      },
+      {
+        num: 4, name: 'Sage Journey',
+        primary: '#2E6B50', accent: '#6FA86A', bg: '#FAFDF8',
+        surface: '#EEF6EC', text: '#1D3D2C', muted: '#6B8A73',
+        font: 'DM Sans', btnText: '#fff',
+        mood: 'Fresh, natural, travel — chess through open landscapes.'
+      },
+      {
+        num: 5, name: 'Cobalt Coral',
+        primary: '#0054A6', accent: '#D96044', bg: '#FFFFFF',
+        surface: '#F0F5FF', text: '#001F4D', muted: '#6B7FA0',
+        font: 'Poppins', btnText: '#fff',
+        mood: 'Energetic, world travel — bold moves on a global board.'
+      },
+      {
+        num: 6, name: 'Parchment Map',
+        primary: '#4A2E1A', accent: '#9B7B1A', bg: '#F5EDD6',
+        surface: '#EDE0C0', text: '#3A2010', muted: '#8A6A40',
+        font: 'Lora', btnText: '#fff',
+        mood: 'Vintage, explorer — chess journeys etched on old maps.'
+      },
+      {
+        num: 7, name: 'Arctic Pure',
+        primary: '#002366', accent: '#CC8800', bg: '#FFFFFF',
+        surface: '#F5F7FA', text: '#001540', muted: '#6A7A9A',
+        font: 'Plus Jakarta Sans', btnText: '#fff',
+        mood: 'Ultra-clean, elite — where champions think clearly.'
+      },
+      {
+        num: 8, name: 'Champagne Club',
+        primary: '#3D1C5A', accent: '#C49A30', bg: '#FDF5E6',
+        surface: '#F2E8D4', text: '#2A1040', muted: '#8A6A50',
+        font: 'Cormorant Garamond', btnText: '#2A1040',
+        mood: 'Luxury club — exclusive gatherings, fine play, champagne.'
+      },
+      {
+        num: 9, name: 'Forest Trail',
+        primary: '#2D5016', accent: '#C49A40', bg: '#FAFDF7',
+        surface: '#EDF5E6', text: '#1A3008', muted: '#6A8050',
+        font: 'Nunito', btnText: '#fff',
+        mood: 'Nature, adventure — discover chess along forest trails.'
+      },
+      {
+        num: 10, name: 'Ink & Teal',
+        primary: '#1A1A2E', accent: '#009999', bg: '#FFFFFF',
+        surface: '#F0F6F6', text: '#0D0D1F', muted: '#5A6A7A',
+        font: 'Manrope', btnText: '#fff',
+        mood: 'Contemporary, digital — chess in the connected era.'
+      }
+    ];
+
+    const commissionerCards = [
+      { name: 'Anna Koroleva', role: 'Chief Commissioner', country: 'Russia', events: '12 tournaments' },
+      { name: 'Pierre Dubois', role: 'FIDE Delegate', country: 'France', events: '8 tournaments' },
+      { name: 'Kenji Watanabe', role: 'Asia Commissioner', country: 'Japan', events: '15 tournaments' },
+      { name: 'Sofia Andrade', role: 'Regional Head', country: 'Brazil', events: '6 tournaments' },
+      { name: 'Marcus Berg', role: 'Lead Commissioner', country: 'Sweden', events: '10 tournaments' },
+      { name: 'Elena Pappa', role: 'EU Director', country: 'Greece', events: '9 tournaments' },
+      { name: 'David Chen', role: 'World Coordinator', country: 'Singapore', events: '18 tournaments' },
+      { name: 'Isabelle Morel', role: 'Grand Commissioner', country: 'Belgium', events: '11 tournaments' },
+      { name: 'Arjun Mehta', role: 'South Asia Head', country: 'India', events: '14 tournaments' },
+      { name: 'Lena Svensson', role: 'Nordic Director', country: 'Denmark', events: '7 tournaments' }
+    ];
+
+    const tournaments = [
+      { name: 'Vienna Open 2025', location: 'Vienna, Austria', date: 'Sept 12–18', players: '240 players' },
+      { name: 'Prague Grand Prix', location: 'Prague, Czech Republic', date: 'Oct 3–9', players: '180 players' },
+      { name: 'Kyoto Classic', location: 'Kyoto, Japan', date: 'Nov 1–7', players: '160 players' },
+      { name: 'Rio Summer Cup', location: 'Rio de Janeiro, Brazil', date: 'Jan 15–21', players: '200 players' },
+      { name: 'Stockholm Masters', location: 'Stockholm, Sweden', date: 'Feb 8–14', players: '220 players' },
+      { name: 'Athens Heritage', location: 'Athens, Greece', date: 'Mar 5–11', players: '150 players' },
+      { name: 'Singapore Rapid', location: 'Singapore', date: 'Apr 20–26', players: '300 players' },
+      { name: 'Brussels Invitational', location: 'Brussels, Belgium', date: 'May 10–16', players: '140 players' },
+      { name: 'Mumbai Grand Open', location: 'Mumbai, India', date: 'June 2–8', players: '260 players' },
+      { name: 'Copenhagen Cup', location: 'Copenhagen, Denmark', date: 'July 14–20', players: '190 players' }
+    ];
+
+    const grid = document.getElementById('grid');
+
+    variants.forEach((v, i) => {
+      const c = commissionerCards[i];
+      const t = tournaments[i];
+
+      const el = document.createElement('div');
+      el.className = 'variant';
+      el.style.cssText = [
+        `--primary:${v.primary}`,
+        `--accent:${v.accent}`,
+        `--bg:${v.bg}`,
+        `--surface:${v.surface}`,
+        `--text:${v.text}`,
+        `--muted:${v.muted}`,
+        `--font:${v.font}`,
+        `--btn-text:${v.btnText}`
+      ].join(';');
+
+      el.innerHTML = `
+        <div class="hero">
+          <img src="${CHESS_IMG}" alt="Chess" loading="lazy" />
+          <div class="hero-overlay">
+            <span class="hero-tag">International Chess Tourism</span>
+            <h2>Where Chess Meets the World</h2>
+            <div class="hero-btns">
+              <button class="btn-primary">Explore Tours</button>
+              <button class="btn-outline">View Schedule</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="variant-label">
+          <span class="variant-name">${v.name}</span>
+          <span class="variant-num">#${v.num} &middot; ${v.font}</span>
+        </div>
+
+        <div class="swatches">
+          ${[
+            ['primary', v.primary],
+            ['accent', v.accent],
+            ['bg', v.bg],
+            ['surface', v.surface],
+            ['text', v.text]
+          ].map(([label, hex]) => `
+            <div class="swatch">
+              <div class="swatch-color" style="background:${hex}"></div>
+              <div class="swatch-hex">${hex}</div>
+              <div class="swatch-label">${label}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <div class="card-type">Commissioner</div>
+            <div class="card-title">${c.name}</div>
+            <div class="card-meta">${c.role}<br />${c.country}</div>
+            <span class="card-badge">${c.events}</span>
+          </div>
+          <div class="card">
+            <div class="card-type">Tournament</div>
+            <div class="card-title">${t.name}</div>
+            <div class="card-meta">${t.location}<br />${t.date}</div>
+            <span class="card-badge">${t.players}</span>
+          </div>
+        </div>
+
+        <div class="mood">${v.mood}</div>
+      `;
+
+      grid.appendChild(el);
+    });
+  </script>
+</body>
+</html>
