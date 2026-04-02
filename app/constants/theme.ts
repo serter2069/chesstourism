@@ -1,6 +1,6 @@
 /**
- * FIDE Navy Gold — Brand Design System (canonical reference)
- * Source: public/brand.html + public/palette.html
+ * Clay — Brand Design System (canonical reference)
+ * Source: public/brand.html
  *
  * This file is the single source of truth for brand tokens.
  * The root constants/ files (colors.ts, typography.ts, spacing.ts)
@@ -8,29 +8,29 @@
  */
 
 export const colors = {
-  primary: '#0D1B3E',
-  primaryLight: '#1A2D5A',
-  accent: '#C59A1A',
-  accentLight: '#D4AF37',
-  background: '#F5F1E8',
-  surface: '#FAF7F2',
+  primary: '#2A1510',
+  primaryLight: '#5A3528',
+  accent: '#C4664A',
+  accentLight: '#D8886A',
+  background: '#FAF2EC',
+  surface: '#F2E8E0',
   surfaceWhite: '#FFFFFF',
-  text: '#1A1A1A',
-  textMuted: '#5C6B8A',
+  text: '#2A1510',
+  textMuted: '#9A7060',
   textOnPrimary: '#FFFFFF',
-  textOnAccent: '#0D1B3E',
-  border: '#DDE3ED',
+  textOnAccent: '#FFFFFF',
+  border: '#DDD0C8',
   error: '#C0392B',
   success: '#27AE60',
 } as const;
 
 export const fonts = {
-  heading: 'PlayfairDisplay_700Bold',
-  headingSemiBold: 'PlayfairDisplay_600SemiBold',
-  body: 'Inter_400Regular',
-  bodyMedium: 'Inter_500Medium',
-  bodySemiBold: 'Inter_600SemiBold',
-  bodyBold: 'Inter_700Bold',
+  heading: 'Nunito_800ExtraBold',
+  headingSemiBold: 'Nunito_600SemiBold',
+  body: 'Nunito_400Regular',
+  bodyMedium: 'Nunito_600SemiBold',
+  bodySemiBold: 'Nunito_600SemiBold',
+  bodyBold: 'Nunito_700Bold',
 } as const;
 
 export const spacing = {

@@ -1,17 +1,17 @@
-// Typography tokens — FIDE Navy Gold (Playfair Display headings, Inter body)
+// Typography tokens — Clay palette (Nunito throughout, source: brand.html)
 export const Typography = {
-  // Heading font (Playfair Display — serif, classic, prestigious)
-  fontFamilyHeading: 'PlayfairDisplay_700Bold',
-  fontFamilyHeadingSemiBold: 'PlayfairDisplay_600SemiBold',
+  // Heading font (Nunito — warm, rounded, friendly)
+  fontFamilyHeading: 'Nunito_800ExtraBold',
+  fontFamilyHeadingSemiBold: 'Nunito_600SemiBold',
 
-  // Body font (Inter — clean, modern, highly legible)
-  fontFamily: 'Inter_400Regular',
-  fontFamilyMedium: 'Inter_500Medium',
-  fontFamilySemiBold: 'Inter_600SemiBold',
-  fontFamilyBold: 'Inter_700Bold',
+  // Body font (Nunito — consistent with headings per brand.html)
+  fontFamily: 'Nunito_400Regular',
+  fontFamilyMedium: 'Nunito_600SemiBold',
+  fontFamilySemiBold: 'Nunito_600SemiBold',
+  fontFamilyBold: 'Nunito_700Bold',
 
   // Legacy aliases (backwards compat)
-  fontFamilyExtraBold: 'Inter_700Bold',
+  fontFamilyExtraBold: 'Nunito_800ExtraBold',
 
   sizes: {
     xs: 12,
