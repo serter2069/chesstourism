@@ -44,7 +44,7 @@ router.get('/', async (req: Request, res: Response) => {
         _count: {
           select: {
             tournamentRegistrations: {
-              where: { status: 'APPROVED' },
+              where: { status: { in: ['APPROVED', 'PAID'] } },
             },
           },
         },
@@ -111,7 +111,7 @@ router.get('/my', authenticate, async (req: AuthRequest, res: Response) => {
           _count: {
             select: {
               tournamentRegistrations: {
-                where: { status: 'APPROVED' },
+                where: { status: { in: ['APPROVED', 'PAID'] } },
               },
             },
           },

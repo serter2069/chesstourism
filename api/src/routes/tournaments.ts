@@ -898,7 +898,7 @@ router.get('/tournaments/:id/my-certificate', authenticate, async (req: AuthRequ
       where: { tournamentId_userId: { tournamentId, userId } },
     });
 
-    if (!registration || registration.status !== 'APPROVED') {
+    if (!registration || !['APPROVED', 'PAID'].includes(registration.status)) {
       res.status(403).json({ error: 'You do not have an approved registration for this tournament' });
       return;
     }
