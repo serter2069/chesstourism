@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { Button, Card, Badge, LoadingSpinner, Input } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, Input, WatchlistButton } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
@@ -267,6 +267,7 @@ export default function TournamentsListScreen() {
               <Card>
                 <View style={styles.cardHeader}>
                   <Text style={styles.cardTitle} numberOfLines={2}>{t.title}</Text>
+                  <WatchlistButton tournamentId={t.id} size={20} />
                   <Badge label={badge.label} status={badge.status} />
                 </View>
                 <View style={styles.cardMeta}>

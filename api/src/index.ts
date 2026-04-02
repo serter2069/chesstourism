@@ -10,6 +10,7 @@ import tournamentRouter from './routes/tournaments';
 import paymentsRouter from './routes/payments';
 import profileRouter from './routes/profile';
 import fideRouter from './routes/fide';
+import watchlistRouter from './routes/watchlist';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/api', tournamentRouter);
 app.use('/api', paymentsRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/profile', fideRouter);
+app.use('/api', watchlistRouter);
 
 app.listen(PORT, () => {
   console.log(`ChesTourism API running on port ${PORT}`);

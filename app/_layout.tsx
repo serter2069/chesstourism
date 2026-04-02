@@ -4,6 +4,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { useBrandFonts } from './constants/fonts';
 import { Colors } from '../constants/colors';
 import { AuthProvider } from '../store/auth';
+import { WatchlistProvider } from '../store/watchlist';
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useBrandFonts();
@@ -18,13 +19,15 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: Colors.bgPrimary },
-        }}
-      />
+      <WatchlistProvider>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: Colors.bgPrimary },
+          }}
+        />
+      </WatchlistProvider>
     </AuthProvider>
   );
 }

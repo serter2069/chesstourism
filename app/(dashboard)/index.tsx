@@ -244,6 +244,12 @@ export default function DashboardScreen() {
               variant="secondary"
               style={styles.linkBtn}
             />
+            <Button
+              title="Watchlist"
+              onPress={() => router.push('/(dashboard)/watchlist' as any)}
+              variant="secondary"
+              style={styles.linkBtn}
+            />
           </View>
         </View>
 
