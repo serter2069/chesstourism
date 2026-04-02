@@ -9,6 +9,7 @@ interface UserSummary {
   userId: string;
   name: string;
   city: string | null;
+  country: string | null;
   fideTitle: string | null;
   effectiveRating: number;
   tournamentCount: number;
@@ -26,18 +27,51 @@ function effectiveRating(fideRating: number | null, rating: number): number {
   return rating;
 }
 
-// GET /api/ratings — leaderboard (top 50, paginated)
+// GET /api/ratings/countries — distinct countries with player counts
+router.get('/countries', async (_req: Request, res: Response) => {
+  try {
+    const rows = await prisma.user.groupBy({
+      by: ['country'],
+      where: {
+        role: 'PARTICIPANT',
+        country: { not: null },
+      },
+      _count: { id: true },
+      orderBy: { country: 'asc' },
+    });
+
+    const countries = rows
+      .filter((r) => r.country !== null)
+      .map((r) => ({ country: r.country as string, count: r._count.id }));
+
+    res.json({ countries });
+  } catch (err: any) {
+    console.error('Ratings countries error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/ratings — leaderboard (top 50, paginated). Supports ?country= filter
 router.get('/', async (req: Request, res: Response) => {
   try {
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
     const skip = (page - 1) * limit;
+    const countryFilter = typeof req.query.country === 'string' && req.query.country.trim()
+      ? req.query.country.trim()
+      : null;
+
+    const where: any = { role: 'PARTICIPANT' };
+    if (countryFilter) {
+      where.country = { equals: countryFilter, mode: 'insensitive' };
+    }
 
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
         city: true,
+        country: true,
         rating: true,
         fideRating: true,
         fideTitle: true,
@@ -49,9 +83,7 @@ router.get('/', async (req: Request, res: Response) => {
           },
         },
       },
-      where: {
-        role: 'PARTICIPANT',
-      },
+      where,
     });
 
     type UserRow = typeof users[0];
@@ -62,6 +94,7 @@ router.get('/', async (req: Request, res: Response) => {
         userId: u.id,
         name: u.name ?? 'Unknown',
         city: u.city ?? null,
+        country: u.country ?? null,
         fideTitle: u.fideTitle ?? null,
         effectiveRating: effectiveRating(u.fideRating, u.rating),
         tournamentCount: u._count.tournamentRegistrations,
@@ -78,6 +111,7 @@ router.get('/', async (req: Request, res: Response) => {
       userId: u.userId,
       name: u.name,
       city: u.city,
+      country: u.country,
       fideTitle: u.fideTitle,
       rating: u.effectiveRating,
       tournamentCount: u.tournamentCount,

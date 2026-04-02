@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   FlatList,
+  ScrollView,
+  TouchableOpacity,
   StyleSheet,
   TextInput,
   ListRenderItemInfo,
@@ -15,14 +17,57 @@ import { Typography } from '../../constants/typography';
 import { useAuth } from '../../store/auth';
 import api from '../../lib/api';
 
+// Country flag emoji mapping (reused from commissars)
+const COUNTRY_FLAGS: Record<string, string> = {
+  Russia: '\u{1F1F7}\u{1F1FA}',
+  USA: '\u{1F1FA}\u{1F1F8}',
+  China: '\u{1F1E8}\u{1F1F3}',
+  India: '\u{1F1EE}\u{1F1F3}',
+  Germany: '\u{1F1E9}\u{1F1EA}',
+  France: '\u{1F1EB}\u{1F1F7}',
+  Spain: '\u{1F1EA}\u{1F1F8}',
+  Norway: '\u{1F1F3}\u{1F1F4}',
+  Brazil: '\u{1F1E7}\u{1F1F7}',
+  Japan: '\u{1F1EF}\u{1F1F5}',
+  Egypt: '\u{1F1EA}\u{1F1EC}',
+  Ireland: '\u{1F1EE}\u{1F1EA}',
+  Italy: '\u{1F1EE}\u{1F1F9}',
+  Sweden: '\u{1F1F8}\u{1F1EA}',
+  UK: '\u{1F1EC}\u{1F1E7}',
+  Netherlands: '\u{1F1F3}\u{1F1F1}',
+  Poland: '\u{1F1F5}\u{1F1F1}',
+  Hungary: '\u{1F1ED}\u{1F1FA}',
+  Ukraine: '\u{1F1FA}\u{1F1E6}',
+  Armenia: '\u{1F1E6}\u{1F1F2}',
+  Azerbaijan: '\u{1F1E6}\u{1F1FF}',
+  Turkey: '\u{1F1F9}\u{1F1F7}',
+  Israel: '\u{1F1EE}\u{1F1F1}',
+  Kazakhstan: '\u{1F1F0}\u{1F1FF}',
+  Uzbekistan: '\u{1F1FA}\u{1F1FF}',
+  Georgia: '\u{1F1EC}\u{1F1EA}',
+};
+
+function getFlag(country?: string | null): string {
+  if (!country) return '\u{1F3F3}\u{FE0F}';
+  return COUNTRY_FLAGS[country] || '\u{1F3F3}\u{FE0F}';
+}
+
+const ALL_COUNTRIES = 'All Countries';
+
 interface RatingEntry {
   rank: number;
   userId: string;
   name: string;
   city: string | null;
+  country: string | null;
   fideTitle: string | null;
   rating: number;
   tournamentCount: number;
+}
+
+interface CountryInfo {
+  country: string;
+  count: number;
 }
 
 interface MyRank {
@@ -80,13 +125,30 @@ export default function RatingsScreen() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [countries, setCountries] = useState<CountryInfo[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string>(ALL_COUNTRIES);
+  const countriesLoaded = useRef(false);
 
-  const fetchData = useCallback(async () => {
+  // Fetch countries list once on mount
+  useEffect(() => {
+    if (countriesLoaded.current) return;
+    api.get('/ratings/countries')
+      .then((res) => {
+        setCountries(res.data.countries || []);
+        countriesLoaded.current = true;
+      })
+      .catch(() => {});
+  }, []);
+
+  const fetchData = useCallback(async (country: string) => {
     try {
       setLoading(true);
       setError(null);
 
-      const ratingsReq = api.get('/ratings', { params: { page: 1, limit: 50 } });
+      const params: Record<string, string | number> = { page: 1, limit: 50 };
+      if (country !== ALL_COUNTRIES) params.country = country;
+
+      const ratingsReq = api.get('/ratings', { params });
       const myRankReq = user ? api.get('/ratings/my').catch(() => null) : Promise.resolve(null);
 
       const [ratingsRes, myRankRes] = await Promise.all([ratingsReq, myRankReq]);
@@ -105,8 +167,12 @@ export default function RatingsScreen() {
   }, [user]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchData(selectedCountry);
+  }, [fetchData, selectedCountry]);
+
+  const handleSelectCountry = useCallback((country: string) => {
+    setSelectedCountry(country);
+  }, []);
 
   // Client-side search filter
   const filteredRatings = useMemo(() => {
@@ -114,6 +180,12 @@ export default function RatingsScreen() {
     const q = searchQuery.trim().toLowerCase();
     return ratings.filter((r) => r.name.toLowerCase().includes(q));
   }, [ratings, searchQuery]);
+
+  // Chip list: "All Countries" + countries from API
+  const chipList = useMemo(
+    () => [ALL_COUNTRIES, ...countries.map((c) => c.country)],
+    [countries]
+  );
 
   const renderItem = useCallback(({ item }: ListRenderItemInfo<RatingEntry>) => {
     const isCurrentUser = user?.id === item.userId;
@@ -140,7 +212,7 @@ export default function RatingsScreen() {
           </Text>
         </View>
 
-        {/* Name + badge + city */}
+        {/* Name + badge + city/country */}
         <View style={styles.colName}>
           <View style={styles.nameRow}>
             <Text
@@ -151,8 +223,10 @@ export default function RatingsScreen() {
             </Text>
             {item.fideTitle ? <TitleBadge title={item.fideTitle} /> : null}
           </View>
-          {item.city ? (
-            <Text style={styles.cityText} numberOfLines={1}>{item.city}</Text>
+          {(item.city || item.country) ? (
+            <Text style={styles.cityText} numberOfLines={1}>
+              {[item.city, item.country].filter(Boolean).join(', ')}
+            </Text>
           ) : null}
         </View>
 
@@ -189,6 +263,34 @@ export default function RatingsScreen() {
   return (
     <SafeContainer>
       <Header />
+
+      {/* Country filter — horizontal scrollable chips */}
+      <View style={styles.chipsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsScroll}
+        >
+          {chipList.map((country) => {
+            const isActive = selectedCountry === country;
+            return (
+              <TouchableOpacity
+                key={country}
+                style={[styles.chip, isActive && styles.chipActive]}
+                onPress={() => handleSelectCountry(country)}
+                activeOpacity={0.7}
+              >
+                {country !== ALL_COUNTRIES && (
+                  <Text style={styles.chipFlag}>{getFlag(country)}</Text>
+                )}
+                <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
+                  {country}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       <View style={styles.container}>
         {/* My Rank card */}
@@ -235,6 +337,7 @@ export default function RatingsScreen() {
                 <View style={styles.footer}>
                   <Text style={styles.footerText}>
                     Showing {filteredRatings.length} of {pagination.total} players
+                    {selectedCountry !== ALL_COUNTRIES ? ` in ${selectedCountry}` : ''}
                   </Text>
                 </View>
               ) : null
@@ -247,6 +350,48 @@ export default function RatingsScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Country filter chips
+  chipsContainer: {
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderDefault,
+  },
+  chipsScroll: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.borderDefault,
+    backgroundColor: Colors.bgSurface,
+  },
+  chipActive: {
+    backgroundColor: Colors.brandPrimary,
+    borderColor: Colors.brandPrimary,
+  },
+  chipFlag: {
+    fontSize: Typography.sizes.sm,
+    marginRight: 4,
+  },
+  chipLabel: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textSecondary,
+    fontWeight: Typography.weights.medium,
+  },
+  chipLabelActive: {
+    color: '#FFFFFF',
+  },
+
   container: {
     flex: 1,
     maxWidth: 430,
