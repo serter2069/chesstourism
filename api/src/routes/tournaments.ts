@@ -148,16 +148,32 @@ async function getCommissioner(userId: string) {
   return prisma.commissioner.findUnique({ where: { userId } });
 }
 
+// ─── Helper: check commissioner is verified (skip for ADMIN) ───
+function assertCommissionerVerified(
+  commissioner: { isVerified: boolean } | null,
+  role: string,
+  res: Response,
+): boolean {
+  if (role === 'ADMIN') return true;
+  if (!commissioner || !commissioner.isVerified) {
+    res.status(403).json({ error: 'Commissioner account not verified yet' });
+    return false;
+  }
+  return true;
+}
+
 // POST /api/tournaments — create tournament (Commissioner/Admin only)
 router.post('/tournaments', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.user!;
+    const { userId, role } = req.user!;
     const commissioner = await getCommissioner(userId);
 
     if (!commissioner) {
       res.status(400).json({ error: 'Complete your commissioner profile first' });
       return;
     }
+
+    if (!assertCommissionerVerified(commissioner, role, res)) return;
 
     const { title, city, country, startDate, endDate, maxParticipants, fee, description, ratingLimit, timeControl, currency } = req.body;
 
@@ -211,7 +227,7 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -224,6 +240,8 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
       res.status(403).json({ error: 'Not authorized to edit this tournament' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const { title, city, country, startDate, endDate, maxParticipants, fee, description, ratingLimit, timeControl, currency, status } = req.body;
 
@@ -277,7 +295,7 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -289,6 +307,8 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
       res.status(403).json({ error: 'Not authorized' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const { status: newStatus } = req.body;
     if (!newStatus) {
@@ -334,7 +354,7 @@ router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADM
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -346,6 +366,8 @@ router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADM
       res.status(403).json({ error: 'Not authorized to delete this tournament' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     await prisma.tournament.delete({ where: { id: req.params.id } });
     res.json({ message: 'Tournament deleted' });
@@ -363,7 +385,7 @@ router.post('/tournaments/:id/results', authenticate, requireRole('COMMISSIONER'
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -375,6 +397,8 @@ router.post('/tournaments/:id/results', authenticate, requireRole('COMMISSIONER'
       res.status(403).json({ error: 'Not authorized to submit results for this tournament' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const { results } = req.body;
     if (!Array.isArray(results) || results.length === 0) {
@@ -552,7 +576,7 @@ router.get('/tournaments/:id/registrations', authenticate, requireRole('COMMISSI
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -564,6 +588,8 @@ router.get('/tournaments/:id/registrations', authenticate, requireRole('COMMISSI
       res.status(403).json({ error: 'Not authorized' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const registrations = await prisma.tournamentRegistration.findMany({
       where: { tournamentId: req.params.id },
@@ -586,7 +612,7 @@ router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('C
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -598,6 +624,8 @@ router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('C
       res.status(403).json({ error: 'Not authorized' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const { status } = req.body;
     if (!status || !['APPROVED', 'REJECTED', 'PENDING'].includes(status)) {
@@ -686,7 +714,7 @@ router.post('/tournaments/:id/photos', authenticate, requireRole('COMMISSIONER',
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -698,6 +726,8 @@ router.post('/tournaments/:id/photos', authenticate, requireRole('COMMISSIONER',
       res.status(403).json({ error: 'Not authorized' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const { url, caption } = req.body;
 
@@ -753,7 +783,7 @@ router.delete('/tournaments/:id/photos/:photoId', authenticate, requireRole('COM
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -765,6 +795,8 @@ router.delete('/tournaments/:id/photos/:photoId', authenticate, requireRole('COM
       res.status(403).json({ error: 'Not authorized' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     const photo = await prisma.tournamentPhoto.findFirst({
       where: { id: req.params.photoId, tournamentId: req.params.id },
@@ -792,7 +824,7 @@ router.patch('/tournaments/:id/participants/:userId/confirm-cash', authenticate,
 
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
-      include: { commissioner: { select: { userId: true } } },
+      include: { commissioner: { select: { userId: true, isVerified: true } } },
     });
 
     if (!tournament) {
@@ -805,6 +837,8 @@ router.patch('/tournaments/:id/participants/:userId/confirm-cash', authenticate,
       res.status(403).json({ error: 'Only the tournament commissioner can confirm cash payments' });
       return;
     }
+
+    if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
     if (!['REGISTRATION_OPEN', 'IN_PROGRESS'].includes(tournament.status)) {
       res.status(400).json({ error: 'Tournament must be in REGISTRATION_OPEN or IN_PROGRESS status' });
