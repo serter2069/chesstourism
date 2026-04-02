@@ -273,24 +273,26 @@ const styles = StyleSheet.create({
     paddingTop: Spacing['3xl'],
     paddingBottom: Spacing['3xl'],
     alignItems: 'center',
-    backgroundColor: '#F2E8E0',
+    backgroundColor: Colors.brandPrimary,
     borderBottomWidth: 1,
-    borderBottomColor: '#D9C9BF',
+    borderBottomColor: Colors.borderDefault,
   },
   heroIcon: {
     fontSize: 56,
     marginBottom: Spacing.lg,
+    color: Colors.brandAccent,
   },
   heroTitle: {
     fontSize: Typography.sizes['2xl'],
+    fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.textOnPrimary,
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
   heroSubtitle: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textOnPrimary,
     textAlign: 'center',
     lineHeight: Typography.sizes.base * Typography.lineHeights.normal,
     marginBottom: Spacing['2xl'],
@@ -320,13 +322,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: Typography.sizes.lg,
+    fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
     marginBottom: Spacing.md,
   },
   seeAll: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandPrimary,
+    color: Colors.brandAccent,
     fontWeight: Typography.weights.semibold,
     marginBottom: Spacing.md,
   },
@@ -380,7 +383,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingsRowEven: {
-    backgroundColor: '#F2E8E0',
+    backgroundColor: Colors.bgSecondary,
   },
   ratingsText: {
     fontSize: Typography.sizes.sm,
@@ -420,7 +423,7 @@ const styles = StyleSheet.create({
     marginRight: Spacing.md,
   },
   stepNumber: {
-    color: '#ffffff',
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
   },
@@ -445,6 +448,7 @@ const styles = StyleSheet.create({
   },
   ctaTitle: {
     fontSize: Typography.sizes.xl,
+    fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
     marginBottom: Spacing.sm,
