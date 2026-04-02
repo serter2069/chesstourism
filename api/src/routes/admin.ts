@@ -185,4 +185,98 @@ router.get('/tournaments', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// ─── COMMISSIONER APPROVAL ─────────────────────────────
+
+// GET /api/admin/commissars?status=pending — list commissioners for review
+router.get('/commissars', async (req: AuthRequest, res: Response) => {
+  try {
+    const { status } = req.query as { status?: string };
+
+    const where: Record<string, unknown> = {};
+    if (status === 'pending') {
+      where.isVerified = false;
+    } else if (status === 'approved') {
+      where.isVerified = true;
+    }
+
+    const commissars = await prisma.commissioner.findMany({
+      where,
+      orderBy: { user: { createdAt: 'desc' } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            city: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    res.json({ items: commissars });
+  } catch (err) {
+    console.error('Admin list commissars error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/admin/commissars/:id/approve — approve a commissioner
+router.patch('/commissars/:id/approve', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const existing = await prisma.commissioner.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ error: 'Commissioner not found' });
+      return;
+    }
+
+    const updated = await prisma.commissioner.update({
+      where: { id },
+      data: { isVerified: true },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Admin approve commissioner error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/admin/commissars/:id/reject — reject a commissioner
+router.patch('/commissars/:id/reject', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body as { reason?: string };
+
+    const existing = await prisma.commissioner.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ error: 'Commissioner not found' });
+      return;
+    }
+
+    const updated = await prisma.commissioner.update({
+      where: { id },
+      data: { isVerified: false },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    res.json({ ...updated, rejectionReason: reason || null });
+  } catch (err) {
+    console.error('Admin reject commissioner error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
