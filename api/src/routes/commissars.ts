@@ -1,7 +1,10 @@
 import { Router, Response } from 'express';
+import Redis from 'ioredis';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
+
 const router = Router();
+const redis = new Redis({ host: '127.0.0.1', port: 6379, lazyConnect: true });
 
 // GET /api/commissars — public list of all commissioners
 // Supports ?country= filter to return only commissioners from a specific country
@@ -185,6 +188,80 @@ router.post('/register', authenticate, async (req: AuthRequest, res: Response) =
     });
   } catch (err: any) {
     console.error('Register as commissioner error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/commissars/:userId/stats — aggregate stats for a commissioner by userId
+// Cached in Redis/Valkey for 5 minutes
+router.get('/:userId/stats', async (req: any, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const cacheKey = `commissar:stats:${userId}`;
+
+    // Try cache first
+    const cached = await redis.get(cacheKey).catch(() => null);
+    if (cached) {
+      res.json(JSON.parse(cached));
+      return;
+    }
+
+    // Find commissioner by userId
+    const commissioner = await prisma.commissioner.findUnique({
+      where: { userId },
+    });
+    if (!commissioner) {
+      res.status(404).json({ error: 'Commissioner not found' });
+      return;
+    }
+
+    // Fetch all tournaments with approved/paid registrations and participant ratings
+    const tournaments = await prisma.tournament.findMany({
+      where: { commissionerId: commissioner.id },
+      orderBy: { startDate: 'desc' },
+      select: {
+        startDate: true,
+        registrations: {
+          where: { status: { in: ['APPROVED', 'PAID'] } },
+          select: {
+            user: { select: { rating: true } },
+          },
+        },
+      },
+    });
+
+    const tournamentsHosted = tournaments.length;
+    const allParticipants = tournaments.flatMap((t: any) => t.registrations);
+    const totalParticipants = allParticipants.length;
+    const averageParticipants =
+      tournamentsHosted > 0
+        ? Math.round(totalParticipants / tournamentsHosted)
+        : 0;
+
+    const ratings = allParticipants
+      .map((r: any) => r.user?.rating)
+      .filter((v: any): v is number => typeof v === 'number' && v > 0);
+    const averageParticipantElo =
+      ratings.length > 0
+        ? Math.round(ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length)
+        : 0;
+
+    const lastTournamentDate = tournaments.length > 0 ? tournaments[0].startDate : null;
+
+    const stats = {
+      tournamentsHosted,
+      totalParticipants,
+      averageParticipants,
+      averageParticipantElo,
+      lastTournamentDate,
+    };
+
+    // Cache for 5 minutes (300 seconds)
+    await redis.setex(cacheKey, 300, JSON.stringify(stats)).catch(() => {});
+
+    res.json(stats);
+  } catch (err: any) {
+    console.error('Commissioner stats error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
