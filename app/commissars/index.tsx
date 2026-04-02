@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+// TODO: replace with react-native-maps when native build is set up
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   FlatList,
+  ScrollView,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
@@ -15,7 +16,7 @@ import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import api from '../../lib/api';
 
-// Country flag emoji helper
+// Country flag emoji mapping
 const COUNTRY_FLAGS: Record<string, string> = {
   Russia: '\u{1F1F7}\u{1F1FA}',
   USA: '\u{1F1FA}\u{1F1F8}',
@@ -44,23 +45,23 @@ function getFlag(country?: string | null): string {
   return COUNTRY_FLAGS[country] || '\u{1F3F3}\u{FE0F}';
 }
 
+const ALL_COUNTRIES = 'All Countries';
+
 interface CommissarUser {
   id: string;
   name: string;
-  surname: string;
-  country?: string | null;
-  city?: string | null;
-  avatar_url?: string | null;
 }
 
 interface Commissar {
   id: string;
-  user_id: string;
-  experience_years: number;
-  specializations: string[];
-  rating: number;
-  approved: boolean;
+  userId: string;
+  specialization: string | null;
+  country: string | null;
+  city: string | null;
+  photoUrl: string | null;
+  isVerified: boolean;
   user: CommissarUser;
+  tournamentsCount: number;
 }
 
 interface GroupedSection {
@@ -72,56 +73,49 @@ interface GroupedSection {
 export default function CommissarsScreen() {
   const router = useRouter();
   const [commissars, setCommissars] = useState<Commissar[]>([]);
+  const [countries, setCountries] = useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string>(ALL_COUNTRIES);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState('');
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  // Track whether countries list has been loaded (only needed on first fetch)
+  const countriesLoaded = useRef(false);
 
-  const fetchCommissars = useCallback(async (pageNum: number, reset: boolean) => {
+  const fetchCommissars = useCallback(async (country: string) => {
     try {
-      if (reset) setLoading(true);
-      else setLoadingMore(true);
-
-      const params: Record<string, string | number> = { page: pageNum, limit: 20 };
-      if (filter.trim()) params.country = filter.trim();
+      setLoading(true);
+      const params: Record<string, string> = {};
+      if (country !== ALL_COUNTRIES) params.country = country;
 
       const res = await api.get('/commissars', { params });
-      const { data, pagination } = res.data;
+      const { data, countries: countryList } = res.data;
 
-      if (reset) {
-        setCommissars(data);
-      } else {
-        setCommissars((prev) => [...prev, ...data]);
+      setCommissars(data);
+      // Only update countries list on first load (no filter active) to keep chips stable
+      if (!countriesLoaded.current && countryList) {
+        setCountries(countryList);
+        countriesLoaded.current = true;
       }
-      setHasMore(pageNum < pagination.totalPages);
       setError(null);
     } catch {
       setError('Failed to load commissars');
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
-  }, [filter]);
+  }, []);
 
   useEffect(() => {
-    setPage(1);
-    fetchCommissars(1, true);
-  }, [fetchCommissars]);
+    fetchCommissars(selectedCountry);
+  }, [selectedCountry, fetchCommissars]);
 
-  const loadMore = useCallback(() => {
-    if (!hasMore || loadingMore) return;
-    const next = page + 1;
-    setPage(next);
-    fetchCommissars(next, false);
-  }, [page, hasMore, loadingMore, fetchCommissars]);
+  const handleSelectCountry = useCallback((country: string) => {
+    setSelectedCountry(country);
+  }, []);
 
-  // Group by country
+  // Group commissars by country for the section list view
   const sections = useMemo<GroupedSection[]>(() => {
     const map = new Map<string, Commissar[]>();
     for (const c of commissars) {
-      const country = c.user.country || 'Unknown';
+      const country = c.country || 'Unknown';
       if (!map.has(country)) map.set(country, []);
       map.get(country)!.push(c);
     }
@@ -134,7 +128,7 @@ export default function CommissarsScreen() {
       }));
   }, [commissars]);
 
-  // Flatten for FlatList with section headers
+  // Flatten sections into a single list for FlatList (headers + commissar rows)
   type ListItem =
     | { type: 'header'; country: string; flag: string; key: string }
     | { type: 'commissar'; data: Commissar; key: string };
@@ -166,58 +160,76 @@ export default function CommissarsScreen() {
     }
 
     const c = item.data;
-    const fullName = `${c.user.name} ${c.user.surname}`;
-    const location = [c.user.city, c.user.country].filter(Boolean).join(', ');
+    const fullName = c.user.name || 'Unknown';
+    const location = [c.city, c.country].filter(Boolean).join(', ');
 
     return (
       <TouchableOpacity
-        onPress={() => router.push(`/commissars/${c.user_id}`)}
+        onPress={() => router.push(`/commissars/${c.userId}`)}
         activeOpacity={0.7}
       >
         <Card style={styles.card}>
           <View style={styles.cardRow}>
-            <Avatar uri={c.user.avatar_url} name={fullName} size={48} />
+            <Avatar uri={c.photoUrl} name={fullName} size={48} />
             <View style={styles.cardInfo}>
-              <Text style={styles.name}>{fullName}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{fullName}</Text>
+                {c.isVerified && (
+                  <Badge label="Verified" status="success" />
+                )}
+              </View>
               {location ? (
                 <Text style={styles.location}>{location}</Text>
               ) : null}
-              <View style={styles.meta}>
-                <Text style={styles.metaText}>
-                  {c.experience_years} yr{c.experience_years !== 1 ? 's' : ''} exp
-                </Text>
-                <Text style={styles.ratingText}>Rating: {c.rating}</Text>
-              </View>
+              {c.specialization ? (
+                <Text style={styles.specialization}>{c.specialization}</Text>
+              ) : null}
+              <Text style={styles.metaText}>
+                {c.tournamentsCount} tournament{c.tournamentsCount !== 1 ? 's' : ''}
+              </Text>
             </View>
           </View>
-          {c.specializations && c.specializations.length > 0 && (
-            <View style={styles.badges}>
-              {c.specializations.map((s) => (
-                <Badge key={s} label={s} status="info" />
-              ))}
-            </View>
-          )}
         </Card>
       </TouchableOpacity>
     );
   }, [router]);
 
+  // Chip list: "All Countries" + all known countries from backend
+  const chipList = useMemo(
+    () => [ALL_COUNTRIES, ...countries],
+    [countries]
+  );
+
   return (
     <SafeContainer>
       <Header />
-      <View style={styles.filterRow}>
-        <TextInput
-          style={styles.filterInput}
-          placeholder="Filter by country..."
-          placeholderTextColor={Colors.textMuted}
-          value={filter}
-          onChangeText={setFilter}
-          returnKeyType="search"
-          onSubmitEditing={() => {
-            setPage(1);
-            fetchCommissars(1, true);
-          }}
-        />
+
+      {/* Country filter — horizontal scrollable chips */}
+      <View style={styles.chipsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsScroll}
+        >
+          {chipList.map((country) => {
+            const isActive = selectedCountry === country;
+            return (
+              <TouchableOpacity
+                key={country}
+                style={[styles.chip, isActive && styles.chipActive]}
+                onPress={() => handleSelectCountry(country)}
+                activeOpacity={0.7}
+              >
+                {country !== ALL_COUNTRIES && (
+                  <Text style={styles.chipFlag}>{getFlag(country)}</Text>
+                )}
+                <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
+                  {country}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {loading ? (
@@ -237,15 +249,7 @@ export default function CommissarsScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.key}
           contentContainerStyle={styles.list}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.3}
-          ListFooterComponent={
-            loadingMore ? (
-              <View style={styles.footer}>
-                <LoadingSpinner size="small" />
-              </View>
-            ) : null
-          }
+          maxToRenderPerBatch={20}
         />
       )}
     </SafeContainer>
@@ -253,24 +257,52 @@ export default function CommissarsScreen() {
 }
 
 const styles = StyleSheet.create({
-  filterRow: {
+  chipsContainer: {
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderDefault,
+  },
+  chipsScroll: {
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  filterInput: {
-    backgroundColor: Colors.bgSurface,
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: Colors.borderDefault,
-    borderRadius: 8,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    color: Colors.textPrimary,
+    backgroundColor: Colors.bgSurface,
+  },
+  chipActive: {
+    backgroundColor: Colors.brandPrimary,
+    borderColor: Colors.brandPrimary,
+  },
+  chipFlag: {
     fontSize: Typography.sizes.sm,
-    minHeight: 40,
+    marginRight: 4,
+  },
+  chipLabel: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textSecondary,
+    fontWeight: Typography.weights.medium,
+  },
+  chipLabelActive: {
+    color: '#FFFFFF',
   },
   list: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing['3xl'],
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -298,6 +330,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: Spacing.md,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    flexWrap: 'wrap',
+  },
   name: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
@@ -308,25 +346,16 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: 2,
   },
-  meta: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    marginTop: Spacing.xs,
+  specialization: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+    marginTop: 2,
   },
   metaText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textMuted,
-  },
-  ratingText: {
-    fontSize: Typography.sizes.xs,
     color: Colors.brandPrimary,
     fontWeight: Typography.weights.medium,
-  },
-  badges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.xs,
-    marginTop: Spacing.md,
+    marginTop: Spacing.xs,
   },
   empty: {
     flex: 1,
@@ -340,8 +369,5 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: Typography.sizes.base,
     color: Colors.textSecondary,
-  },
-  footer: {
-    paddingVertical: Spacing.lg,
   },
 });
