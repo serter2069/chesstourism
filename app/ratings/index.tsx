@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   TextInput,
+  ListRenderItemInfo,
 } from 'react-native';
 import { SafeContainer, Header } from '../../components/layout';
-import { Button, LoadingSpinner } from '../../components/ui';
+import { LoadingSpinner } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
@@ -18,13 +19,18 @@ interface RatingEntry {
   rank: number;
   userId: string;
   name: string;
-  surname: string;
-  country?: string | null;
-  elo: number;
-  games_played: number;
-  wins: number;
-  losses: number;
-  draws: number;
+  city: string | null;
+  fideTitle: string | null;
+  rating: number;
+  tournamentCount: number;
+}
+
+interface MyRank {
+  rank: number;
+  total: number;
+  rating: number;
+  fideTitle: string | null;
+  name: string;
 }
 
 interface Pagination {
@@ -34,168 +40,275 @@ interface Pagination {
   totalPages: number;
 }
 
+// Medal colors for top-3
+const MEDAL_COLORS: Record<number, string> = {
+  1: Colors.brandAccent,   // gold
+  2: '#9EA3A8',             // silver
+  3: '#CD7F32',             // bronze
+};
+
+function TitleBadge({ title }: { title: string }) {
+  return (
+    <View style={styles.badge}>
+      <Text style={styles.badgeText}>{title}</Text>
+    </View>
+  );
+}
+
+function MyRankCard({ myRank }: { myRank: MyRank }) {
+  return (
+    <View style={styles.myRankCard}>
+      <View style={styles.myRankLeft}>
+        <Text style={styles.myRankLabel}>MY RANK</Text>
+        <Text style={styles.myRankName} numberOfLines={1}>{myRank.name}</Text>
+        {myRank.fideTitle ? <TitleBadge title={myRank.fideTitle} /> : null}
+      </View>
+      <View style={styles.myRankRight}>
+        <Text style={styles.myRankPosition}>#{myRank.rank}</Text>
+        <Text style={styles.myRankRating}>{myRank.rating}</Text>
+        <Text style={styles.myRankTotal}>of {myRank.total}</Text>
+      </View>
+    </View>
+  );
+}
+
 export default function RatingsScreen() {
   const { user } = useAuth();
   const [ratings, setRatings] = useState<RatingEntry[]>([]);
+  const [myRank, setMyRank] = useState<MyRank | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState('');
-  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const fetchRatings = useCallback(async (pageNum: number, reset: boolean) => {
+  const fetchData = useCallback(async () => {
     try {
-      if (reset) setLoading(true);
-      else setLoadingMore(true);
-
-      const params: Record<string, string | number> = { page: pageNum, limit: 50 };
-      if (filter.trim()) params.country = filter.trim();
-
-      const res = await api.get('/ratings', { params });
-      const { data, pagination: pag } = res.data;
-
-      if (reset) {
-        setRatings(data);
-      } else {
-        setRatings((prev) => [...prev, ...data]);
-      }
-      setPagination(pag);
+      setLoading(true);
       setError(null);
+
+      const ratingsReq = api.get('/ratings', { params: { page: 1, limit: 50 } });
+      const myRankReq = user ? api.get('/ratings/my').catch(() => null) : Promise.resolve(null);
+
+      const [ratingsRes, myRankRes] = await Promise.all([ratingsReq, myRankReq]);
+
+      setRatings(ratingsRes.data.data);
+      setPagination(ratingsRes.data.pagination);
+
+      if (myRankRes) {
+        setMyRank(myRankRes.data);
+      }
     } catch {
       setError('Failed to load ratings');
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
-  }, [filter]);
+  }, [user]);
 
   useEffect(() => {
-    setPage(1);
-    fetchRatings(1, true);
-  }, [fetchRatings]);
+    fetchData();
+  }, [fetchData]);
 
-  const loadMore = useCallback(() => {
-    if (!pagination || page >= pagination.totalPages || loadingMore) return;
-    const next = page + 1;
-    setPage(next);
-    fetchRatings(next, false);
-  }, [page, pagination, loadingMore, fetchRatings]);
+  // Client-side search filter
+  const filteredRatings = useMemo(() => {
+    if (!searchQuery.trim()) return ratings;
+    const q = searchQuery.trim().toLowerCase();
+    return ratings.filter((r) => r.name.toLowerCase().includes(q));
+  }, [ratings, searchQuery]);
 
-  const hasMore = pagination ? page < pagination.totalPages : false;
-
-  const renderHeader = () => (
-    <View style={styles.tableHeader}>
-      <Text style={[styles.colRank, styles.headerText]}>#</Text>
-      <Text style={[styles.colName, styles.headerText]}>Name</Text>
-      <Text style={[styles.colCountry, styles.headerText]}>Country</Text>
-      <Text style={[styles.colElo, styles.headerText]}>ELO</Text>
-      <Text style={[styles.colWld, styles.headerText]}>W/L/D</Text>
-    </View>
-  );
-
-  const renderItem = useCallback(({ item }: { item: RatingEntry }) => {
+  const renderItem = useCallback(({ item }: ListRenderItemInfo<RatingEntry>) => {
     const isCurrentUser = user?.id === item.userId;
+    const medalColor = MEDAL_COLORS[item.rank];
+    const isTop3 = item.rank <= 3;
 
     return (
-      <View style={[styles.tableRow, isCurrentUser && styles.highlightRow]}>
-        <Text style={[styles.colRank, styles.cellText, isCurrentUser && styles.highlightText]}>
-          {item.rank}
-        </Text>
-        <Text
-          style={[styles.colName, styles.cellText, isCurrentUser && styles.highlightText]}
-          numberOfLines={1}
-        >
-          {item.name} {item.surname}
-        </Text>
-        <Text
-          style={[styles.colCountry, styles.cellTextSmall]}
-          numberOfLines={1}
-        >
-          {item.country || '-'}
-        </Text>
-        <Text style={[styles.colElo, styles.cellElo, isCurrentUser && styles.highlightText]}>
-          {item.elo}
-        </Text>
-        <Text style={[styles.colWld, styles.cellTextSmall]}>
-          {item.wins}/{item.losses}/{item.draws}
-        </Text>
+      <View
+        style={[
+          styles.row,
+          isTop3 && styles.top3Row,
+          isCurrentUser && styles.currentUserRow,
+        ]}
+      >
+        {/* Rank */}
+        <View style={styles.colRank}>
+          <Text
+            style={[
+              styles.rankText,
+              isTop3 && { color: medalColor, fontWeight: Typography.weights.bold },
+            ]}
+          >
+            {item.rank}
+          </Text>
+        </View>
+
+        {/* Name + badge + city */}
+        <View style={styles.colName}>
+          <View style={styles.nameRow}>
+            <Text
+              style={[styles.nameText, isCurrentUser && styles.currentUserText]}
+              numberOfLines={1}
+            >
+              {item.name}
+            </Text>
+            {item.fideTitle ? <TitleBadge title={item.fideTitle} /> : null}
+          </View>
+          {item.city ? (
+            <Text style={styles.cityText} numberOfLines={1}>{item.city}</Text>
+          ) : null}
+        </View>
+
+        {/* Rating */}
+        <View style={styles.colRating}>
+          <Text
+            style={[
+              styles.ratingText,
+              isTop3 && { color: medalColor },
+              isCurrentUser && styles.currentUserText,
+            ]}
+          >
+            {item.rating}
+          </Text>
+        </View>
       </View>
     );
   }, [user?.id]);
 
+  const ListHeader = useCallback(() => (
+    <View style={styles.tableHeader}>
+      <View style={styles.colRank}>
+        <Text style={styles.headerText}>#</Text>
+      </View>
+      <View style={styles.colName}>
+        <Text style={styles.headerText}>Player</Text>
+      </View>
+      <View style={styles.colRating}>
+        <Text style={[styles.headerText, { textAlign: 'right' }]}>Rating</Text>
+      </View>
+    </View>
+  ), []);
+
   return (
     <SafeContainer>
       <Header />
-      <View style={styles.filterRow}>
-        <TextInput
-          style={styles.filterInput}
-          placeholder="Filter by country..."
-          placeholderTextColor={Colors.textMuted}
-          value={filter}
-          onChangeText={setFilter}
-          returnKeyType="search"
-          onSubmitEditing={() => {
-            setPage(1);
-            fetchRatings(1, true);
-          }}
-        />
+
+      <View style={styles.container}>
+        {/* My Rank card */}
+        {myRank ? <MyRankCard myRank={myRank} /> : null}
+
+        {/* Search */}
+        <View style={styles.searchRow}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name..."
+            placeholderTextColor={Colors.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
+        </View>
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyIcon}>{'♜'}</Text>
+            <Text style={styles.emptyText}>{error}</Text>
+          </View>
+        ) : filteredRatings.length === 0 ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyIcon}>{'♜'}</Text>
+            <Text style={styles.emptyText}>
+              {searchQuery.trim() ? 'No players found' : 'No ratings yet'}
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredRatings}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.userId}
+            ListHeaderComponent={ListHeader}
+            stickyHeaderIndices={[0]}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              pagination && !searchQuery.trim() ? (
+                <View style={styles.footer}>
+                  <Text style={styles.footerText}>
+                    Showing {filteredRatings.length} of {pagination.total} players
+                  </Text>
+                </View>
+              ) : null
+            }
+          />
+        )}
       </View>
-
-      {loading ? (
-        <LoadingSpinner />
-      ) : error ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>{error}</Text>
-        </View>
-      ) : ratings.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>{'♜'}</Text>
-          <Text style={styles.emptyText}>No ratings found</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={ratings}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.userId}
-          ListHeaderComponent={renderHeader}
-          stickyHeaderIndices={[0]}
-          contentContainerStyle={styles.list}
-          ListFooterComponent={
-            loadingMore ? (
-              <View style={styles.footer}>
-                <LoadingSpinner size="small" />
-              </View>
-            ) : hasMore ? (
-              <View style={styles.footer}>
-                <Button
-                  title="Load more"
-                  onPress={loadMore}
-                  variant="secondary"
-                />
-              </View>
-            ) : null
-          }
-        />
-      )}
-
-      {pagination && (
-        <View style={styles.totalBar}>
-          <Text style={styles.totalText}>
-            Total: {pagination.total} player{pagination.total !== 1 ? 's' : ''}
-          </Text>
-        </View>
-      )}
     </SafeContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  filterRow: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+  container: {
+    flex: 1,
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
   },
-  filterInput: {
+
+  // My Rank card
+  myRankCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: Spacing.lg,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+    padding: Spacing.lg,
+    backgroundColor: Colors.brandPrimary,
+    borderRadius: 12,
+  },
+  myRankLeft: {
+    flex: 1,
+    marginRight: Spacing.md,
+  },
+  myRankLabel: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.brandAccent,
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+  myRankName: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textOnPrimary,
+    marginBottom: 4,
+  },
+  myRankRight: {
+    alignItems: 'flex-end',
+  },
+  myRankPosition: {
+    fontSize: Typography.sizes['2xl'],
+    fontWeight: Typography.weights.bold,
+    color: Colors.brandAccent,
+    lineHeight: 28,
+  },
+  myRankRating: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textOnPrimary,
+  },
+  myRankTotal: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.brandAccent,
+    opacity: 0.8,
+  },
+
+  // Search
+  searchRow: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+  },
+  searchInput: {
     backgroundColor: Colors.bgSurface,
     borderWidth: 1,
     borderColor: Colors.borderDefault,
@@ -206,6 +319,8 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     minHeight: 40,
   },
+
+  // Table
   list: {
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.lg,
@@ -226,8 +341,9 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  tableRow: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: Spacing.sm,
@@ -235,52 +351,87 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderDefault,
   },
-  highlightRow: {
-    backgroundColor: Colors.brandPrimary + '18',
+  top3Row: {
+    backgroundColor: Colors.bgCard,
+    borderBottomColor: 'transparent',
+    borderRadius: 6,
+    marginBottom: 2,
+  },
+  currentUserRow: {
+    backgroundColor: Colors.brandPrimary + '14',
     borderRadius: 6,
     borderBottomColor: 'transparent',
   },
-  highlightText: {
-    color: Colors.brandPrimary,
-    fontWeight: Typography.weights.semibold,
-  },
+
+  // Columns
   colRank: {
-    width: 32,
-    textAlign: 'center',
+    width: 36,
+    alignItems: 'center',
   },
   colName: {
     flex: 1,
-    paddingRight: Spacing.xs,
+    paddingRight: Spacing.sm,
   },
-  colCountry: {
-    width: 64,
+  colRating: {
+    width: 52,
+    alignItems: 'flex-end',
+  },
+
+  rankText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
-  colElo: {
-    width: 48,
-    textAlign: 'right',
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'nowrap',
   },
-  colWld: {
-    width: 56,
-    textAlign: 'right',
-  },
-  cellText: {
+  nameText: {
     fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.medium,
     color: Colors.textPrimary,
+    flexShrink: 1,
   },
-  cellTextSmall: {
+  currentUserText: {
+    color: Colors.brandPrimary,
+    fontWeight: Typography.weights.semibold,
+  },
+  cityText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
+    marginTop: 2,
   },
-  cellElo: {
+  ratingText: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
     color: Colors.textAccent,
+    textAlign: 'right',
   },
+
+  // FIDE title badge
+  badge: {
+    backgroundColor: Colors.brandAccent + '22',
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    marginLeft: 6,
+    flexShrink: 0,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: Typography.weights.bold,
+    color: Colors.brandAccent,
+    letterSpacing: 0.5,
+  },
+
+  // Empty / footer
   empty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: Spacing['3xl'],
   },
   emptyIcon: {
     fontSize: 48,
@@ -294,16 +445,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
     alignItems: 'center',
   },
-  totalBar: {
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
-    backgroundColor: Colors.bgSecondary,
-  },
-  totalText: {
+  footerText: {
     fontSize: Typography.sizes.xs,
     color: Colors.textMuted,
-    textAlign: 'center',
   },
 });
