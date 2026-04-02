@@ -17,6 +17,9 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
     token = authHeader.split(' ')[1];
   } else if (req.cookies?.accessToken) {
     token = req.cookies.accessToken;
+  } else if (typeof req.query?.token === 'string' && req.query.token) {
+    // Allow token as query param for native WebBrowser certificate downloads
+    token = req.query.token as string;
   }
 
   if (!token) {
