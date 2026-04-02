@@ -13,7 +13,6 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
       select: {
         id: true,
         name: true,
-        email: true,
         city: true,
         role: true,
         rating: true,
