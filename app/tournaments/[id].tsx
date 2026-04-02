@@ -61,6 +61,12 @@ interface Photo {
   caption?: string;
 }
 
+interface MyRegistration {
+  id: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID';
+  createdAt: string;
+}
+
 interface TournamentDetail {
   id: string;
   title: string;
@@ -82,6 +88,8 @@ interface TournamentDetail {
   participants: Participant[];
   results: Result[];
   photos: Photo[];
+  registrationCount?: number;
+  myRegistration?: MyRegistration | null;
   _count?: { participants: number };
 }
 
@@ -110,6 +118,7 @@ export default function TournamentDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [registering, setRegistering] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const fetchTournament = useCallback(async () => {
     if (!id) return;
@@ -147,6 +156,33 @@ export default function TournamentDetailScreen() {
       setRegistering(false);
     }
   }, [id, user, fetchTournament]);
+
+  const handleCancelRegistration = useCallback(async () => {
+    if (!id) return;
+    Alert.alert(
+      'Cancel Registration',
+      'Are you sure you want to cancel your registration?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes, Cancel',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setCancelling(true);
+              await api.delete(`/tournaments/${id}/register`);
+              await fetchTournament();
+            } catch (err: unknown) {
+              const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to cancel registration';
+              Alert.alert('Error', message);
+            } finally {
+              setCancelling(false);
+            }
+          },
+        },
+      ],
+    );
+  }, [id, fetchTournament]);
 
   const handleShare = useCallback(async () => {
     if (!tournament) return;
@@ -190,12 +226,13 @@ export default function TournamentDetailScreen() {
   }
 
   const badge = STATUS_BADGE[tournament.status] || { label: tournament.status, status: 'default' as const };
-  const isOwner = user?.role === 'commissar' && user?.id === tournament.commissarId;
-  const isAdmin = user?.role === 'admin';
-  const myParticipation = tournament.participants?.find((p) => p.user.id === user?.id);
-  const isRegistered = !!myParticipation;
-  const isPaid = myParticipation?.paid ?? false;
-  const canRegister = tournament.status === 'REGISTRATION_OPEN' && user && user.role === 'participant' && !isRegistered;
+  const isOwner = user?.role === 'COMMISSIONER' && user?.id === tournament.commissarId;
+  const isAdmin = user?.role === 'ADMIN';
+  const myReg = tournament.myRegistration;
+  const isRegistered = !!myReg;
+  const regStatus = myReg?.status;
+  const isFull = !!(tournament.maxParticipants && (tournament.registrationCount ?? 0) >= tournament.maxParticipants);
+  const canRegister = ['PUBLISHED', 'REGISTRATION_OPEN'].includes(tournament.status) && user && !isRegistered && !isFull;
   const hasResults = tournament.status === 'COMPLETED' || tournament.status === 'IN_PROGRESS';
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'info', label: 'Info' },
@@ -268,28 +305,42 @@ export default function TournamentDetailScreen() {
 
         {/* Action buttons */}
         <View style={styles.actions}>
-          {!user && (
+          {!user && ['PUBLISHED', 'REGISTRATION_OPEN'].includes(tournament.status) && (
             <Button
-              title="Sign In to Participate"
+              title="Sign In to Register"
               onPress={() => router.push('/(auth)/login')}
             />
           )}
           {canRegister && (
             <Button
-              title="Register"
+              title={isFull ? 'Tournament Full' : 'Register for Tournament'}
               onPress={handleRegister}
               loading={registering}
+              disabled={isFull}
             />
           )}
-          {isRegistered && !isPaid && (
-            <Button
-              title="Pay Entry Fee"
-              onPress={() => Alert.alert('Payment', 'Payment integration coming soon')}
-              variant="secondary"
-            />
+          {isFull && !isRegistered && user && (
+            <Badge label="Tournament Full" status="warning" style={styles.regStatusBadge} />
           )}
-          {isRegistered && isPaid && (
-            <Badge label="Paid" status="success" style={styles.paidBadge} />
+          {isRegistered && regStatus === 'PENDING' && (
+            <View style={styles.regStatusRow}>
+              <Badge label="Pending Approval" status="warning" style={styles.regStatusBadge} />
+              <Button
+                title="Cancel Registration"
+                onPress={handleCancelRegistration}
+                loading={cancelling}
+                variant="secondary"
+              />
+            </View>
+          )}
+          {isRegistered && regStatus === 'APPROVED' && (
+            <Badge label="You're In!" status="success" style={styles.regStatusBadge} />
+          )}
+          {isRegistered && regStatus === 'REJECTED' && (
+            <Badge label="Registration Rejected" status="error" style={styles.regStatusBadge} />
+          )}
+          {isRegistered && regStatus === 'PAID' && (
+            <Badge label="Registered & Paid" status="success" style={styles.regStatusBadge} />
           )}
           {(isOwner || isAdmin) && (
             <Button
@@ -531,8 +582,11 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
     gap: Spacing.sm,
   },
-  paidBadge: {
+  regStatusBadge: {
     alignSelf: 'flex-start',
+  },
+  regStatusRow: {
+    gap: Spacing.sm,
   },
   // Sections
   section: {
