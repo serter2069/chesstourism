@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import prisma from '../lib/prisma';
+import { sendOrganizationRequestDecision } from '../services/email.service';
 
 const router = Router();
 
@@ -181,6 +182,104 @@ router.get('/tournaments', async (req: AuthRequest, res: Response) => {
     });
   } catch (err) {
     console.error('Admin tournaments error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─── ORGANIZATION REQUESTS ─────────────────────────────
+
+// GET /api/admin/organization-requests — list all requests with optional status filter
+router.get('/organization-requests', async (req: AuthRequest, res: Response) => {
+  try {
+    const { status } = req.query;
+
+    const where: Record<string, unknown> = {};
+    if (status && ['PENDING', 'APPROVED', 'REJECTED'].includes(status as string)) {
+      where.status = status as string;
+    }
+
+    const requests = await prisma.organizationRequest.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json({ data: requests, total: requests.length });
+  } catch (err) {
+    console.error('Admin list organization requests error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/admin/organization-requests/:id/approve
+router.patch('/organization-requests/:id/approve', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const existing = await prisma.organizationRequest.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ error: 'Request not found' });
+      return;
+    }
+
+    if (existing.status !== 'PENDING') {
+      res.status(400).json({ error: `Request already ${existing.status.toLowerCase()}` });
+      return;
+    }
+
+    const updated = await prisma.organizationRequest.update({
+      where: { id },
+      data: { status: 'APPROVED' },
+    });
+
+    // Send email notification (fire and forget)
+    sendOrganizationRequestDecision(
+      existing.email,
+      existing.contactName,
+      existing.organizationName,
+      true,
+    ).catch((err) => console.error('Failed to send org request approval email:', err));
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Admin approve organization request error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/admin/organization-requests/:id/reject
+router.patch('/organization-requests/:id/reject', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body as { reason?: string };
+
+    const existing = await prisma.organizationRequest.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ error: 'Request not found' });
+      return;
+    }
+
+    if (existing.status !== 'PENDING') {
+      res.status(400).json({ error: `Request already ${existing.status.toLowerCase()}` });
+      return;
+    }
+
+    const updated = await prisma.organizationRequest.update({
+      where: { id },
+      data: { status: 'REJECTED' },
+    });
+
+    // Send email notification (fire and forget)
+    sendOrganizationRequestDecision(
+      existing.email,
+      existing.contactName,
+      existing.organizationName,
+      false,
+      reason,
+    ).catch((err) => console.error('Failed to send org request rejection email:', err));
+
+    res.json({ ...updated, rejectionReason: reason || null });
+  } catch (err) {
+    console.error('Admin reject organization request error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
