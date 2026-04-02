@@ -104,7 +104,7 @@ router.get('/certificate', authenticate, async (req: AuthRequest, res: Response)
       return;
     }
 
-    const memberName = [user.name, user.surname].filter(Boolean).join(' ') || user.email;
+    const memberName = user.name || user.email;
     const memberNumber = membership.id.slice(-8).toUpperCase();
 
     function formatDate(d: Date): string {
