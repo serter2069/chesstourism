@@ -1,4 +1,5 @@
 import { PrismaClient, TournamentStatus } from '@prisma/client';
+import { calculateEloChanges } from './elo.service';
 
 const prisma = new PrismaClient();
 
@@ -398,43 +399,61 @@ export async function submitResults(
       where: { tournament_id: tournamentId },
     });
 
-    // Create result records
+    // Fetch current ELO ratings for all participants
+    const currentRatings = new Map<string, number>();
     for (const entry of results) {
-      // Get current ELO for the user
       const rating = await tx.rating.findUnique({
         where: { user_id: entry.userId },
       });
+      currentRatings.set(entry.userId, rating?.elo || 1200);
+    }
 
-      const eloBefore = rating?.elo || 1200;
+    // Calculate ELO changes using proper algorithm
+    const eloChanges = calculateEloChanges(results, currentRatings);
 
-      // ELO calculation placeholder: +10 for 1st, +5 for 2nd, +2 for 3rd, 0 otherwise
-      let eloChange = 0;
-      if (entry.place === 1) eloChange = 10;
-      else if (entry.place === 2) eloChange = 5;
-      else if (entry.place === 3) eloChange = 2;
-
-      const eloAfter = eloBefore + eloChange;
+    // Create result records and update ratings
+    for (const change of eloChanges) {
+      const entry = results.find((r) => r.userId === change.userId)!;
 
       await tx.tournamentResult.create({
         data: {
           tournament_id: tournamentId,
-          user_id: entry.userId,
+          user_id: change.userId,
           place: entry.place,
           score: entry.score,
-          elo_change: eloChange,
-          elo_before: eloBefore,
-          elo_after: eloAfter,
+          elo_change: change.eloChange,
+          elo_before: change.eloBefore,
+          elo_after: change.eloAfter,
         },
       });
 
-      // Update rating if exists
-      if (rating) {
+      // Upsert rating record (create if first tournament, update if exists)
+      const existingRating = await tx.rating.findUnique({
+        where: { user_id: change.userId },
+      });
+
+      if (existingRating) {
         await tx.rating.update({
-          where: { user_id: entry.userId },
+          where: { user_id: change.userId },
           data: {
-            elo: eloAfter,
-            peak_elo: Math.max(rating.peak_elo, eloAfter),
+            elo: change.eloAfter,
+            peak_elo: Math.max(existingRating.peak_elo, change.eloAfter),
             games_played: { increment: 1 },
+            wins: change.outcome === 'win' ? { increment: 1 } : undefined,
+            losses: change.outcome === 'loss' ? { increment: 1 } : undefined,
+            draws: change.outcome === 'draw' ? { increment: 1 } : undefined,
+          },
+        });
+      } else {
+        await tx.rating.create({
+          data: {
+            user_id: change.userId,
+            elo: change.eloAfter,
+            peak_elo: Math.max(1200, change.eloAfter),
+            games_played: 1,
+            wins: change.outcome === 'win' ? 1 : 0,
+            losses: change.outcome === 'loss' ? 1 : 0,
+            draws: change.outcome === 'draw' ? 1 : 0,
           },
         });
       }
