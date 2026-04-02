@@ -6,10 +6,19 @@ const prisma = new PrismaClient();
 const router = Router();
 
 // GET /api/commissars — public list of all commissioners
-router.get('/', async (_req: any, res: Response) => {
+// Supports ?country= filter to return only commissioners from a specific country
+router.get('/', async (req: any, res: Response) => {
   try {
+    const { country } = req.query as { country?: string };
+
+    const where: Record<string, any> = {};
+    if (country && typeof country === 'string' && country.trim()) {
+      where.country = { equals: country.trim(), mode: 'insensitive' };
+    }
+
     const commissioners = await prisma.commissioner.findMany({
-      orderBy: { user: { name: 'asc' } },
+      where,
+      orderBy: { country: 'asc' },
       include: {
         user: {
           select: { id: true, name: true },
@@ -32,7 +41,19 @@ router.get('/', async (_req: any, res: Response) => {
       tournamentsCount: c._count.tournaments,
     }));
 
-    res.json({ data, pagination: { totalPages: 1 } });
+    // Also return the list of distinct countries for the country filter chips
+    const allCountries = await prisma.commissioner.findMany({
+      where: { country: { not: null } },
+      select: { country: true },
+      distinct: ['country'],
+      orderBy: { country: 'asc' },
+    });
+
+    const countries = allCountries
+      .map((c: any) => c.country as string)
+      .filter(Boolean);
+
+    res.json({ data, countries, pagination: { totalPages: 1 } });
   } catch (err: any) {
     console.error('List commissioners error:', err);
     res.status(500).json({ error: 'Internal server error' });
