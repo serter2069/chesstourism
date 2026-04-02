@@ -13,6 +13,7 @@ import { Button, Card, Badge, LoadingSpinner } from '../components/ui';
 import { Colors } from '../constants/colors';
 import { Spacing } from '../constants/spacing';
 import { Typography } from '../constants/typography';
+import { usePlatform } from '../hooks/usePlatform';
 import api from '../lib/api';
 
 interface HeroData {
@@ -67,6 +68,7 @@ function formatDate(dateStr: string): string {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { columns, isDesktop, isTablet } = usePlatform();
   const [hero, setHero] = useState<HeroData | null>(null);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [ratings, setRatings] = useState<RatingEntry[]>([]);
@@ -223,50 +225,62 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* How it works */}
+        {/* How it works — responsive grid on wider screens */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>How It Works</Text>
-          {HOW_IT_WORKS.map((item) => (
-            <View key={item.step} style={styles.stepRow}>
-              <View style={styles.stepBadge}>
-                <Text style={styles.stepNumber}>{item.step}</Text>
+          <View style={[styles.stepsGrid, (isTablet || isDesktop) && styles.stepsGridWide]}>
+            {HOW_IT_WORKS.map((item) => (
+              <View
+                key={item.step}
+                style={[
+                  styles.stepRow,
+                  (isTablet || isDesktop) && { width: isDesktop ? '23%' : '48%' } as any,
+                ]}
+              >
+                <View style={styles.stepBadge}>
+                  <Text style={styles.stepNumber}>{item.step}</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>{item.title}</Text>
+                  <Text style={styles.stepDesc}>{item.desc}</Text>
+                </View>
               </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>{item.title}</Text>
-                <Text style={styles.stepDesc}>{item.desc}</Text>
-              </View>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
 
-        {/* Become a Commissar CTA */}
-        <View style={styles.section}>
-          <Card style={styles.ctaCard}>
-            <Text style={styles.ctaTitle}>Become a Commissar</Text>
-            <Text style={styles.ctaText}>
-              Organize chess tournaments in your city and become part of the international chess tourism network.
-            </Text>
-            <Button
-              title="Apply as Commissar"
-              onPress={() => router.push('/(auth)/login')}
-              variant="secondary"
-            />
-          </Card>
-        </View>
+        {/* CTA cards — side by side on tablet/desktop */}
+        <View style={[
+          styles.section,
+          (isTablet || isDesktop) && styles.ctaRow,
+        ]}>
+          <View style={(isTablet || isDesktop) ? styles.ctaCardHalf : undefined}>
+            <Card style={styles.ctaCard}>
+              <Text style={styles.ctaTitle}>Become a Commissar</Text>
+              <Text style={styles.ctaText}>
+                Organize chess tournaments in your city and become part of the international chess tourism network.
+              </Text>
+              <Button
+                title="Apply as Commissar"
+                onPress={() => router.push('/(auth)/login')}
+                variant="secondary"
+              />
+            </Card>
+          </View>
 
-        {/* Organization Tournament Request CTA */}
-        <View style={styles.section}>
-          <Card style={styles.ctaCard}>
-            <Text style={styles.ctaTitle}>Провести турнир через федерацию?</Text>
+          <View style={(isTablet || isDesktop) ? styles.ctaCardHalf : undefined}>
+            <Card style={styles.ctaCard}>
+              <Text style={styles.ctaTitle}>Host a Tournament</Text>
             <Text style={styles.ctaText}>
-              Организации могут подать заявку на проведение турнира. Мы рассмотрим её в течение 3 рабочих дней.
+              Organizations can submit a tournament request. We will review it within 3 business days.
             </Text>
-            <Button
-              title="Подать заявку"
-              onPress={() => router.push('/organizations/apply')}
-              variant="secondary"
-            />
-          </Card>
+              <Button
+                title="Submit Request"
+                onPress={() => router.push('/organizations/apply')}
+                variant="secondary"
+              />
+            </Card>
+          </View>
         </View>
 
         <View style={styles.footer} />
@@ -423,6 +437,12 @@ const styles = StyleSheet.create({
     color: Colors.brandPrimary,
   },
   // How it works
+  stepsGrid: {},
+  stepsGridWide: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.md,
+  },
   stepRow: {
     flexDirection: 'row',
     marginBottom: Spacing.lg,
@@ -457,9 +477,16 @@ const styles = StyleSheet.create({
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
   },
   // CTA
+  ctaRow: {
+    flexDirection: 'row',
+    gap: Spacing.lg,
+  },
   ctaCard: {
     alignItems: 'center',
     paddingVertical: Spacing['2xl'],
+  },
+  ctaCardHalf: {
+    flex: 1,
   },
   ctaTitle: {
     fontSize: Typography.sizes.xl,

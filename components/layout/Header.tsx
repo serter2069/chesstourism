@@ -6,6 +6,7 @@ import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import { useAuth } from '../../store/auth';
 import { useNotifications } from '../../store/notifications';
+import { usePlatform } from '../../hooks/usePlatform';
 
 interface HeaderProps {
   title?: string;
@@ -25,6 +26,7 @@ export default function Header({ title, showBack = false }: HeaderProps) {
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isMobile } = usePlatform();
 
   function isActive(href: string): boolean {
     if (href === '/') return pathname === '/';
@@ -84,12 +86,14 @@ export default function Header({ title, showBack = false }: HeaderProps) {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            onPress={() => setMenuOpen(!menuOpen)}
-            style={styles.hamburger}
-          >
-            <Text style={styles.hamburgerText}>{menuOpen ? 'X' : '='}</Text>
-          </TouchableOpacity>
+          {isMobile && (
+            <TouchableOpacity
+              onPress={() => setMenuOpen(!menuOpen)}
+              style={styles.hamburger}
+            >
+              <Text style={styles.hamburgerText}>{menuOpen ? 'X' : '='}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -114,10 +118,29 @@ export default function Header({ title, showBack = false }: HeaderProps) {
             </Text>
           </TouchableOpacity>
         ))}
+        {/* Dashboard link visible on tablet/desktop when logged in */}
+        {!isMobile && user && (
+          <TouchableOpacity
+            onPress={() => {
+              router.push('/(dashboard)' as any);
+              setMenuOpen(false);
+            }}
+            style={[styles.navLink, pathname.startsWith('/dashboard') && styles.navLinkActive]}
+          >
+            <Text
+              style={[
+                styles.navLinkText,
+                pathname.startsWith('/dashboard') && styles.navLinkTextActive,
+              ]}
+            >
+              Dashboard
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Collapsible mobile menu (for dashboard links when logged in) */}
-      {menuOpen && user && (
+      {isMobile && menuOpen && user && (
         <View style={styles.mobileMenu}>
           <TouchableOpacity
             onPress={() => {
