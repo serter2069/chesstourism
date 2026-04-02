@@ -141,11 +141,13 @@ export async function verifyOtp(email: string, code: string) {
     include: { commissioner: true },
   });
 
+  let isNewUser = false;
   if (!user) {
     user = await prisma.user.create({
       data: { email, role: Role.PARTICIPANT },
       include: { commissioner: true },
     });
+    isNewUser = true;
   }
 
   // Generate token pair
@@ -166,6 +168,8 @@ export async function verifyOtp(email: string, code: string) {
     token: accessToken,
     refreshToken,
     user: sanitizeUser(user),
+    isNewUser,
+    onboardingCompleted: user.onboardingCompleted,
   };
 }
 

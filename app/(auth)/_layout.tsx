@@ -10,8 +10,11 @@ export default function AuthLayout() {
     return <LoadingSpinner />;
   }
 
-  // Already logged in — redirect to home
+  // Already logged in — redirect to onboarding or home
   if (user) {
+    if (!user.onboardingCompleted) {
+      return <Redirect href="/(onboarding)/quiz" />;
+    }
     return <Redirect href="/" />;
   }
 
