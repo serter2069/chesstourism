@@ -5,6 +5,106 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 const prisma = new PrismaClient();
 const router = Router();
 
+// GET /api/commissars — public list of all commissioners
+router.get('/', async (_req: any, res: Response) => {
+  try {
+    const commissioners = await prisma.commissioner.findMany({
+      orderBy: { user: { name: 'asc' } },
+      include: {
+        user: {
+          select: { id: true, name: true },
+        },
+        _count: {
+          select: { tournaments: true },
+        },
+      },
+    });
+
+    const data = commissioners.map((c: any) => ({
+      id: c.id,
+      userId: c.userId,
+      specialization: c.specialization,
+      country: c.country,
+      city: c.city,
+      photoUrl: c.photoUrl,
+      isVerified: c.isVerified,
+      user: c.user,
+      tournamentsCount: c._count.tournaments,
+    }));
+
+    res.json({ data, pagination: { totalPages: 1 } });
+  } catch (err: any) {
+    console.error('List commissioners error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/commissars/:id — public commissioner profile by commissioner id or userId
+router.get('/:id', async (req: any, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Support lookup by commissioner.id or commissioner.userId
+    const commissioner = await prisma.commissioner.findFirst({
+      where: { OR: [{ id }, { userId: id }] },
+      include: {
+        user: {
+          select: { id: true, name: true },
+        },
+        tournaments: {
+          orderBy: { startDate: 'desc' },
+          include: {
+            _count: {
+              select: { registrations: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!commissioner) {
+      res.status(404).json({ error: 'Commissioner not found' });
+      return;
+    }
+
+    const totalParticipants = commissioner.tournaments.reduce(
+      (sum: number, t: any) => sum + t._count.registrations,
+      0
+    );
+
+    res.json({
+      id: commissioner.id,
+      userId: commissioner.userId,
+      bio: commissioner.bio,
+      specialization: commissioner.specialization,
+      country: commissioner.country,
+      city: commissioner.city,
+      photoUrl: commissioner.photoUrl,
+      isVerified: commissioner.isVerified,
+      user: commissioner.user,
+      stats: {
+        totalTournaments: commissioner.tournaments.length,
+        totalParticipants,
+      },
+      tournaments: commissioner.tournaments.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        city: t.city,
+        country: t.country,
+        startDate: t.startDate,
+        endDate: t.endDate,
+        status: t.status,
+        participantsCount: t._count.registrations,
+        maxParticipants: t.maxParticipants,
+        timeControl: t.timeControl,
+      })),
+    });
+  } catch (err: any) {
+    console.error('Get commissioner public profile error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/commissars/profile — get own commissioner profile
 router.get('/profile', authenticate, async (req: AuthRequest, res: Response) => {
   try {

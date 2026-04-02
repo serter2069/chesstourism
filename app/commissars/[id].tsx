@@ -1,63 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { Avatar, Badge, Button, Card, LoadingSpinner } from '../../components/ui';
+import { Avatar, Badge, Card, LoadingSpinner } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import api from '../../lib/api';
 
-interface CommissarProfile {
+interface CommissionerUser {
   id: string;
-  user_id: string;
-  experience_years: number;
-  specializations: string[];
-  rating: number;
-  approved: boolean;
-  license_number?: string | null;
-  user: {
-    id: string;
-    name: string;
-    surname: string;
-    country?: string | null;
-    city?: string | null;
-    avatar_url?: string | null;
-    bio?: string | null;
-  };
+  name: string;
 }
 
-export default function CommissarProfileScreen() {
+interface TournamentSummary {
+  id: string;
+  title: string;
+  city: string;
+  country: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  participantsCount: number;
+  maxParticipants: number | null;
+  timeControl: string | null;
+}
+
+interface CommissionerProfile {
+  id: string;
+  userId: string;
+  bio: string | null;
+  specialization: string | null;
+  country: string | null;
+  city: string | null;
+  photoUrl: string | null;
+  isVerified: boolean;
+  user: CommissionerUser;
+  stats: {
+    totalTournaments: number;
+    totalParticipants: number;
+  };
+  tournaments: TournamentSummary[];
+}
+
+type TournamentBadgeStatus = 'success' | 'warning' | 'error' | 'info';
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function statusLabel(status: string): string {
+  const map: Record<string, string> = {
+    DRAFT: 'Draft',
+    OPEN: 'Open',
+    ONGOING: 'Ongoing',
+    FINISHED: 'Finished',
+    CANCELLED: 'Cancelled',
+  };
+  return map[status] ?? status;
+}
+
+function statusBadge(status: string): TournamentBadgeStatus {
+  const map: Record<string, TournamentBadgeStatus> = {
+    OPEN: 'success',
+    ONGOING: 'warning',
+    CANCELLED: 'error',
+  };
+  return map[status] ?? 'info';
+}
+
+export default function CommissionerPublicProfileScreen() {
+  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [profile, setProfile] = useState<CommissarProfile | null>(null);
+  const [profile, setProfile] = useState<CommissionerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchProfile = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await api.get(`/commissars/${id}`);
+      setProfile(res.data);
+      setError(null);
+    } catch {
+      setError('Failed to load commissioner profile');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    if (!id) return;
+    fetchProfile();
+  }, [fetchProfile]);
 
-    let cancelled = false;
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await api.get(`/commissars/${id}`);
-        if (!cancelled) {
-          setProfile(res.data);
-          setError(null);
-        }
-      } catch {
-        if (!cancelled) setError('Failed to load commissar profile');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [id]);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchProfile();
+  }, [fetchProfile]);
 
   if (loading) {
     return (
       <SafeContainer>
-        <Header title="Commissar" showBack />
+        <Header />
         <LoadingSpinner />
       </SafeContainer>
     );
@@ -66,189 +120,310 @@ export default function CommissarProfileScreen() {
   if (error || !profile) {
     return (
       <SafeContainer>
-        <Header title="Commissar" showBack />
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>{error || 'Profile not found'}</Text>
+        <Header />
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error ?? 'Commissioner not found'}</Text>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>Go back</Text>
+          </TouchableOpacity>
         </View>
       </SafeContainer>
     );
   }
 
-  const fullName = `${profile.user.name} ${profile.user.surname}`;
-  const location = [profile.user.city, profile.user.country].filter(Boolean).join(', ');
+  const location = [profile.city, profile.country].filter(Boolean).join(', ');
 
   return (
     <SafeContainer>
-      <Header title="Commissar" showBack />
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Avatar + Name */}
-        <View style={styles.avatarSection}>
-          <Avatar uri={profile.user.avatar_url} name={fullName} size={80} />
-          <Text style={styles.name}>{fullName}</Text>
-          {location ? <Text style={styles.location}>{location}</Text> : null}
-        </View>
+      <Header />
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        {/* Back navigation */}
+        <TouchableOpacity onPress={() => router.back()} style={styles.backRow}>
+          <Text style={styles.backArrow}>{'←'}</Text>
+          <Text style={styles.backText}>Commissioners</Text>
+        </TouchableOpacity>
 
-        {/* Stats */}
-        <Card style={styles.statsCard}>
-          <View style={styles.statsRow}>
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{profile.experience_years}</Text>
-              <Text style={styles.statLabel}>Years exp.</Text>
+        {/* Profile header card */}
+        <Card style={styles.profileCard}>
+          <View style={styles.avatarRow}>
+            <Avatar uri={profile.photoUrl} name={profile.user.name} size={80} />
+            <View style={styles.headerInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{profile.user.name}</Text>
+                {profile.isVerified && (
+                  <View style={styles.verifiedBadge}>
+                    <Text style={styles.verifiedIcon}>{'★'}</Text>
+                    <Text style={styles.verifiedText}>Verified</Text>
+                  </View>
+                )}
+              </View>
+              {profile.specialization ? (
+                <Text style={styles.specialization}>{profile.specialization}</Text>
+              ) : null}
+              {location ? (
+                <Text style={styles.location}>{location}</Text>
+              ) : null}
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{profile.rating}</Text>
-              <Text style={styles.statLabel}>Rating</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              {profile.approved ? (
-                <Badge label="Approved" status="success" />
-              ) : (
-                <Badge label="Pending" status="warning" />
-              )}
-            </View>
+          </View>
+
+          {/* Bio */}
+          <View style={styles.bioSection}>
+            <Text style={styles.bioText}>
+              {profile.bio ?? 'No biography provided yet.'}
+            </Text>
           </View>
         </Card>
 
-        {/* Specializations */}
-        {profile.specializations && profile.specializations.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Specializations</Text>
-            <View style={styles.badges}>
-              {profile.specializations.map((s) => (
-                <Badge key={s} label={s} status="info" />
-              ))}
-            </View>
+        {/* Stats bar */}
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{profile.stats.totalTournaments}</Text>
+            <Text style={styles.statLabel}>Tournaments</Text>
           </View>
-        )}
-
-        {/* Bio */}
-        {profile.user.bio ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About</Text>
-            <Card>
-              <Text style={styles.bioText}>{profile.user.bio}</Text>
-            </Card>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{profile.stats.totalParticipants}</Text>
+            <Text style={styles.statLabel}>Participants</Text>
           </View>
-        ) : null}
-
-        {/* License */}
-        {profile.license_number ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>License</Text>
-            <Card>
-              <Text style={styles.licenseText}>{profile.license_number}</Text>
-            </Card>
-          </View>
-        ) : null}
-
-        {/* Tournaments placeholder */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tournaments</Text>
-          <Card>
-            <Text style={styles.placeholderText}>No tournaments yet</Text>
-          </Card>
         </View>
 
-        {/* Contact placeholder */}
-        <Button
-          title="Contact commissar"
-          onPress={() => {}}
-          disabled
-          style={styles.contactBtn}
-        />
+        {/* Tournaments section */}
+        <Text style={styles.sectionTitle}>Tournaments by this commissioner</Text>
+
+        {profile.tournaments.length === 0 ? (
+          <View style={styles.emptyTournaments}>
+            <Text style={styles.emptyIcon}>{'♟'}</Text>
+            <Text style={styles.emptyText}>No tournaments yet</Text>
+          </View>
+        ) : (
+          profile.tournaments.map((t) => (
+            <TouchableOpacity
+              key={t.id}
+              activeOpacity={0.7}
+              onPress={() => router.push(`/tournaments/${t.id}`)}
+            >
+              <Card style={styles.tournamentCard}>
+                <View style={styles.tournamentHeader}>
+                  <Text style={styles.tournamentTitle} numberOfLines={2}>
+                    {t.title}
+                  </Text>
+                  <Badge label={statusLabel(t.status)} status={statusBadge(t.status)} />
+                </View>
+                <Text style={styles.tournamentLocation}>
+                  {[t.city, t.country].filter(Boolean).join(', ')}
+                </Text>
+                <View style={styles.tournamentMeta}>
+                  <Text style={styles.metaText}>
+                    {formatDate(t.startDate)} – {formatDate(t.endDate)}
+                  </Text>
+                  <Text style={styles.metaText}>
+                    {t.participantsCount}
+                    {t.maxParticipants != null ? `/${t.maxParticipants}` : ''} players
+                  </Text>
+                </View>
+                {t.timeControl ? (
+                  <Text style={styles.timeControl}>{t.timeControl}</Text>
+                ) : null}
+              </Card>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </SafeContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing['4xl'],
+  container: {
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing['3xl'],
   },
-  avatarSection: {
+  centered: {
+    flex: 1,
     alignItems: 'center',
-    paddingVertical: Spacing['2xl'],
+    justifyContent: 'center',
+    padding: Spacing.lg,
+  },
+  errorText: {
+    fontSize: Typography.sizes.base,
+    color: Colors.statusError,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
+  backBtn: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    backgroundColor: Colors.brandPrimary,
+    borderRadius: 8,
+  },
+  backBtnText: {
+    color: Colors.textOnPrimary,
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.medium,
+  },
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  backArrow: {
+    fontSize: Typography.sizes.lg,
+    color: Colors.brandAccent,
+    marginRight: Spacing.sm,
+  },
+  backText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.brandAccent,
+    fontWeight: Typography.weights.medium,
+  },
+  profileCard: {
+    marginBottom: Spacing.lg,
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.md,
+  },
+  headerInfo: {
+    flex: 1,
+    marginLeft: Spacing.lg,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   name: {
-    fontSize: Typography.sizes['2xl'],
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
-    marginTop: Spacing.md,
+  },
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.brandAccent,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    gap: 3,
+  },
+  verifiedIcon: {
+    fontSize: 10,
+    color: Colors.textOnAccent,
+  },
+  verifiedText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textOnAccent,
+  },
+  specialization: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.brandAccent,
+    fontWeight: Typography.weights.medium,
+    marginBottom: Spacing.xs,
   },
   location: {
     fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
-    marginTop: Spacing.xs,
   },
-  statsCard: {
-    marginBottom: Spacing.lg,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-  stat: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statValue: {
-    fontSize: Typography.sizes.xl,
-    fontWeight: Typography.weights.bold,
-    color: Colors.brandPrimary,
-  },
-  statLabel: {
-    fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: Colors.borderDefault,
-  },
-  section: {
-    marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: Typography.sizes.base,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
-    marginBottom: Spacing.sm,
-  },
-  badges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
+  bioSection: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderDefault,
+    paddingTop: Spacing.md,
   },
   bioText: {
     fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
-    lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
+    lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
   },
-  licenseText: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textAccent,
-    fontWeight: Typography.weights.medium,
+  statsRow: {
+    flexDirection: 'row',
+    backgroundColor: Colors.brandPrimary,
+    borderRadius: 12,
+    marginBottom: Spacing.lg,
+    overflow: 'hidden',
   },
-  placeholderText: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textMuted,
-    textAlign: 'center',
-  },
-  contactBtn: {
-    marginTop: Spacing.md,
-  },
-  empty: {
+  statBox: {
     flex: 1,
+    paddingVertical: Spacing.lg,
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginVertical: Spacing.md,
+  },
+  statNumber: {
+    fontSize: Typography.sizes['2xl'],
+    fontWeight: Typography.weights.bold,
+    color: Colors.brandAccent,
+  },
+  statLabel: {
+    fontSize: Typography.sizes.xs,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
+  sectionTitle: {
+    fontSize: Typography.sizes.lg,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.md,
+  },
+  emptyTournaments: {
+    alignItems: 'center',
+    paddingVertical: Spacing['3xl'],
+  },
+  emptyIcon: {
+    fontSize: 40,
+    marginBottom: Spacing.md,
   },
   emptyText: {
     fontSize: Typography.sizes.base,
     color: Colors.textSecondary,
+  },
+  tournamentCard: {
+    marginBottom: Spacing.md,
+  },
+  tournamentHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+  tournamentTitle: {
+    flex: 1,
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textPrimary,
+  },
+  tournamentLocation: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.xs,
+  },
+  tournamentMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: Spacing.xs,
+  },
+  metaText: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+  },
+  timeControl: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.brandAccent,
+    marginTop: Spacing.xs,
+    fontWeight: Typography.weights.medium,
   },
 });
