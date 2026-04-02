@@ -15,9 +15,13 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Build frontend (Expo web)
+        run: |
+          npm ci
+          npx expo export -p web --output-dir dist
+
       - name: Generate version.json
         run: |
-          mkdir -p dist
           cat > dist/version.json << EOF
           {
             "version": "$(git rev-parse --short HEAD)",
@@ -26,11 +30,6 @@ jobs:
             "deployed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
           EOF
-
-      - name: Build frontend (Expo web)
-        run: |
-          npm ci
-          npx expo export -p web --output-dir dist
 
       - name: Deploy frontend
         run: |
