@@ -91,10 +91,16 @@ router.post('/payments/tournament/:tournamentId', authenticate, async (req: Auth
   }
 });
 
-// POST /api/payments/:paymentId/confirm — confirm payment (mock: always succeeds in dev)
+// POST /api/payments/:paymentId/confirm — confirm payment (mock: only works in dev/test)
 // TODO: integrate Stripe — replace mock confirmation with Stripe payment intent verification
+// SECURITY(#1702): mock confirm disabled in production to prevent free PAID status
 router.post('/payments/:paymentId/confirm', authenticate, async (req: AuthRequest, res: Response) => {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      res.status(503).json({ error: 'Payment integration not yet configured' });
+      return;
+    }
+
     const userId = req.user!.userId;
     const { paymentId } = req.params;
 
