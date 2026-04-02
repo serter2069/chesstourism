@@ -164,7 +164,7 @@ export default function CommissionerCabinetScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {loading && <LoadingSpinner />}
@@ -321,13 +321,13 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
     fontFamily: Typography.fontFamilyHeading,
-    color: Colors.textPrimary,
+    color: Colors.text,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
   ctaDescription: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: Spacing['3xl'],
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
   },
   avatarPlaceholder: {
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -364,12 +364,12 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: 2,
   },
   profileSpecialization: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.xs,
   },
   badgeRow: {
@@ -379,13 +379,13 @@ const styles = StyleSheet.create({
   },
   bioText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
     lineHeight: 20,
     marginBottom: Spacing.md,
   },
   locationText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.md,
   },
   editButtonWrap: {
@@ -406,12 +406,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     marginBottom: Spacing.xs,
   },
   statLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   // Tournaments
   tournamentsSection: {
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   empty: {
     alignItems: 'center',
@@ -436,12 +436,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   emptyText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
   },
   tournamentCard: {
@@ -456,18 +456,18 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     flex: 1,
     marginRight: Spacing.sm,
   },
   cardMeta: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   cardParticipants: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontWeight: Typography.weights.medium,
     marginTop: Spacing.sm,
   },
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
   },
   bottomPad: {

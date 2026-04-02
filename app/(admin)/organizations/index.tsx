@@ -118,7 +118,7 @@ export default function AdminOrganizationsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.brandPrimary}
+            tintColor={Colors.primary}
           />
         }
       >
@@ -225,26 +225,26 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
-    backgroundColor: Colors.bgSecondary,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundAlt,
   },
   filterTabActive: {
-    backgroundColor: Colors.brandPrimary,
-    borderColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   filterTabText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   filterTabTextActive: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
   },
   errorCard: {
     marginTop: Spacing.lg,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
   },
@@ -256,12 +256,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   emptyText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
   },
   itemCard: {
@@ -280,17 +280,17 @@ const styles = StyleSheet.create({
   orgName: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   contactName: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   metaText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   dateText: {
     fontSize: Typography.sizes.xs,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: Spacing.xs,
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
     marginBottom: Spacing.md,
   },

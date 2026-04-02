@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.xl,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
   },
@@ -223,19 +223,19 @@ const styles = StyleSheet.create({
   },
   successIcon: {
     fontSize: Typography.sizes['3xl'],
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     fontWeight: Typography.weights.bold,
     marginBottom: Spacing.lg,
   },
   successTitle: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   successText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
     paddingHorizontal: Spacing.md,

@@ -145,7 +145,7 @@ export default function TournamentsListScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {/* Page title */}
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   pageTitleText: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   // Filters
   filters: {
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   filterLabel: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
     marginBottom: Spacing.xs,
   },
@@ -373,21 +373,21 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
     borderRadius: 16,
-    backgroundColor: Colors.bgCard,
+    backgroundColor: Colors.background,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
   },
   chipActive: {
-    backgroundColor: Colors.brandAccent,
-    borderColor: Colors.brandAccent,
+    backgroundColor: Colors.gold,
+    borderColor: Colors.gold,
   },
   chipText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   chipTextActive: {
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
   },
   // Create button
   createRow: {
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
   },
@@ -421,12 +421,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   emptyText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
   },
   // Grid layout
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     flex: 1,
     marginRight: Spacing.sm,
   },
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   cardFooter: {
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: Spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.sm,
   },
   footerItem: {},
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
   },
   footerValue: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.medium,
   },
   // Load more

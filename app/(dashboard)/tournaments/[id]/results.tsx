@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.lg,
   },
   noData: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   participantName: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   inputRow: {

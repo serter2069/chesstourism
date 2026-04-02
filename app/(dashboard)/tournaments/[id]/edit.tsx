@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   statusLabel: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   statusBtn: {
     marginTop: Spacing.sm,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.lg,
   },
   multiline: {
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   fieldLabel: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
     marginBottom: Spacing.xs,
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
   participantName: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.medium,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   participantEmail: {
     fontSize: Typography.sizes.xs,
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   footerSpacer: {
     height: Spacing['4xl'],

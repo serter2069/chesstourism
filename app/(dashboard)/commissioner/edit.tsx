@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
   },
   successText: {
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     fontSize: Typography.sizes.sm,
   },
   buttonRow: {

@@ -277,19 +277,19 @@ const styles = StyleSheet.create({
   cardLabel: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
     marginBottom: Spacing.sm,
   },
   tournamentTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   tournamentMeta: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   feeRow: {
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.md,
     marginTop: Spacing.md,
   },
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   feeValue: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
-    color: Colors.brandPrimary,
+    color: Colors.primary,
   },
   payBtn: {
     marginBottom: Spacing.lg,
@@ -316,28 +316,28 @@ const styles = StyleSheet.create({
   cashLabel: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   cashText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
   },
   infoText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     textAlign: 'center',
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
   },
   // Confirm step
   confirmTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.lg,
     textAlign: 'center',
   },
@@ -349,12 +349,12 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   summaryValue: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     maxWidth: '60%',
     textAlign: 'right',
   },
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.borderDefault,
+    backgroundColor: Colors.border,
     marginVertical: Spacing.md,
   },
   mockNote: {
@@ -390,17 +390,17 @@ const styles = StyleSheet.create({
   receiptTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
     textAlign: 'center',
   },
   paidText: {
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     fontWeight: Typography.weights.bold,
   },
   errorMessage: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
     marginVertical: Spacing.lg,
   },

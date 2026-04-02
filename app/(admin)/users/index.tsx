@@ -140,7 +140,7 @@ export default function AdminUsersScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.brandPrimary}
+            tintColor={Colors.primary}
           />
         }
       >
@@ -300,14 +300,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   searchInput: {
-    backgroundColor: Colors.bgCard,
+    backgroundColor: Colors.background,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
     borderRadius: 8,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     fontSize: Typography.sizes.base,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   filterRow: {
@@ -321,26 +321,26 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
-    backgroundColor: Colors.bgSecondary,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundAlt,
   },
   filterTabActive: {
-    backgroundColor: Colors.brandPrimary,
-    borderColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   filterTabText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   filterTabTextActive: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
   },
   errorCard: {
     marginTop: Spacing.lg,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
   },
@@ -352,12 +352,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   emptyText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
   },
   userCard: {
@@ -376,17 +376,17 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   userEmail: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   userMeta: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   userDate: {
     fontSize: Typography.sizes.xs,
@@ -400,21 +400,21 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     paddingTop: Spacing.xs,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
   },
   fideText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   roleChangeBtn: {
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.sm,
     marginTop: Spacing.xs,
   },
   roleChangeBtnText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontWeight: Typography.weights.semibold,
     textAlign: 'center',
   },
@@ -429,23 +429,23 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
-    backgroundColor: Colors.bgSecondary,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundAlt,
   },
   roleOptionActive: {
-    backgroundColor: Colors.brandPrimary,
-    borderColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   roleOptionDisabled: {
     opacity: 0.4,
   },
   roleOptionText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   roleOptionTextActive: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
   },
   roleOptionTextDisabled: {
     color: Colors.textMuted,
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   },
   pageText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   bottomSpacer: {
     height: Spacing['4xl'],

@@ -87,7 +87,7 @@ export default function MyTournamentsScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {loading && <LoadingSpinner />}
@@ -146,8 +146,8 @@ export default function MyTournamentsScreen() {
                         styles.detailValue,
                         reg.eloAfter != null && reg.eloBefore != null
                           ? (reg.eloAfter - reg.eloBefore) >= 0
-                            ? { color: Colors.statusSuccess }
-                            : { color: Colors.statusError }
+                            ? { color: Colors.primary }
+                            : { color: Colors.error }
                           : {},
                       ]}
                     >
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     flex: 1,
     marginRight: Spacing.sm,
   },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   detailsRow: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: Spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.sm,
   },
   detailItem: {},
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.medium,
   },
   // Empty state
@@ -234,16 +234,16 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   emptyText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
   },

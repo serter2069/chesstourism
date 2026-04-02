@@ -129,7 +129,7 @@ export default function HomeScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {/* Hero Banner */}
@@ -302,26 +302,26 @@ const styles = StyleSheet.create({
     paddingTop: Spacing['3xl'],
     paddingBottom: Spacing['3xl'],
     alignItems: 'center',
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   heroIcon: {
     fontSize: 56,
     marginBottom: Spacing.lg,
-    color: Colors.brandAccent,
+    color: Colors.gold,
   },
   heroTitle: {
     fontSize: Typography.sizes['2xl'],
     fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
   heroSubtitle: {
     fontSize: Typography.sizes.base,
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     textAlign: 'center',
     lineHeight: Typography.sizes.base * Typography.lineHeights.normal,
     marginBottom: Spacing['2xl'],
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     margin: Spacing.lg,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
   },
@@ -353,12 +353,12 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.lg,
     fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   seeAll: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontWeight: Typography.weights.semibold,
     marginBottom: Spacing.md,
   },
@@ -378,12 +378,12 @@ const styles = StyleSheet.create({
   tournamentTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   tournamentMeta: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   // Ratings
@@ -395,14 +395,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: Colors.bgSurface,
+    backgroundColor: Colors.backgroundAlt,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   ratingsHeaderText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
   },
   ratingsRow: {
@@ -412,15 +412,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingsRowEven: {
-    backgroundColor: Colors.bgSecondary,
+    backgroundColor: Colors.backgroundAlt,
   },
   ratingsText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   ratingsMeta: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   rankCol: {
     width: 32,
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   },
   ratingValue: {
     fontWeight: Typography.weights.semibold,
-    color: Colors.brandPrimary,
+    color: Colors.primary,
   },
   // How it works
   stepsGrid: {},
@@ -452,13 +452,13 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Spacing.md,
   },
   stepNumber: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
   },
@@ -468,12 +468,12 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   stepDesc: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
   },
   // CTA
@@ -492,12 +492,12 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xl,
     fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   ctaText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
     marginBottom: Spacing.xl,

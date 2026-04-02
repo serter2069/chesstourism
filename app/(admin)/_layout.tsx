@@ -23,7 +23,7 @@ export default function AdminLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: Colors.bgPrimary },
+        contentStyle: { backgroundColor: Colors.background },
       }}
     />
   );
