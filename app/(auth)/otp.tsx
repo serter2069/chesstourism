@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { Typography } from '../../constants/typography';
 import { useAuth } from '../../store/auth';
 
 const CODE_LENGTH = 6;
+const RESEND_COOLDOWN_SEC = 60;
 
 export default function OtpScreen() {
   const router = useRouter();
@@ -29,8 +30,16 @@ export default function OtpScreen() {
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
   const [resent, setResent] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(RESEND_COOLDOWN_SEC);
 
   const inputs = useRef<(TextInput | null)[]>([]);
+
+  // 60-second resend timer
+  useEffect(() => {
+    if (resendCountdown <= 0) return;
+    const timer = setTimeout(() => setResendCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCountdown]);
 
   function handleDigitChange(index: number, value: string) {
     // Allow only digits
@@ -74,16 +83,19 @@ export default function OtpScreen() {
   }
 
   async function handleResend() {
+    if (resendCountdown > 0) return;
     setResending(true);
     setError('');
     try {
       await requestOtp(email);
       setResent(true);
+      setResendCountdown(RESEND_COOLDOWN_SEC);
       setDigits(Array(CODE_LENGTH).fill(''));
       inputs.current[0]?.focus();
       setTimeout(() => setResent(false), 5000);
     } catch (err: any) {
-      setError('Failed to resend code. Please try again.');
+      const msg = err.response?.data?.error || 'Failed to resend code. Please try again.';
+      setError(msg);
     } finally {
       setResending(false);
     }
@@ -136,9 +148,21 @@ export default function OtpScreen() {
 
           <View style={styles.resendRow}>
             <Text style={styles.resendText}>Didn't receive it? </Text>
-            <TouchableOpacity onPress={handleResend} disabled={resending}>
-              <Text style={[styles.resendLink, resending && styles.resendLinkDisabled]}>
-                {resending ? 'Sending...' : 'Resend code'}
+            <TouchableOpacity
+              onPress={handleResend}
+              disabled={resending || resendCountdown > 0}
+            >
+              <Text
+                style={[
+                  styles.resendLink,
+                  (resending || resendCountdown > 0) && styles.resendLinkDisabled,
+                ]}
+              >
+                {resending
+                  ? 'Sending...'
+                  : resendCountdown > 0
+                    ? `Resend in ${resendCountdown}s`
+                    : 'Resend code'}
               </Text>
             </TouchableOpacity>
           </View>
