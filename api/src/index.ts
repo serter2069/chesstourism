@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth';
+import usersRouter from './routes/users';
+import commissarsRouter from './routes/commissars';
+import ratingsRouter from './routes/ratings';
 
 dotenv.config();
 
@@ -16,6 +19,9 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/commissars', commissarsRouter);
+app.use('/api/ratings', ratingsRouter);
 
 app.listen(PORT, () => {
   console.log(`ChesTourism API running on port ${PORT}`);
