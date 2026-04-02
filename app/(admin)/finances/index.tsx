@@ -63,18 +63,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   subtitle: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandPrimary,
+    color: Colors.primary,
     fontWeight: Typography.weights.semibold,
     marginBottom: Spacing.md,
   },
   description: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
     paddingHorizontal: Spacing.lg,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   statsRow: {
@@ -98,11 +98,11 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandPrimary,
+    color: Colors.primary,
     marginBottom: Spacing.xs,
   },
   statLabel: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
 });

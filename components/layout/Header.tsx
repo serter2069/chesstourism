@@ -159,9 +159,9 @@ export default function Header({ title, showBack = false }: HeaderProps) {
 
 const styles = StyleSheet.create({
   headerWrap: {
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   topRow: {
     flexDirection: 'row',
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   backText: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
   },
@@ -188,10 +188,10 @@ const styles = StyleSheet.create({
   logoIcon: {
     fontSize: 24,
     marginRight: Spacing.sm,
-    color: Colors.brandAccent,
+    color: Colors.gold,
   },
   logoText: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.lg,
     fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   userName: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
     maxWidth: 120,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: Colors.statusError,
+    backgroundColor: Colors.error,
     borderRadius: 8,
     minWidth: 16,
     height: 16,
@@ -245,10 +245,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.brandAccent,
+    borderColor: Colors.gold,
   },
   logoutText: {
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.medium,
   },
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
     borderRadius: 4,
-    backgroundColor: Colors.brandAccent,
+    backgroundColor: Colors.gold,
   },
   loginText: {
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
   },
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   hamburgerText: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
   },
@@ -287,16 +287,16 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   navLinkActive: {
-    borderBottomColor: Colors.brandAccent,
+    borderBottomColor: Colors.gold,
   },
   navLinkText: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
     opacity: 0.7,
   },
   navLinkTextActive: {
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontWeight: Typography.weights.semibold,
     opacity: 1,
   },
@@ -305,13 +305,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: Colors.brandSecondary,
+    borderTopColor: Colors.primary,
   },
   menuItem: {
     paddingVertical: Spacing.md,
   },
   menuItemText: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },

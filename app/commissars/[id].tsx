@@ -252,18 +252,18 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: Typography.sizes.base,
-    color: Colors.statusError,
+    color: Colors.error,
     textAlign: 'center',
     marginBottom: Spacing.lg,
   },
   backBtn: {
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.lg,
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     borderRadius: 8,
   },
   backBtnText: {
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },
@@ -275,12 +275,12 @@ const styles = StyleSheet.create({
   },
   backArrow: {
     fontSize: Typography.sizes.lg,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     marginRight: Spacing.sm,
   },
   backText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontWeight: Typography.weights.medium,
   },
   profileCard: {
@@ -305,12 +305,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   verifiedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.brandAccent,
+    backgroundColor: Colors.gold,
     borderRadius: 12,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
@@ -318,36 +318,36 @@ const styles = StyleSheet.create({
   },
   verifiedIcon: {
     fontSize: 10,
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
   },
   verifiedText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
   },
   specialization: {
     fontSize: Typography.sizes.sm,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     fontWeight: Typography.weights.medium,
     marginBottom: Spacing.xs,
   },
   location: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   bioSection: {
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.md,
   },
   bioText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
   },
   statsRow: {
     flexDirection: 'row',
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     borderRadius: 12,
     marginBottom: Spacing.lg,
     overflow: 'hidden',
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandAccent,
+    color: Colors.gold,
   },
   statLabel: {
     fontSize: Typography.sizes.xs,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   emptyTournaments: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   tournamentCard: {
     marginBottom: Spacing.md,
@@ -404,11 +404,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   tournamentLocation: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.xs,
   },
   tournamentMeta: {
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   },
   timeControl: {
     fontSize: Typography.sizes.xs,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     marginTop: Spacing.xs,
     fontWeight: Typography.weights.medium,
   },

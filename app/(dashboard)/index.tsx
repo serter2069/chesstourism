@@ -115,7 +115,7 @@ export default function DashboardScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {/* Welcome */}
@@ -170,11 +170,11 @@ export default function DashboardScreen() {
                   <Text style={styles.statLabel}>Games</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: Colors.statusSuccess }]}>{rating.wins}</Text>
+                  <Text style={[styles.statValue, { color: Colors.primary }]}>{rating.wins}</Text>
                   <Text style={styles.statLabel}>Wins</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: Colors.statusError }]}>{rating.losses}</Text>
+                  <Text style={[styles.statValue, { color: Colors.error }]}>{rating.losses}</Text>
                   <Text style={styles.statLabel}>Losses</Text>
                 </View>
                 <View style={styles.statItem}>
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   cardLabel: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
     marginBottom: Spacing.sm,
   },
@@ -291,13 +291,13 @@ const styles = StyleSheet.create({
   },
   memberText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'capitalize',
   },
   ratingValue: {
     fontSize: Typography.sizes['3xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandPrimary,
+    color: Colors.primary,
   },
   ratingUnit: {
     fontSize: Typography.sizes.xs,
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.border,
     paddingTop: Spacing.md,
   },
   statItem: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   statLabel: {
     fontSize: Typography.sizes.xs,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   tournamentCard: {
@@ -336,12 +336,12 @@ const styles = StyleSheet.create({
   tournamentTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   tournamentMeta: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 2,
   },
   badge: {
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   linksRow: {
     flexDirection: 'row',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
   },
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   fideBadge: {
-    backgroundColor: Colors.brandAccent,
+    backgroundColor: Colors.gold,
     borderRadius: 8,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -379,17 +379,17 @@ const styles = StyleSheet.create({
   fideTitleText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
     letterSpacing: 1,
   },
   fideRatingText: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
   },
   fideIdText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   footer: {
     height: Spacing['2xl'],

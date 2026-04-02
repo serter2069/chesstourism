@@ -201,29 +201,29 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
   subtitle: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
     marginBottom: Spacing['3xl'],
     lineHeight: Typography.sizes.base * 1.5,
   },
   emailText: {
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.semibold,
   },
   error: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     textAlign: 'center',
     marginBottom: Spacing.lg,
   },
   success: {
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     fontSize: Typography.sizes.sm,
     textAlign: 'center',
     marginBottom: Spacing.lg,
@@ -238,16 +238,16 @@ const styles = StyleSheet.create({
     width: 48,
     height: 56,
     borderWidth: 1.5,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
     borderRadius: 8,
     textAlign: 'center',
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
-    backgroundColor: Colors.bgCard,
+    color: Colors.text,
+    backgroundColor: Colors.background,
   },
   cellFilled: {
-    borderColor: Colors.brandPrimary,
+    borderColor: Colors.primary,
   },
   btn: {
     marginTop: Spacing.sm,
@@ -258,11 +258,11 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xl,
   },
   resendText: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontSize: Typography.sizes.sm,
   },
   resendLink: {
-    color: Colors.brandPrimary,
+    color: Colors.primary,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontSize: Typography.sizes.sm,
   },
 });

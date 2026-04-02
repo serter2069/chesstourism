@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   fieldLabel: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
     marginBottom: Spacing.xs,

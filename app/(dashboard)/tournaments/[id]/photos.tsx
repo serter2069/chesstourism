@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   uploadBtn: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   limitText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.statusWarning,
+    color: Colors.gold,
     fontWeight: Typography.weights.medium,
   },
   formCard: {
@@ -245,9 +245,9 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: Colors.bgCard,
+    backgroundColor: Colors.background,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
   },
   photo: {
     width: '100%',

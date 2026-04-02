@@ -19,7 +19,7 @@ export default function DashboardLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: Colors.bgPrimary },
+        contentStyle: { backgroundColor: Colors.background },
       }}
     />
   );

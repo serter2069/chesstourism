@@ -17,7 +17,7 @@ const statusColors: Record<BadgeStatus, { bg: string; text: string }> = {
   warning: { bg: '#FFF8E1', text: '#E65100' },
   error: { bg: '#FFEBEE', text: '#B71C1C' },
   info: { bg: '#E3F2FD', text: '#0D47A1' },
-  default: { bg: Colors.bgSurface, text: Colors.textSecondary },
+  default: { bg: Colors.backgroundAlt, text: Colors.textMuted },
 };
 
 export default function Badge({ label, status = 'default', style }: BadgeProps) {

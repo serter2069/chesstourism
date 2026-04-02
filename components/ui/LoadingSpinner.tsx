@@ -9,7 +9,7 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({
   size = 'large',
-  color = Colors.brandPrimary,
+  color = Colors.primary,
 }: LoadingSpinnerProps) {
   return (
     <View style={styles.container}>

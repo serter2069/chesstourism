@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   chipsScroll: {
     paddingHorizontal: Spacing.lg,
@@ -278,12 +278,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
-    backgroundColor: Colors.bgSurface,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundAlt,
   },
   chipActive: {
-    backgroundColor: Colors.brandPrimary,
-    borderColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   chipFlag: {
     fontSize: Typography.sizes.sm,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   chipLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   chipLabelActive: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   card: {
     marginBottom: Spacing.md,
@@ -339,11 +339,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   location: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginTop: 2,
   },
   specialization: {
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.brandPrimary,
+    color: Colors.primary,
     fontWeight: Typography.weights.medium,
     marginTop: Spacing.xs,
   },
@@ -368,6 +368,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
 });

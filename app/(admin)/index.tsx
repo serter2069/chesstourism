@@ -96,7 +96,7 @@ export default function AdminDashboardScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.brandPrimary}
+            tintColor={Colors.primary}
           />
         }
       >
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
     marginTop: Spacing.lg,
   },
@@ -199,27 +199,27 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.xl,
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
   },
   statValueGold: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     marginBottom: Spacing.xs,
   },
   statLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
   },
   alertCard: {
-    backgroundColor: Colors.statusWarning + '15',
+    backgroundColor: Colors.gold + '15',
     borderWidth: 1,
-    borderColor: Colors.statusWarning,
+    borderColor: Colors.gold,
     marginBottom: Spacing.md,
   },
   alertText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.statusWarning,
+    color: Colors.gold,
     fontWeight: Typography.weights.semibold,
     textAlign: 'center',
   },
@@ -246,19 +246,19 @@ const styles = StyleSheet.create({
   linkTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   linkDescription: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   linkArrow: {
     fontSize: Typography.sizes.lg,
     color: Colors.textMuted,
   },
   badge: {
-    backgroundColor: Colors.statusWarning,
+    backgroundColor: Colors.gold,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
   },
   bottomSpacer: {
     height: Spacing['4xl'],

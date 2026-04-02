@@ -350,7 +350,7 @@ export default function TournamentDetailScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {/* Title section */}
@@ -680,9 +680,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.xl,
     paddingBottom: Spacing.lg,
-    backgroundColor: Colors.bgSecondary,
+    backgroundColor: Colors.backgroundAlt,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   statusBadge: {
     marginBottom: Spacing.sm,
@@ -697,17 +697,17 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   dates: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.xs,
   },
   location: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.lg,
   },
   metaRow: {
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
   },
   metaValue: {
     fontSize: Typography.sizes.base,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.semibold,
   },
   // Actions
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   // Commissar
@@ -762,11 +762,11 @@ const styles = StyleSheet.create({
   commissarName: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   commissarMeta: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginTop: 2,
   },
   // Tabs
@@ -775,7 +775,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xl,
     marginHorizontal: Spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   tab: {
     paddingVertical: Spacing.sm,
@@ -784,15 +784,15 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: Colors.brandPrimary,
+    borderBottomColor: Colors.primary,
   },
   tabText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   tabTextActive: {
-    color: Colors.brandPrimary,
+    color: Colors.primary,
     fontWeight: Typography.weights.semibold,
   },
   // Info tab
@@ -802,12 +802,12 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   infoText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
   },
   emptyTab: {
@@ -828,7 +828,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   rowEven: {
-    backgroundColor: Colors.bgSurface + '44',
+    backgroundColor: Colors.backgroundAlt + '44',
   },
   participantRank: {
     width: 28,
@@ -840,26 +840,26 @@ const styles = StyleSheet.create({
   },
   participantName: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.medium,
   },
   participantMeta: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   // Results
   resultsHeader: {
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: Colors.bgSurface,
+    backgroundColor: Colors.backgroundAlt,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   resultsHeaderText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
   },
   resultRow: {
@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
   },
   resultText: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   resultRank: {
     width: 28,
@@ -888,10 +888,10 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   ratingPositive: {
-    color: Colors.statusSuccess,
+    color: Colors.primary,
   },
   ratingNegative: {
-    color: Colors.statusError,
+    color: Colors.error,
   },
   // Photos
   addPhotoSection: {
@@ -904,18 +904,18 @@ const styles = StyleSheet.create({
   addPhotoTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
     borderRadius: 8,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     fontSize: Typography.sizes.sm,
-    color: Colors.textPrimary,
-    backgroundColor: Colors.bgSecondary,
+    color: Colors.text,
+    backgroundColor: Colors.backgroundAlt,
     marginBottom: Spacing.xs,
   },
   addPhotoActions: {
@@ -937,11 +937,11 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 1,
     borderRadius: 8,
-    backgroundColor: Colors.bgSurface,
+    backgroundColor: Colors.backgroundAlt,
   },
   photoCaption: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginTop: Spacing.xs,
   },
   deletePhotoBtn: {
@@ -950,11 +950,11 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: Spacing.sm,
     borderRadius: 4,
-    backgroundColor: Colors.statusError + '22',
+    backgroundColor: Colors.error + '22',
   },
   deletePhotoBtnText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.statusError,
+    color: Colors.error,
     fontWeight: Typography.weights.medium,
   },
   // Error
@@ -965,7 +965,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
     textAlign: 'center',

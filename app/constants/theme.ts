@@ -7,21 +7,19 @@
  * are kept in sync and used by components via shorter imports.
  */
 
+import { Colors } from '../../constants/colors'
+
 export const colors = {
-  primary: '#1A2B4A',
-  primaryLight: '#3D4F6E',
-  accent: '#C8A96E',
-  accentLight: '#E8D5A3',
-  background: '#FFFFFF',
-  surface: '#F5F6FA',
-  surfaceWhite: '#FFFFFF',
-  text: '#0D1B3E',
-  textMuted: '#6B7A99',
+  primary: Colors.primary,
+  accent: Colors.gold,
+  background: Colors.background,
+  surface: Colors.backgroundAlt,
+  text: Colors.text,
+  textMuted: Colors.textMuted,
   textOnPrimary: '#FFFFFF',
   textOnAccent: '#FFFFFF',
-  border: '#DDE1EC',
-  error: '#C0392B',
-  success: '#1A7A4A',
+  border: Colors.border,
+  error: Colors.error,
 } as const;
 
 export const fonts = {

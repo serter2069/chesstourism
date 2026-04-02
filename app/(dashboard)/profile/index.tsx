@@ -243,12 +243,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   description: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginBottom: Spacing.lg,
     lineHeight: 20,
   },
@@ -256,14 +256,14 @@ const styles = StyleSheet.create({
   fideBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.bgCard,
+    backgroundColor: Colors.background,
     borderRadius: 8,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: Colors.brandAccent,
+    borderColor: Colors.gold,
   },
   fideBadge: {
-    backgroundColor: Colors.brandAccent,
+    backgroundColor: Colors.gold,
     borderRadius: 8,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -273,13 +273,13 @@ const styles = StyleSheet.create({
   fideTitleText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
     letterSpacing: 1,
   },
   fideRatingText: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: Colors.textOnAccent,
+    color: '#FFFFFF',
   },
   fideDetails: {
     marginLeft: Spacing.lg,
@@ -287,27 +287,27 @@ const styles = StyleSheet.create({
   },
   fideIdLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   fideTitleLabel: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginTop: Spacing.xs,
   },
   // Lookup result
   resultCard: {
     marginTop: Spacing.lg,
-    backgroundColor: Colors.bgCard,
+    backgroundColor: Colors.background,
     borderRadius: 8,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
   },
   resultTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     marginBottom: Spacing.md,
   },
   resultRow: {
@@ -316,16 +316,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   resultLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   resultValue: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   titleBadgeWrap: {
     flexDirection: 'row',
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   titleFullName: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   saveButtonWrap: {
     marginTop: Spacing.lg,
@@ -350,11 +350,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
   errorText: {
-    color: Colors.statusError,
+    color: Colors.error,
     fontSize: Typography.sizes.sm,
   },
   successText: {
-    color: Colors.statusSuccess,
+    color: Colors.primary,
     fontSize: Typography.sizes.sm,
   },
 });

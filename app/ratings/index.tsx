@@ -87,7 +87,7 @@ interface Pagination {
 
 // Medal colors for top-3
 const MEDAL_COLORS: Record<number, string> = {
-  1: Colors.brandAccent,   // gold
+  1: Colors.gold,   // gold
   2: '#9EA3A8',             // silver
   3: '#CD7F32',             // bronze
 };
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   chipsScroll: {
     paddingHorizontal: Spacing.lg,
@@ -372,12 +372,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
-    backgroundColor: Colors.bgSurface,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundAlt,
   },
   chipActive: {
-    backgroundColor: Colors.brandPrimary,
-    borderColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   chipFlag: {
     fontSize: Typography.sizes.sm,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   chipLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   chipLabelActive: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
     padding: Spacing.lg,
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.primary,
     borderRadius: 12,
   },
   myRankLeft: {
@@ -418,14 +418,14 @@ const styles = StyleSheet.create({
   myRankLabel: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     letterSpacing: 1.5,
     marginBottom: 4,
   },
   myRankName: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   myRankRight: {
@@ -434,17 +434,17 @@ const styles = StyleSheet.create({
   myRankPosition: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     lineHeight: 28,
   },
   myRankRating: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textOnPrimary,
+    color: '#FFFFFF',
   },
   myRankTotal: {
     fontSize: Typography.sizes.xs,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     opacity: 0.8,
   },
 
@@ -454,13 +454,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   searchInput: {
-    backgroundColor: Colors.bgSurface,
+    backgroundColor: Colors.backgroundAlt,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
     borderRadius: 8,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.lg,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontSize: Typography.sizes.sm,
     minHeight: 40,
   },
@@ -475,16 +475,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.sm,
-    backgroundColor: Colors.bgSecondary,
+    backgroundColor: Colors.backgroundAlt,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
     borderRadius: 6,
     marginBottom: Spacing.xs,
   },
   headerText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -494,16 +494,16 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   top3Row: {
-    backgroundColor: Colors.bgCard,
+    backgroundColor: Colors.background,
     borderBottomColor: 'transparent',
     borderRadius: 6,
     marginBottom: 2,
   },
   currentUserRow: {
-    backgroundColor: Colors.brandPrimary + '14',
+    backgroundColor: Colors.primary + '14',
     borderRadius: 6,
     borderBottomColor: 'transparent',
   },
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   rankText: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
   },
   nameRow: {
@@ -536,11 +536,11 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
-    color: Colors.textPrimary,
+    color: Colors.text,
     flexShrink: 1,
   },
   currentUserText: {
-    color: Colors.brandPrimary,
+    color: Colors.primary,
     fontWeight: Typography.weights.semibold,
   },
   cityText: {
@@ -551,13 +551,13 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
-    color: Colors.textAccent,
+    color: Colors.gold,
     textAlign: 'right',
   },
 
   // FIDE title badge
   badge: {
-    backgroundColor: Colors.brandAccent + '22',
+    backgroundColor: Colors.gold + '22',
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: Typography.weights.bold,
-    color: Colors.brandAccent,
+    color: Colors.gold,
     letterSpacing: 0.5,
   },
 
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: Typography.sizes.base,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   footer: {
     paddingVertical: Spacing.lg,

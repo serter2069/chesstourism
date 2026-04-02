@@ -1,38 +1,19 @@
-// Brand color tokens — Navy + Gold palette (Official Chess Federation)
 export const Colors = {
   // Backgrounds
-  bgPrimary: '#FFFFFF',
-  bgSecondary: '#F5F6FA',
-  bgSurface: '#F5F6FA',
-  bgCard: '#FFFFFF',
-
-  // Text
-  textPrimary: '#0D1B3E',
-  textSecondary: '#3D4F6E',
-  textMuted: '#6B7A99',
-  textAccent: '#C8A96E',
-
-  // Borders
-  borderDefault: '#DDE1EC',
-  borderFocus: '#C8A96E',
+  background: '#FFFFFF',
+  backgroundAlt: '#F5F6FA',
 
   // Brand
-  brandPrimary: '#1A2B4A',
-  brandAccent: '#C8A96E',
-  brandSecondary: '#3D4F6E',
+  primary: '#1A2B4A',
+  gold: '#C8A96E',
 
-  // Status
-  statusSuccess: '#1A7A4A',
-  statusWarning: '#B8860B',
-  statusError: '#C0392B',
-  statusInfo: '#1A5276',
+  // Text
+  text: '#0D1B3E',
+  textMuted: '#6B7A99',
 
-  // On-color text
-  textOnPrimary: '#FFFFFF',
-  textOnAccent: '#FFFFFF',
+  // System
+  error: '#C0392B',
+  border: '#DDE1EC',
+} as const
 
-  // Accent
-  accentLight: '#E8D5A3',
-} as const;
-
-export type ColorKey = keyof typeof Colors;
+export type Color = keyof typeof Colors

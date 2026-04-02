@@ -112,7 +112,7 @@ export default function NotificationsScreen() {
               <RefreshControl
                 refreshing={isLoading}
                 onRefresh={refresh}
-                tintColor={Colors.brandAccent}
+                tintColor={Colors.gold}
               />
             }
           >
@@ -140,25 +140,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: Colors.border,
   },
   heading: {
     fontSize: Typography.sizes.lg,
     fontFamily: Typography.fontFamilyHeading,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.bold,
   },
   markAllBtn: {
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
     borderRadius: 4,
-    backgroundColor: Colors.bgSecondary,
+    backgroundColor: Colors.backgroundAlt,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.border,
   },
   markAllText: {
     fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
   },
   list: {
@@ -170,8 +170,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
-    backgroundColor: Colors.bgCard,
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.background,
   },
   itemUnread: {
     backgroundColor: '#EFF6FF',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.bgSecondary,
+    backgroundColor: Colors.backgroundAlt,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Spacing.md,
@@ -195,24 +195,24 @@ const styles = StyleSheet.create({
   iconText: {
     fontSize: 16,
     fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   itemContent: {
     flex: 1,
   },
   itemTitle: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weights.medium,
     marginBottom: 2,
   },
   itemTitleUnread: {
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: Typography.weights.semibold,
   },
   itemBody: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     lineHeight: 18,
     marginBottom: 4,
   },
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.brandAccent,
+    backgroundColor: Colors.gold,
     marginLeft: Spacing.sm,
     marginTop: 4,
     flexShrink: 0,
