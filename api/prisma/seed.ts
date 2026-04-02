@@ -328,6 +328,7 @@ async function seedUsers(): Promise<Map<string, string>> {
       update: {
         name: p.name,
         city: p.city,
+        country: p.country,
         rating: p.rating,
         fideId: p.fideId || null,
         fideTitle: p.fideTitle || null,
@@ -338,6 +339,7 @@ async function seedUsers(): Promise<Map<string, string>> {
         email,
         name: p.name,
         city: p.city,
+        country: p.country,
         rating: p.rating,
         role: p.isCommissioner ? Role.COMMISSIONER : Role.PARTICIPANT,
         fideId: p.fideId || null,
