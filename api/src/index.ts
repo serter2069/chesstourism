@@ -13,7 +13,6 @@ import profileRouter from './routes/profile';
 import fideRouter from './routes/fide';
 import watchlistRouter from './routes/watchlist';
 import organizationsRouter from './routes/organizations';
-import membershipRouter from './routes/membership';
 import adminRouter from './routes/admin';
 import notificationsRouter from './routes/notifications';
 
@@ -68,7 +67,6 @@ app.use('/api/profile', profileRouter);
 app.use('/api/profile', fideRouter);
 app.use('/api', watchlistRouter);
 app.use('/api', organizationsRouter);
-app.use('/api/membership', membershipRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', notificationsRouter);
 
