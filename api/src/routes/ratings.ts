@@ -192,4 +192,54 @@ router.post(
   }
 );
 
+// GET /api/ratings/:userId/history — paginated ELO change history for a user
+router.get('/:userId/history', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const where = {
+      userId,
+      tournament: { status: 'COMPLETED' as const },
+    };
+
+    const [results, total] = await Promise.all([
+      prisma.tournamentResult.findMany({
+        where,
+        include: {
+          tournament: {
+            select: { id: true, title: true, endDate: true },
+          },
+        },
+        orderBy: { tournament: { endDate: 'desc' } },
+        skip,
+        take: limit,
+      }),
+      prisma.tournamentResult.count({ where }),
+    ]);
+
+    res.json({
+      data: results.map((r) => ({
+        tournamentId: r.tournamentId,
+        tournamentName: r.tournament.title,
+        place: r.place,
+        score: r.score,
+        eloChange: r.eloChange,
+        date: r.tournament.endDate,
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
+  } catch (err: any) {
+    console.error('ELO history error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
