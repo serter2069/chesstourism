@@ -37,6 +37,8 @@ jobs:
           rsync -av --delete dist/ /var/www/chesstourism/web/
 
       - name: Deploy API
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           cd api
           npm ci
