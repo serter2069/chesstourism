@@ -45,5 +45,8 @@ jobs:
           npx prisma generate
           npx prisma migrate deploy
           npm run build
+          # Write .env for PM2 process (dotenv.config reads from .env at runtime)
+          echo "DATABASE_URL=${DATABASE_URL}" > .env
+          echo "PORT=3811" >> .env
           pm2 restart chesstourism-api || pm2 start dist/index.js --name chesstourism-api
           sudo chown -R www-data:www-data /var/www/chesstourism/web/
