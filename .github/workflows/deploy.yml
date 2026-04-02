@@ -39,16 +39,18 @@ jobs:
           rsync -av --delete dist/ /var/www/chesstourism/web/
           sudo chown -R www-data:www-data /var/www/chesstourism/web/
 
+      - name: Install Doppler CLI
+        run: (curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sudo sh
+
       - name: Deploy API
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
           cd api
           npm ci
-          npx prisma generate
-          npx prisma db push --accept-data-loss
+          doppler run -- npx prisma generate
+          doppler run -- npx prisma db push --accept-data-loss
           npm run build
           # Write .env for PM2 process (dotenv.config reads from .env at runtime)
-          echo "DATABASE_URL=${DATABASE_URL}" > .env
-          echo "PORT=3811" >> .env
+          doppler secrets download --no-file --format env > .env
           pm2 restart chesstourism-api || pm2 start dist/index.js --name chesstourism-api

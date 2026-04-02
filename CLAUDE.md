@@ -1,5 +1,26 @@
 # ChesTourism
 
+## Local Development
+
+Secrets: **Doppler** (workspace: Sergei MSP, project: `chesstourism`, config: `dev`)
+
+```bash
+doppler login      # once per machine
+doppler setup --project chesstourism --config dev --no-interactive
+cd api && doppler run -- npm run dev
+# frontend:
+npx expo start --web
+```
+
+Manage secrets:
+```bash
+doppler secrets --project chesstourism --config dev
+doppler secrets set KEY=value --project chesstourism --config dev
+```
+
+TODO: server-side Doppler injection via GitHub Actions (requires DOPPLER_TOKEN secret).
+Currently: manual `.env` at `/var/www/chesstourism/.env` on server.
+
 International Chess Tourism Association platform.
 
 ## Stack
@@ -19,8 +40,11 @@ International Chess Tourism Association platform.
 # Frontend
 npx expo start --web
 
-# API
+# API (with Doppler)
 cd api && npm run dev
+
+# API (without Doppler, uses local .env)
+cd api && npm run dev:nodoppler
 ```
 
 ## Database
