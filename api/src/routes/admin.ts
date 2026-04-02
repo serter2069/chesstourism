@@ -1,10 +1,9 @@
 import { Router, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
+import prisma from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // All admin routes require authentication + ADMIN role
 router.use(authenticate, requireRole('ADMIN'));

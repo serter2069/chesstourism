@@ -1,9 +1,8 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { sendOtpEmail } from './email.service';
 import { Response } from 'express';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 const DEV_MODE = process.env.NODE_ENV !== 'production';
 const OTP_TTL_MINUTES = 10;

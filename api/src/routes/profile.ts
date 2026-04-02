@@ -1,8 +1,6 @@
 import { Router, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 const router = Router();
 
 // POST /api/profile/preferences — save onboarding quiz answers
