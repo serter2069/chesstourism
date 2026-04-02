@@ -763,4 +763,87 @@ router.delete('/tournaments/:id/photos/:photoId', authenticate, requireRole('COM
   }
 });
 
+// PATCH /api/tournaments/:id/participants/:userId/confirm-cash — commissioner confirms cash payment
+router.patch('/tournaments/:id/participants/:userId/confirm-cash', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId: commissionerUserId, role } = req.user!;
+    const { id: tournamentId, userId: participantUserId } = req.params;
+
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    // Only tournament owner commissioner (or admin) can confirm cash payments
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== commissionerUserId) {
+      res.status(403).json({ error: 'Only the tournament commissioner can confirm cash payments' });
+      return;
+    }
+
+    if (!['REGISTRATION_OPEN', 'IN_PROGRESS'].includes(tournament.status)) {
+      res.status(400).json({ error: 'Tournament must be in REGISTRATION_OPEN or IN_PROGRESS status' });
+      return;
+    }
+
+    // Find the registration for this participant
+    const registration = await prisma.tournamentRegistration.findUnique({
+      where: { tournamentId_userId: { tournamentId, userId: participantUserId } },
+      include: { payment: true },
+    });
+
+    if (!registration) {
+      res.status(404).json({ error: 'Participant not registered for this tournament' });
+      return;
+    }
+
+    if (registration.payment) {
+      // Payment record exists — update it if not already PAID
+      if (registration.payment.status === 'PAID') {
+        res.status(400).json({ error: 'Payment is already confirmed' });
+        return;
+      }
+
+      await prisma.payment.update({
+        where: { id: registration.payment.id },
+        data: { status: 'PAID' },
+      });
+    } else {
+      // No payment record yet — create one and link it to the registration
+      const newPayment = await prisma.payment.create({
+        data: {
+          userId: participantUserId,
+          tournamentId,
+          amount: tournament.fee ?? 0,
+          currency: tournament.currency,
+          status: 'PAID',
+        },
+      });
+
+      await prisma.tournamentRegistration.update({
+        where: { id: registration.id },
+        data: { paymentId: newPayment.id },
+      });
+    }
+
+    // Notify participant (fire-and-forget)
+    createNotification(
+      participantUserId,
+      'PAYMENT_CONFIRMED',
+      'Оплата подтверждена',
+      `Комиссар подтвердил вашу оплату наличными для турнира "${tournament.title}"`,
+      { tournamentId },
+    ).catch(() => {});
+
+    res.json({ success: true, message: 'Cash payment confirmed' });
+  } catch (err) {
+    console.error('Confirm cash payment error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
