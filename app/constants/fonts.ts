@@ -1,22 +1,28 @@
 /**
- * Font loader for Clay brand system.
- * Uses expo-google-fonts for Nunito (all text per brand.html).
+ * Font loader for Navy + Gold brand system.
+ * Uses expo-google-fonts for Playfair Display (headings) + Inter (body).
  */
+import { useFonts } from 'expo-font';
 import {
-  useFonts as useNunito,
-  Nunito_400Regular,
-  Nunito_600SemiBold,
-  Nunito_700Bold,
-  Nunito_800ExtraBold,
-} from '@expo-google-fonts/nunito';
+  PlayfairDisplay_400Regular,
+  PlayfairDisplay_700Bold,
+} from '@expo-google-fonts/playfair-display';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 
 export function useBrandFonts(): [boolean, Error | null] {
-  const [nunitoLoaded, nunitoError] = useNunito({
-    Nunito_400Regular,
-    Nunito_600SemiBold,
-    Nunito_700Bold,
-    Nunito_800ExtraBold,
+  const [fontsLoaded, fontsError] = useFonts({
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
   });
 
-  return [nunitoLoaded, nunitoError];
+  return [fontsLoaded, fontsError];
 }
