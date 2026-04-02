@@ -14,6 +14,7 @@ import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import { useAuth } from '../../store/auth';
+import { usePlatform } from '../../hooks/usePlatform';
 import api from '../../lib/api';
 
 interface Tournament {
@@ -135,6 +136,7 @@ export default function TournamentsListScreen() {
   }, [hasMore, page, fetchTournaments]);
 
   const isCommissar = user?.role === 'commissar' || user?.role === 'admin';
+  const { columns } = usePlatform();
 
   return (
     <SafeContainer>
@@ -254,60 +256,67 @@ export default function TournamentsListScreen() {
           </View>
         )}
 
-        {/* Tournament list */}
-        {!loading && tournaments.map((t) => {
-          const badge = STATUS_BADGE[t.status] || { label: t.status, status: 'default' as const };
-          return (
-            <TouchableOpacity
-              key={t.id}
-              onPress={() => router.push(`/tournaments/${t.id}`)}
-              activeOpacity={0.7}
-              style={styles.cardWrapper}
-            >
-              <Card>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardTitle} numberOfLines={2}>{t.title}</Text>
-                  <WatchlistButton tournamentId={t.id} size={20} />
-                  <Badge label={badge.label} status={badge.status} />
-                </View>
-                <View style={styles.cardMeta}>
-                  <Text style={styles.metaText}>
-                    {formatDate(t.startDate)} - {formatDate(t.endDate)}
-                  </Text>
-                  <Text style={styles.metaText}>
-                    {t.city}, {t.country}
-                  </Text>
-                </View>
-                <View style={styles.cardFooter}>
-                  <View style={styles.footerItem}>
-                    <Text style={styles.footerLabel}>Format</Text>
-                    <Text style={styles.footerValue}>{t.format}</Text>
-                  </View>
-                  {t.commissar && (
-                    <View style={styles.footerItem}>
-                      <Text style={styles.footerLabel}>Commissar</Text>
-                      <Text style={styles.footerValue}>{t.commissar.name} {t.commissar.surname}</Text>
+        {/* Tournament list — responsive grid */}
+        {!loading && (
+          <View style={[styles.grid, { paddingHorizontal: Spacing.lg }]}>
+            {tournaments.map((t) => {
+              const badge = STATUS_BADGE[t.status] || { label: t.status, status: 'default' as const };
+              return (
+                <TouchableOpacity
+                  key={t.id}
+                  onPress={() => router.push(`/tournaments/${t.id}`)}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.gridItem,
+                    columns > 1 && { width: `${(100 / columns) - 1}%` as unknown as number },
+                  ]}
+                >
+                  <Card>
+                    <View style={styles.cardHeader}>
+                      <Text style={styles.cardTitle} numberOfLines={2}>{t.title}</Text>
+                      <WatchlistButton tournamentId={t.id} size={20} />
+                      <Badge label={badge.label} status={badge.status} />
                     </View>
-                  )}
-                  {t._count?.participants != null && (
-                    <View style={styles.footerItem}>
-                      <Text style={styles.footerLabel}>Players</Text>
-                      <Text style={styles.footerValue}>{t._count.participants}</Text>
-                    </View>
-                  )}
-                  {t.entryFee != null && (
-                    <View style={styles.footerItem}>
-                      <Text style={styles.footerLabel}>Fee</Text>
-                      <Text style={styles.footerValue}>
-                        {t.entryFee === 0 ? 'Free' : `${t.entryFee} ${t.currency || 'EUR'}`}
+                    <View style={styles.cardMeta}>
+                      <Text style={styles.metaText}>
+                        {formatDate(t.startDate)} - {formatDate(t.endDate)}
+                      </Text>
+                      <Text style={styles.metaText}>
+                        {t.city}, {t.country}
                       </Text>
                     </View>
-                  )}
-                </View>
-              </Card>
-            </TouchableOpacity>
-          );
-        })}
+                    <View style={styles.cardFooter}>
+                      <View style={styles.footerItem}>
+                        <Text style={styles.footerLabel}>Format</Text>
+                        <Text style={styles.footerValue}>{t.format}</Text>
+                      </View>
+                      {t.commissar && (
+                        <View style={styles.footerItem}>
+                          <Text style={styles.footerLabel}>Commissar</Text>
+                          <Text style={styles.footerValue}>{t.commissar.name} {t.commissar.surname}</Text>
+                        </View>
+                      )}
+                      {t._count?.participants != null && (
+                        <View style={styles.footerItem}>
+                          <Text style={styles.footerLabel}>Players</Text>
+                          <Text style={styles.footerValue}>{t._count.participants}</Text>
+                        </View>
+                      )}
+                      {t.entryFee != null && (
+                        <View style={styles.footerItem}>
+                          <Text style={styles.footerLabel}>Fee</Text>
+                          <Text style={styles.footerValue}>
+                            {t.entryFee === 0 ? 'Free' : `${t.entryFee} ${t.currency || 'EUR'}`}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </Card>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
 
         {/* Load more */}
         {hasMore && !loading && (
@@ -344,9 +353,7 @@ const styles = StyleSheet.create({
   filters: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.lg,
-    maxWidth: 430,
-    alignSelf: 'center' as const,
-    width: '100%' as unknown as number,
+    width: '100%',
   },
   filterRow: {
     marginBottom: Spacing.md,
@@ -422,10 +429,15 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
-  // Cards
-  cardWrapper: {
-    paddingHorizontal: Spacing.lg,
+  // Grid layout
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.md,
     marginTop: Spacing.md,
+  },
+  gridItem: {
+    marginTop: 0,
   },
   cardHeader: {
     flexDirection: 'row',
