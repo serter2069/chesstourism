@@ -128,6 +128,36 @@ export async function sendThankYouEmail(
   });
 }
 
+export async function sendOrganizationRequestDecision(
+  to: string,
+  contactName: string,
+  organizationName: string,
+  approved: boolean,
+  reason?: string,
+): Promise<void> {
+  const status = approved ? 'Approved' : 'Declined';
+  const subject = approved
+    ? `Your organization "${organizationName}" has been approved!`
+    : `Update on your organization request for "${organizationName}"`;
+
+  await transporter.sendMail({
+    from: FROM_EMAIL,
+    to,
+    subject,
+    html: `
+      <h2>Organization Request ${status}</h2>
+      <p>Dear ${contactName},</p>
+      <p>Your request to register <strong>${organizationName}</strong> on ChesTourism has been <strong>${status.toLowerCase()}</strong>.</p>
+      ${reason ? `<p>Reason: ${reason}</p>` : ''}
+      ${approved
+        ? `<p>Welcome aboard! You can now explore partnership opportunities on <a href="${BASE_URL}">ChesTourism</a>.</p>`
+        : '<p>If you have questions, feel free to contact us or submit a new request.</p>'
+      }
+      <p>Best regards,<br/>ChesTourism Team</p>
+    `,
+  });
+}
+
 export async function sendResultsWithCertificate(
   to: string,
   userName: string,
