@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Picker — 3 Sites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #F0F2F5;
+  font-family: Inter, sans-serif;
+  padding: 32px 20px 64px;
+  min-height: 100vh;
+}
+.page-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+.page-subtitle {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 40px;
+  letter-spacing: -0.5px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── SITE CARD ── */
+.site-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+}
+.site-card-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: 0.3px;
+}
+.site-card-domain {
+  font-size: 11px;
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+/* ── PALETTE SWITCHER ── */
+.palette-row {
+  padding: 12px 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #F3F4F6;
+  background: #FAFAFA;
+}
+.palette-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  border: 1.5px solid #E5E7EB;
+  background: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.palette-btn:hover { border-color: #9CA3AF; }
+.palette-btn.active { border-color: #111827; background: #111827; color: #fff; }
+.palette-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* ── PREVIEW ── */
+.preview {
+  transition: background 0.2s;
+}
+
+/* NAV */
+.preview-nav {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.nav-links {
+  display: flex;
+  gap: 18px;
+}
+.nav-link {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.55;
+}
+.nav-cta {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+}
+
+/* HERO */
+.preview-hero {
+  padding: 28px 20px 24px;
+}
+.hero-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
+.hero-h1 {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+.hero-sub {
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.6;
+  margin-bottom: 20px;
+}
+.hero-btns {
+  display: flex;
+  gap: 10px;
+}
+.btn-p {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.btn-s {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+}
+
+/* CARD ROW */
+.preview-cards {
+  padding: 0 20px 24px;
+  display: flex;
+  gap: 10px;
+}
+.mini-card {
+  flex: 1;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.mini-card-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.mini-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+.mini-card-sub { font-size: 11px; opacity: 0.55; }
+
+/* SELECTED INFO */
+.palette-info {
+  padding: 12px 20px 16px;
+  background: #FAFAFA;
+  border-top: 1px solid #F3F4F6;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.palette-info-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  margin-right: auto;
+}
+.hex-chip {
+  font-size: 10px;
+  font-family: monospace;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #F3F4F6;
+  color: #374151;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-title">Stage 5 — Brand Style</div>
+<div class="page-subtitle">Выбери цвета для каждого сайта</div>
+
+<div class="grid">
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CHESS TOURISM                               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="site-card" id="chess-card">
+    <div class="site-card-header">
+      <div class="site-card-name">Шахматная федерация</div>
+      <div class="site-card-domain">chesstourism.com</div>
+    </div>
+    <div class="palette-row" id="chess-palettes"></div>
+    <div class="preview" id="chess-preview"></div>
+    <div class="palette-info" id="chess-info"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- P2PTAX                                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="site-card" id="tax-card">
+    <div class="site-card-header">
+      <div class="site-card-name">Налоговик</div>
+      <div class="site-card-domain">p2ptax.com</div>
+    </div>
+    <div class="palette-row" id="tax-palettes"></div>
+    <div class="preview" id="tax-preview"></div>
+    <div class="palette-info" id="tax-info"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- AVITO GEORGIA                               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="site-card" id="avito-card">
+    <div class="site-card-header">
+      <div class="site-card-name">Авито Грузия</div>
+      <div class="site-card-domain">avito-georgia.com</div>
+    </div>
+    <div class="palette-row" id="avito-palettes"></div>
+    <div class="preview" id="avito-preview"></div>
+    <div class="palette-info" id="avito-info"></div>
+  </div>
+
+</div>
+
+<script>
+// ── PALETTES ─────────────────────────────────────────────────────────────────
+
+const chessPalettes = [
+  {
+    id: 'navy-gold',
+    name: 'Navy Gold',
+    bg: '#FFFFFF', surface: '#F8FAFF',
+    primary: '#0D1B3E', accent: '#C9941A',
+    text: '#0D1B3E', muted: '#64748B',
+    btnBg: '#0D1B3E', btnText: '#FFFFFF',
+    btnSBorder: '#0D1B3E',
+    cardBg: '#F8FAFF',
+    font: "'Playfair Display', serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'ChessTours',
+    tag: 'International Chess Tourism',
+    h1: 'Шахматные туры по всему миру',
+    sub: 'Турниры FIDE, исторические клубы, легендарные города.',
+    cta: 'Найти тур', sec: 'Расписание',
+    nav: ['Туры', 'Турниры', 'О нас'],
+    cards: [
+      { label: 'Топ', title: 'Турнир Прага', sub: '€2 400 · 7 дней' },
+      { label: 'VIP', title: 'Дубай FIDE', sub: '$3 800 · 5★' },
+    ]
+  },
+  {
+    id: 'slate',
+    name: 'Slate Pro',
+    bg: '#FFFFFF', surface: '#F1F5F9',
+    primary: '#1E293B', accent: '#3B82F6',
+    text: '#1E293B', muted: '#64748B',
+    btnBg: '#1E293B', btnText: '#FFFFFF',
+    btnSBorder: '#1E293B',
+    cardBg: '#F1F5F9',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'ChessTours',
+    tag: 'International Chess Tourism',
+    h1: 'Шахматные туры по всему миру',
+    sub: 'Турниры FIDE, исторические клубы, легендарные города.',
+    cta: 'Найти тур', sec: 'Расписание',
+    nav: ['Туры', 'Турниры', 'О нас'],
+    cards: [
+      { label: 'Топ', title: 'Турнир Прага', sub: '€2 400 · 7 дней' },
+      { label: 'VIP', title: 'Дубай FIDE', sub: '$3 800 · 5★' },
+    ]
+  },
+  {
+    id: 'forest-gold',
+    name: 'Forest Gold',
+    bg: '#FFFFFF', surface: '#F0F7F2',
+    primary: '#0A2E18', accent: '#2E8B57',
+    text: '#0A2E18', muted: '#4B7A5E',
+    btnBg: '#0A2E18', btnText: '#FFFFFF',
+    btnSBorder: '#0A2E18',
+    cardBg: '#F0F7F2',
+    font: "'Playfair Display', serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'ChessTours',
+    tag: 'International Chess Tourism',
+    h1: 'Шахматные туры по всему миру',
+    sub: 'Турниры FIDE, исторические клубы, легендарные города.',
+    cta: 'Найти тур', sec: 'Расписание',
+    nav: ['Туры', 'Турниры', 'О нас'],
+    cards: [
+      { label: 'Топ', title: 'Турнир Прага', sub: '€2 400 · 7 дней' },
+      { label: 'VIP', title: 'Дубай FIDE', sub: '$3 800 · 5★' },
+    ]
+  },
+  {
+    id: 'charcoal-amber',
+    name: 'Charcoal Amber',
+    bg: '#FFFFFF', surface: '#FFF8EE',
+    primary: '#1C1C1E', accent: '#F59E0B',
+    text: '#1C1C1E', muted: '#6B7280',
+    btnBg: '#1C1C1E', btnText: '#FFFFFF',
+    btnSBorder: '#1C1C1E',
+    cardBg: '#FFF8EE',
+    font: "'Playfair Display', serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'ChessTours',
+    tag: 'International Chess Tourism',
+    h1: 'Шахматные туры по всему миру',
+    sub: 'Турниры FIDE, исторические клубы, легендарные города.',
+    cta: 'Найти тур', sec: 'Расписание',
+    nav: ['Туры', 'Турниры', 'О нас'],
+    cards: [
+      { label: 'Топ', title: 'Турнир Прага', sub: '€2 400 · 7 дней' },
+      { label: 'VIP', title: 'Дубай FIDE', sub: '$3 800 · 5★' },
+    ]
+  },
+  {
+    id: 'ruby',
+    name: 'Classic Ruby',
+    bg: '#FFFFFF', surface: '#FFF5F5',
+    primary: '#1A0A0A', accent: '#C41E3A',
+    text: '#1A0A0A', muted: '#6B5B5B',
+    btnBg: '#C41E3A', btnText: '#FFFFFF',
+    btnSBorder: '#1A0A0A',
+    cardBg: '#FFF5F5',
+    font: "'Playfair Display', serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'ChessTours',
+    tag: 'International Chess Tourism',
+    h1: 'Шахматные туры по всему миру',
+    sub: 'Турниры FIDE, исторические клубы, легендарные города.',
+    cta: 'Найти тур', sec: 'Расписание',
+    nav: ['Туры', 'Турниры', 'О нас'],
+    cards: [
+      { label: 'Топ', title: 'Турнир Прага', sub: '€2 400 · 7 дней' },
+      { label: 'VIP', title: 'Дубай FIDE', sub: '$3 800 · 5★' },
+    ]
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal',
+    bg: '#FFFFFF', surface: '#F9FAFB',
+    primary: '#111111', accent: '#111111',
+    text: '#111111', muted: '#9CA3AF',
+    btnBg: '#111111', btnText: '#FFFFFF',
+    btnSBorder: '#111111',
+    cardBg: '#F9FAFB',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'ChessTours',
+    tag: 'International Chess Tourism',
+    h1: 'Шахматные туры по всему миру',
+    sub: 'Турниры FIDE, исторические клубы, легендарные города.',
+    cta: 'Найти тур', sec: 'Расписание',
+    nav: ['Туры', 'Турниры', 'О нас'],
+    cards: [
+      { label: 'Топ', title: 'Турнир Прага', sub: '€2 400 · 7 дней' },
+      { label: 'VIP', title: 'Дубай FIDE', sub: '$3 800 · 5★' },
+    ]
+  },
+];
+
+const taxPalettes = [
+  {
+    id: 'state-blue',
+    name: 'State Blue',
+    bg: '#FFFFFF', surface: '#EEF4FF',
+    primary: '#0F2447', accent: '#1A5BA8',
+    text: '#0F2447', muted: '#4A6080',
+    btnBg: '#0F2447', btnText: '#FFFFFF',
+    btnSBorder: '#0F2447',
+    cardBg: '#EEF4FF',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'P2PTax',
+    tag: 'Налоговые консультанты',
+    h1: 'Найдите налогового эксперта',
+    sub: 'Верифицированные консультанты, юристы, бухгалтеры.',
+    cta: 'Найти эксперта', sec: 'Как это работает',
+    nav: ['Поиск', 'Эксперты', 'Цены'],
+    cards: [
+      { label: 'НДС', title: 'Налоговый юрист', sub: 'Москва · 4.9 ★' },
+      { label: 'УСН', title: 'Бухгалтер', sub: 'Онлайн · от 3 000₽' },
+    ]
+  },
+  {
+    id: 'law-green',
+    name: 'Law Green',
+    bg: '#FFFFFF', surface: '#EDFAF2',
+    primary: '#0B2D18', accent: '#16A34A',
+    text: '#0B2D18', muted: '#4B7A5E',
+    btnBg: '#0B2D18', btnText: '#FFFFFF',
+    btnSBorder: '#0B2D18',
+    cardBg: '#EDFAF2',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'P2PTax',
+    tag: 'Налоговые консультанты',
+    h1: 'Найдите налогового эксперта',
+    sub: 'Верифицированные консультанты, юристы, бухгалтеры.',
+    cta: 'Найти эксперта', sec: 'Как это работает',
+    nav: ['Поиск', 'Эксперты', 'Цены'],
+    cards: [
+      { label: 'НДС', title: 'Налоговый юрист', sub: 'Москва · 4.9 ★' },
+      { label: 'УСН', title: 'Бухгалтер', sub: 'Онлайн · от 3 000₽' },
+    ]
+  },
+  {
+    id: 'corporate-gray',
+    name: 'Corporate',
+    bg: '#FFFFFF', surface: '#F3F4F6',
+    primary: '#1F2937', accent: '#2563EB',
+    text: '#1F2937', muted: '#6B7280',
+    btnBg: '#2563EB', btnText: '#FFFFFF',
+    btnSBorder: '#1F2937',
+    cardBg: '#F3F4F6',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'P2PTax',
+    tag: 'Налоговые консультанты',
+    h1: 'Найдите налогового эксперта',
+    sub: 'Верифицированные консультанты, юристы, бухгалтеры.',
+    cta: 'Найти эксперта', sec: 'Как это работает',
+    nav: ['Поиск', 'Эксперты', 'Цены'],
+    cards: [
+      { label: 'НДС', title: 'Налоговый юрист', sub: 'Москва · 4.9 ★' },
+      { label: 'УСН', title: 'Бухгалтер', sub: 'Онлайн · от 3 000₽' },
+    ]
+  },
+  {
+    id: 'trust-teal',
+    name: 'Trust Teal',
+    bg: '#FFFFFF', surface: '#EDF8F9',
+    primary: '#0A3040', accent: '#0891B2',
+    text: '#0A3040', muted: '#4A7080',
+    btnBg: '#0A3040', btnText: '#FFFFFF',
+    btnSBorder: '#0A3040',
+    cardBg: '#EDF8F9',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'P2PTax',
+    tag: 'Налоговые консультанты',
+    h1: 'Найдите налогового эксперта',
+    sub: 'Верифицированные консультанты, юристы, бухгалтеры.',
+    cta: 'Найти эксперта', sec: 'Как это работает',
+    nav: ['Поиск', 'Эксперты', 'Цены'],
+    cards: [
+      { label: 'НДС', title: 'Налоговый юрист', sub: 'Москва · 4.9 ★' },
+      { label: 'УСН', title: 'Бухгалтер', sub: 'Онлайн · от 3 000₽' },
+    ]
+  },
+  {
+    id: 'black-gold',
+    name: 'Black & Gold',
+    bg: '#FFFFFF', surface: '#FFFAEB',
+    primary: '#111111', accent: '#D97706',
+    text: '#111111', muted: '#6B7280',
+    btnBg: '#111111', btnText: '#FFFFFF',
+    btnSBorder: '#111111',
+    cardBg: '#FFFAEB',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'P2PTax',
+    tag: 'Налоговые консультанты',
+    h1: 'Найдите налогового эксперта',
+    sub: 'Верифицированные консультанты, юристы, бухгалтеры.',
+    cta: 'Найти эксперта', sec: 'Как это работает',
+    nav: ['Поиск', 'Эксперты', 'Цены'],
+    cards: [
+      { label: 'НДС', title: 'Налоговый юрист', sub: 'Москва · 4.9 ★' },
+      { label: 'УСН', title: 'Бухгалтер', sub: 'Онлайн · от 3 000₽' },
+    ]
+  },
+  {
+    id: 'neutral-pro',
+    name: 'Neutral Pro',
+    bg: '#FAFAFA', surface: '#F3F4F6',
+    primary: '#18181B', accent: '#3B82F6',
+    text: '#18181B', muted: '#71717A',
+    btnBg: '#18181B', btnText: '#FFFFFF',
+    btnSBorder: '#18181B',
+    cardBg: '#FFFFFF',
+    font: "Inter, sans-serif",
+    fontBody: "Inter, sans-serif",
+    logo: 'P2PTax',
+    tag: 'Налоговые консультанты',
+    h1: 'Найдите налогового эксперта',
+    sub: 'Верифицированные консультанты, юристы, бухгалтеры.',
+    cta: 'Найти эксперта', sec: 'Как это работает',
+    nav: ['Поиск', 'Эксперты', 'Цены'],
+    cards: [
+      { label: 'НДС', title: 'Налоговый юрист', sub: 'Москва · 4.9 ★' },
+      { label: 'УСН', title: 'Бухгалтер', sub: 'Онлайн · от 3 000₽' },
+    ]
+  },
+];
+
+const avitoPalettes = [
+  {
+    id: 'georgian-red',
+    name: 'Georgian Red',
+    bg: '#FFFFFF', surface: '#FFF1EE',
+    primary: '#1A0808', accent: '#DC2626',
+    text: '#1A0808', muted: '#6B5555',
+    btnBg: '#DC2626', btnText: '#FFFFFF',
+    btnSBorder: '#1A0808',
+    cardBg: '#FFF1EE',
+    font: "'Nunito', sans-serif",
+    fontBody: "'Nunito', sans-serif",
+    logo: 'AvitoGE',
+    tag: 'Маркетплейс Грузии',
+    h1: 'Купи и продай в Грузии',
+    sub: 'Авто, недвижимость, электроника и услуги.',
+    cta: 'Разместить объявление', sec: 'Смотреть всё',
+    nav: ['Авто', 'Недвижимость', 'Электроника'],
+    cards: [
+      { label: 'Авто', title: 'Toyota Camry 2021', sub: '45 000 ₾ · Тбилиси' },
+      { label: 'Новое', title: 'iPhone 15 Pro', sub: '3 200 ₾ · Батуми' },
+    ]
+  },
+  {
+    id: 'orange-market',
+    name: 'Orange Market',
+    bg: '#FFFFFF', surface: '#FFF7ED',
+    primary: '#1A0C00', accent: '#EA580C',
+    text: '#1A0C00', muted: '#78450A',
+    btnBg: '#EA580C', btnText: '#FFFFFF',
+    btnSBorder: '#1A0C00',
+    cardBg: '#FFF7ED',
+    font: "'Nunito', sans-serif",
+    fontBody: "'Nunito', sans-serif",
+    logo: 'AvitoGE',
+    tag: 'Маркетплейс Грузии',
+    h1: 'Купи и продай в Грузии',
+    sub: 'Авто, недвижимость, электроника и услуги.',
+    cta: 'Разместить объявление', sec: 'Смотреть всё',
+    nav: ['Авто', 'Недвижимость', 'Электроника'],
+    cards: [
+      { label: 'Авто', title: 'Toyota Camry 2021', sub: '45 000 ₾ · Тбилиси' },
+      { label: 'Новое', title: 'iPhone 15 Pro', sub: '3 200 ₾ · Батуми' },
+    ]
+  },
+  {
+    id: 'teal-market',
+    name: 'Teal Batumi',
+    bg: '#FFFFFF', surface: '#ECFEFF',
+    primary: '#0A2028', accent: '#0891B2',
+    text: '#0A2028', muted: '#4A7080',
+    btnBg: '#0891B2', btnText: '#FFFFFF',
+    btnSBorder: '#0A2028',
+    cardBg: '#ECFEFF',
+    font: "'Nunito', sans-serif",
+    fontBody: "'Nunito', sans-serif",
+    logo: 'AvitoGE',
+    tag: 'Маркетплейс Грузии',
+    h1: 'Купи и продай в Грузии',
+    sub: 'Авто, недвижимость, электроника и услуги.',
+    cta: 'Разместить объявление', sec: 'Смотреть всё',
+    nav: ['Авто', 'Недвижимость', 'Электроника'],
+    cards: [
+      { label: 'Авто', title: 'Toyota Camry 2021', sub: '45 000 ₾ · Тбилиси' },
+      { label: 'Новое', title: 'iPhone 15 Pro', sub: '3 200 ₾ · Батуми' },
+    ]
+  },
+  {
+    id: 'green-market',
+    name: 'Green Market',
+    bg: '#FFFFFF', surface: '#F0FDF4',
+    primary: '#052E16', accent: '#16A34A',
+    text: '#052E16', muted: '#4A7A5E',
+    btnBg: '#16A34A', btnText: '#FFFFFF',
+    btnSBorder: '#052E16',
+    cardBg: '#F0FDF4',
+    font: "'Nunito', sans-serif",
+    fontBody: "'Nunito', sans-serif",
+    logo: 'AvitoGE',
+    tag: 'Маркетплейс Грузии',
+    h1: 'Купи и продай в Грузии',
+    sub: 'Авто, недвижимость, электроника и услуги.',
+    cta: 'Разместить объявление', sec: 'Смотреть всё',
+    nav: ['Авто', 'Недвижимость', 'Электроника'],
+    cards: [
+      { label: 'Авто', title: 'Toyota Camry 2021', sub: '45 000 ₾ · Тбилиси' },
+      { label: 'Новое', title: 'iPhone 15 Pro', sub: '3 200 ₾ · Батуми' },
+    ]
+  },
+  {
+    id: 'yellow-fun',
+    name: 'Sunny Yellow',
+    bg: '#FFFFFF', surface: '#FEFCE8',
+    primary: '#1A1200', accent: '#CA8A04',
+    text: '#1A1200', muted: '#78640A',
+    btnBg: '#CA8A04', btnText: '#FFFFFF',
+    btnSBorder: '#1A1200',
+    cardBg: '#FEFCE8',
+    font: "'Nunito', sans-serif",
+    fontBody: "'Nunito', sans-serif",
+    logo: 'AvitoGE',
+    tag: 'Маркетплейс Грузии',
+    h1: 'Купи и продай в Грузии',
+    sub: 'Авто, недвижимость, электроника и услуги.',
+    cta: 'Разместить объявление', sec: 'Смотреть всё',
+    nav: ['Авто', 'Недвижимость', 'Электроника'],
+    cards: [
+      { label: 'Авто', title: 'Toyota Camry 2021', sub: '45 000 ₾ · Тбилиси' },
+      { label: 'Новое', title: 'iPhone 15 Pro', sub: '3 200 ₾ · Батуми' },
+    ]
+  },
+  {
+    id: 'dark-pop',
+    name: 'Dark & Bold',
+    bg: '#FFFFFF', surface: '#F9FAFB',
+    primary: '#111827', accent: '#7C3AED',
+    text: '#111827', muted: '#6B7280',
+    btnBg: '#7C3AED', btnText: '#FFFFFF',
+    btnSBorder: '#111827',
+    cardBg: '#F9FAFB',
+    font: "'Nunito', sans-serif",
+    fontBody: "'Nunito', sans-serif",
+    logo: 'AvitoGE',
+    tag: 'Маркетплейс Грузии',
+    h1: 'Купи и продай в Грузии',
+    sub: 'Авто, недвижимость, электроника и услуги.',
+    cta: 'Разместить объявление', sec: 'Смотреть всё',
+    nav: ['Авто', 'Недвижимость', 'Электроника'],
+    cards: [
+      { label: 'Авто', title: 'Toyota Camry 2021', sub: '45 000 ₾ · Тбилиси' },
+      { label: 'Новое', title: 'iPhone 15 Pro', sub: '3 200 ₾ · Батуми' },
+    ]
+  },
+];
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+
+const state = {
+  chess: 0,
+  tax: 0,
+  avito: 0,
+};
+
+function renderPreview(p) {
+  return `
+    <div style="background:${p.bg};">
+      <div class="preview-nav" style="background:${p.bg}; border-bottom:1px solid rgba(0,0,0,0.06);">
+        <div class="nav-logo" style="color:${p.primary}; font-family:${p.font};">${p.logo}</div>
+        <div class="nav-links">
+          ${p.nav.map(n => `<span class="nav-link" style="color:${p.text}; font-family:${p.fontBody};">${n}</span>`).join('')}
+        </div>
+        <button class="nav-cta" style="background:${p.btnBg}; color:${p.btnText}; font-family:${p.fontBody};">${p.cta.split(' ')[0]}</button>
+      </div>
+      <div class="preview-hero" style="background:${p.bg};">
+        <div class="hero-tag" style="color:${p.accent}; font-family:${p.fontBody};">${p.tag}</div>
+        <div class="hero-h1" style="color:${p.primary}; font-family:${p.font};">${p.h1}</div>
+        <div class="hero-sub" style="color:${p.text}; font-family:${p.fontBody};">${p.sub}</div>
+        <div class="hero-btns">
+          <button class="btn-p" style="background:${p.btnBg}; color:${p.btnText}; font-family:${p.fontBody};">${p.cta}</button>
+          <button class="btn-s" style="color:${p.primary}; border:1.5px solid ${p.btnSBorder}; border-radius:6px; font-family:${p.fontBody};">${p.sec}</button>
+        </div>
+      </div>
+      <div class="preview-cards">
+        ${p.cards.map(c => `
+          <div class="mini-card" style="background:${p.cardBg};">
+            <div class="mini-card-label" style="color:${p.accent}; font-family:${p.fontBody};">${c.label}</div>
+            <div class="mini-card-title" style="color:${p.primary}; font-family:${p.font};">${c.title}</div>
+            <div class="mini-card-sub" style="color:${p.text}; font-family:${p.fontBody};">${c.sub}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderPaletteRow(palettes, key, selectedIdx) {
+  return palettes.map((p, i) => `
+    <button class="palette-btn ${i === selectedIdx ? 'active' : ''}" onclick="selectPalette('${key}', ${i})">
+      <span class="palette-dot" style="background:${p.accent};"></span>
+      ${p.name}
+    </button>
+  `).join('');
+}
+
+function renderInfo(p) {
+  return `
+    <span class="palette-info-name">${p.name}</span>
+    <span class="hex-chip" title="Background">${p.bg}</span>
+    <span class="hex-chip" title="Primary">${p.primary}</span>
+    <span class="hex-chip" title="Accent">${p.accent}</span>
+  `;
+}
+
+function selectPalette(key, idx) {
+  state[key] = idx;
+  redraw();
+}
+
+function redraw() {
+  // Chess
+  document.getElementById('chess-palettes').innerHTML = renderPaletteRow(chessPalettes, 'chess', state.chess);
+  document.getElementById('chess-preview').innerHTML = renderPreview(chessPalettes[state.chess]);
+  document.getElementById('chess-info').innerHTML = renderInfo(chessPalettes[state.chess]);
+
+  // Tax
+  document.getElementById('tax-palettes').innerHTML = renderPaletteRow(taxPalettes, 'tax', state.tax);
+  document.getElementById('tax-preview').innerHTML = renderPreview(taxPalettes[state.tax]);
+  document.getElementById('tax-info').innerHTML = renderInfo(taxPalettes[state.tax]);
+
+  // Avito
+  document.getElementById('avito-palettes').innerHTML = renderPaletteRow(avitoPalettes, 'avito', state.avito);
+  document.getElementById('avito-preview').innerHTML = renderPreview(avitoPalettes[state.avito]);
+  document.getElementById('avito-info').innerHTML = renderInfo(avitoPalettes[state.avito]);
+}
+
+redraw();
+</script>
+</body>
+</html>
