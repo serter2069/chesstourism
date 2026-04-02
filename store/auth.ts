@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import api, { setAuthToken, clearAuthToken, getAuthToken } from '../lib/api';
+import api, { saveTokens, clearTokens, getAuthToken } from '../lib/api';
+import { useAuthRefresh } from '../hooks/use-auth-refresh';
 
 // Types
 export interface User {
@@ -7,7 +8,7 @@ export interface User {
   email: string;
   name?: string;
   surname?: string;
-  role: 'PARTICIPANT' | 'COMMISSAR' | 'ORG_ADMIN' | 'ADMIN';
+  role: 'PARTICIPANT' | 'COMMISSIONER' | 'ADMIN';
   country?: string;
   city?: string;
 }
@@ -66,6 +67,10 @@ export const AuthContext = createContext<AuthContextValue>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  // Level 2: Proactive refresh every 20 min (only when logged in)
+  useAuthRefresh(!!state.user);
+
+  // Level 3: Check auth on startup
   const loadUser = useCallback(async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
@@ -75,11 +80,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       dispatch({ type: 'SET_TOKEN', payload: token });
+      // GET /me — api interceptor handles 401 with reactive refresh (Level 1)
       const res = await api.get('/auth/me');
       dispatch({ type: 'SET_USER', payload: res.data });
     } catch {
       dispatch({ type: 'LOGOUT' });
-      await clearAuthToken();
+      await clearTokens();
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
@@ -90,19 +96,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadUser]);
 
   const requestOtp = useCallback(async (email: string) => {
-    await api.post('/auth/request-otp', { email });
+    await api.post('/auth/send-code', { email });
   }, []);
 
   const verifyOtp = useCallback(async (email: string, code: string) => {
-    const res = await api.post('/auth/verify-otp', { email, code });
-    const { token, user } = res.data;
-    await setAuthToken(token);
+    const res = await api.post('/auth/verify-code', { email, code });
+    const { token, refreshToken, user } = res.data;
+    await saveTokens(token, refreshToken);
     dispatch({ type: 'SET_TOKEN', payload: token });
     dispatch({ type: 'SET_USER', payload: user });
   }, []);
 
   const logout = useCallback(async () => {
-    await clearAuthToken();
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Server logout failed — still clear local state
+    }
+    await clearTokens();
     dispatch({ type: 'LOGOUT' });
   }, []);
 

@@ -9,14 +9,20 @@ export interface AuthRequest extends Request {
 }
 
 export function authenticate(req: AuthRequest, res: Response, next: NextFunction): void {
+  // Try Bearer token first, then httpOnly cookie
   const authHeader = req.headers.authorization;
+  let token: string | undefined;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.cookies?.accessToken) {
+    token = req.cookies.accessToken;
+  }
+
+  if (!token) {
     res.status(401).json({ error: 'Authorization token required' });
     return;
   }
-
-  const token = authHeader.split(' ')[1];
 
   try {
     const payload = verifyToken(token);

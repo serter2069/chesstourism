@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
@@ -13,7 +14,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3811;
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || true,
+  credentials: true,
+}));
 
 // Stripe webhook needs raw body — mount BEFORE express.json()
 app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
@@ -21,6 +25,7 @@ app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (re
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', project: 'chesstourism', version: process.env.npm_package_version });

@@ -17,8 +17,13 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
 
   async function handleRequestOtp() {
-    if (!email.trim()) {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed) {
       setError('Please enter your email');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError('Please enter a valid email address');
       return;
     }
     setError('');

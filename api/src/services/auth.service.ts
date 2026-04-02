@@ -1,11 +1,17 @@
 import { PrismaClient, Role } from '@prisma/client';
-import { signAccessToken, signRefreshToken, verifyToken } from '../utils/jwt';
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { sendOtpEmail } from './email.service';
+import { Response } from 'express';
 
 const prisma = new PrismaClient();
 
 const DEV_MODE = process.env.NODE_ENV !== 'production';
 const OTP_TTL_MINUTES = 10;
+const OTP_MAX_ATTEMPTS = 3;
+const OTP_RATE_LIMIT_SECONDS = 30;
+const SESSION_TTL_DAYS = 30;
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function generateOtp(): string {
   if (DEV_MODE) return '000000';
@@ -13,35 +19,65 @@ function generateOtp(): string {
 }
 
 function sanitizeUser(user: any) {
-  const { password_hash, otp_code, otp_expires_at, ...rest } = user;
+  // Strip any internal fields before sending to client
+  const { ...rest } = user;
   return rest;
 }
 
+// Set httpOnly cookies for tokens
+export function setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    maxAge: 15 * 60 * 1000, // 15 minutes
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    path: '/api/auth/refresh',
+  });
+}
+
+export function clearTokenCookies(res: Response) {
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+}
+
 export async function requestOtp(email: string) {
-  // Find or create user
-  let user = await prisma.user.findUnique({ where: { email } });
+  // Validate email
+  if (!EMAIL_REGEX.test(email)) {
+    throw Object.assign(new Error('Invalid email format'), { status: 400 });
+  }
+
+  // Rate limit: check last OTP sent for this email
+  const recentOtp = await prisma.otpCode.findFirst({
+    where: { email },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (recentOtp) {
+    const secondsSinceLastOtp = (Date.now() - recentOtp.createdAt.getTime()) / 1000;
+    if (secondsSinceLastOtp < OTP_RATE_LIMIT_SECONDS) {
+      throw Object.assign(
+        new Error(`Please wait ${Math.ceil(OTP_RATE_LIMIT_SECONDS - secondsSinceLastOtp)} seconds before requesting a new code`),
+        { status: 429 },
+      );
+    }
+  }
 
   const code = generateOtp();
   const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
 
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        email,
-        role: Role.PARTICIPANT,
-        otp_code: code,
-        otp_expires_at: expiresAt,
-      },
-    });
-  } else {
-    user = await prisma.user.update({
-      where: { email },
-      data: {
-        otp_code: code,
-        otp_expires_at: expiresAt,
-      },
-    });
-  }
+  // Create OTP record in dedicated table
+  await prisma.otpCode.create({
+    data: { email, code, expiresAt },
+  });
 
   if (!DEV_MODE) {
     await sendOtpEmail(email, code).catch((err) => {
@@ -52,36 +88,79 @@ export async function requestOtp(email: string) {
   return { message: 'OTP sent' };
 }
 
+// In-memory attempt tracker (per OTP record id)
+const attemptMap = new Map<string, number>();
+
 export async function verifyOtp(email: string, code: string) {
-  const user = await prisma.user.findUnique({
+  // Find the latest unused, unexpired OTP for this email
+  const otpRecord = await prisma.otpCode.findFirst({
+    where: {
+      email,
+      usedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (!otpRecord) {
+    throw Object.assign(new Error('No valid OTP found. Request a new code.'), { status: 401 });
+  }
+
+  // Check attempts
+  const attempts = attemptMap.get(otpRecord.id) || 0;
+  if (attempts >= OTP_MAX_ATTEMPTS) {
+    // Invalidate the OTP
+    await prisma.otpCode.update({
+      where: { id: otpRecord.id },
+      data: { usedAt: new Date() },
+    });
+    attemptMap.delete(otpRecord.id);
+    throw Object.assign(new Error('Too many attempts. Request a new code.'), { status: 429 });
+  }
+
+  // Check if code matches
+  if (otpRecord.code !== code) {
+    attemptMap.set(otpRecord.id, attempts + 1);
+    const remaining = OTP_MAX_ATTEMPTS - attempts - 1;
+    throw Object.assign(
+      new Error(`Invalid code. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`),
+      { status: 401 },
+    );
+  }
+
+  // Mark OTP as used
+  await prisma.otpCode.update({
+    where: { id: otpRecord.id },
+    data: { usedAt: new Date() },
+  });
+  attemptMap.delete(otpRecord.id);
+
+  // Find or create user
+  let user = await prisma.user.findUnique({
     where: { email },
-    include: { rating: true, commissar_profile: true },
+    include: { commissioner: true },
   });
 
   if (!user) {
-    throw new Error('Invalid email or OTP');
+    user = await prisma.user.create({
+      data: { email, role: Role.PARTICIPANT },
+      include: { commissioner: true },
+    });
   }
 
-  if (!user.otp_code || !user.otp_expires_at) {
-    throw new Error('No OTP requested for this email');
-  }
-
-  if (user.otp_code !== code) {
-    throw new Error('Invalid email or OTP');
-  }
-
-  if (user.otp_expires_at < new Date()) {
-    throw new Error('OTP expired');
-  }
-
-  // Clear OTP after successful verification
-  await prisma.user.update({
-    where: { email },
-    data: { otp_code: null, otp_expires_at: null },
-  });
-
+  // Generate token pair
   const accessToken = signAccessToken(user.id, user.role);
   const refreshToken = signRefreshToken(user.id, user.role);
+
+  // Create session in DB
+  const sessionExpiresAt = new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000);
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshToken,
+      expiresAt: sessionExpiresAt,
+    },
+  });
 
   return {
     token: accessToken,
@@ -91,10 +170,25 @@ export async function verifyOtp(email: string, code: string) {
 }
 
 export async function refreshTokens(refreshToken: string) {
-  const payload = verifyToken(refreshToken);
+  // Verify the refresh token JWT
+  const payload = verifyRefreshToken(refreshToken);
 
   if (payload.type !== 'refresh') {
     throw new Error('Invalid token type');
+  }
+
+  // Find the session in DB
+  const session = await prisma.session.findUnique({
+    where: { refreshToken },
+  });
+
+  if (!session) {
+    throw new Error('Session not found — token may have been revoked');
+  }
+
+  if (session.expiresAt < new Date()) {
+    await prisma.session.delete({ where: { id: session.id } });
+    throw new Error('Session expired');
   }
 
   const user = await prisma.user.findUnique({ where: { id: payload.userId } });
@@ -102,19 +196,39 @@ export async function refreshTokens(refreshToken: string) {
     throw new Error('User not found');
   }
 
+  // Token rotation: generate new pair
   const newAccessToken = signAccessToken(user.id, user.role);
   const newRefreshToken = signRefreshToken(user.id, user.role);
 
+  // Update session with new refresh token and sliding window expiry
+  const newExpiresAt = new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000);
+  await prisma.session.update({
+    where: { id: session.id },
+    data: {
+      refreshToken: newRefreshToken,
+      expiresAt: newExpiresAt,
+    },
+  });
+
   return {
-    accessToken: newAccessToken,
+    token: newAccessToken,
     refreshToken: newRefreshToken,
   };
+}
+
+export async function logout(refreshToken: string) {
+  if (refreshToken) {
+    await prisma.session.deleteMany({ where: { refreshToken } }).catch(() => {
+      // Session may not exist — that's fine
+    });
+  }
+  return { ok: true };
 }
 
 export async function getMe(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { rating: true, commissar_profile: true },
+    include: { commissioner: true },
   });
 
   if (!user) {
