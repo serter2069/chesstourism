@@ -60,6 +60,9 @@ model User {
   phone     String?
   city      String?
   rating              Int      @default(0)
+  fideId              String?
+  fideRating          Int?
+  fideTitle           String?
   preferences         Json?
   onboardingCompleted Boolean  @default(false)
   createdAt           DateTime @default(now())

@@ -17,6 +17,9 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
         city: true,
         role: true,
         rating: true,
+        fideId: true,
+        fideRating: true,
+        fideTitle: true,
         createdAt: true,
       },
     });
@@ -59,6 +62,9 @@ router.put('/me', authenticate, async (req: AuthRequest, res: Response) => {
         city: true,
         role: true,
         rating: true,
+        fideId: true,
+        fideRating: true,
+        fideTitle: true,
         createdAt: true,
       },
     });

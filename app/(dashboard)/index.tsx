@@ -139,6 +139,24 @@ export default function DashboardScreen() {
           </Card>
         </View>
 
+        {/* FIDE Badge */}
+        {user?.fideId && user?.fideRating && (
+          <View style={styles.section}>
+            <Card>
+              <Text style={styles.cardLabel}>FIDE Profile</Text>
+              <View style={styles.fideRow}>
+                <View style={styles.fideBadge}>
+                  {user.fideTitle && (
+                    <Text style={styles.fideTitleText}>{user.fideTitle}</Text>
+                  )}
+                  <Text style={styles.fideRatingText}>{user.fideRating}</Text>
+                </View>
+                <Text style={styles.fideIdText}>ID: {user.fideId}</Text>
+              </View>
+            </Card>
+          </View>
+        )}
+
         {/* Rating */}
         <View style={styles.section}>
           <Card>
@@ -215,6 +233,14 @@ export default function DashboardScreen() {
             <Button
               title="Certificate"
               onPress={() => router.push('/(dashboard)/certificate')}
+              variant="secondary"
+              style={styles.linkBtn}
+            />
+          </View>
+          <View style={[styles.linksRow, { marginTop: Spacing.sm }]}>
+            <Button
+              title="FIDE Profile"
+              onPress={() => router.push('/(dashboard)/profile' as any)}
               variant="secondary"
               style={styles.linkBtn}
             />
@@ -336,6 +362,34 @@ const styles = StyleSheet.create({
     color: Colors.statusError,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
+  },
+  fideRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  fideBadge: {
+    backgroundColor: Colors.brandAccent,
+    borderRadius: 8,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    alignItems: 'center',
+    minWidth: 64,
+  },
+  fideTitleText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textOnAccent,
+    letterSpacing: 1,
+  },
+  fideRatingText: {
+    fontSize: Typography.sizes.xl,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textOnAccent,
+  },
+  fideIdText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textSecondary,
   },
   footer: {
     height: Spacing['2xl'],

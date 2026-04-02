@@ -13,6 +13,9 @@ export interface User {
   city?: string;
   onboardingCompleted?: boolean;
   preferences?: Record<string, any> | null;
+  fideId?: string | null;
+  fideRating?: number | null;
+  fideTitle?: string | null;
 }
 
 interface AuthState {
