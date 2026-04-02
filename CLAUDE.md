@@ -18,8 +18,7 @@ doppler secrets --project chesstourism --config dev
 doppler secrets set KEY=value --project chesstourism --config dev
 ```
 
-TODO: server-side Doppler injection via GitHub Actions (requires DOPPLER_TOKEN secret).
-Currently: manual `.env` at `/var/www/chesstourism/.env` on server.
+Secrets injected via Doppler in GitHub Actions (DOPPLER_TOKEN set in repo secrets).
 
 International Chess Tourism Association platform.
 
