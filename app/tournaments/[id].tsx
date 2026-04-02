@@ -8,8 +8,11 @@ import {
   Image,
   RefreshControl,
   Alert,
+  Share,
+  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import Head from 'expo-router/head';
 import { SafeContainer, Header } from '../../components/layout';
 import { Button, Card, Badge, LoadingSpinner, Avatar } from '../../components/ui';
 import { Colors } from '../../constants/colors';
@@ -145,6 +148,26 @@ export default function TournamentDetailScreen() {
     }
   }, [id, user, fetchTournament]);
 
+  const handleShare = useCallback(async () => {
+    if (!tournament) return;
+    const url = `https://chesstourism.smartlaunchhub.com/tournaments/${tournament.id}`;
+    const message = `Check out this chess tournament: ${tournament.title}`;
+    try {
+      if (Platform.OS === 'web') {
+        if (typeof navigator !== 'undefined' && navigator.share) {
+          await navigator.share({ title: tournament.title, text: message, url });
+        } else {
+          await navigator.clipboard?.writeText(url);
+          Alert.alert('Link copied', 'Tournament link copied to clipboard.');
+        }
+      } else {
+        await Share.share({ message: `${message}\n${url}`, url });
+      }
+    } catch {
+      // User cancelled share — no action needed
+    }
+  }, [tournament]);
+
   if (loading) {
     return (
       <SafeContainer>
@@ -181,8 +204,25 @@ export default function TournamentDetailScreen() {
     ...(tournament.photos?.length ? [{ key: 'photos' as TabKey, label: 'Photos' }] : []),
   ];
 
+  const shareUrl = `https://chesstourism.smartlaunchhub.com/tournaments/${tournament.id}`;
+  const ogDescription = tournament.description
+    ? tournament.description.slice(0, 160)
+    : `${formatDate(tournament.startDate)} — ${tournament.city}, ${tournament.country}`;
+
   return (
     <SafeContainer>
+      <Head>
+        <title>{tournament.title} — ChesTourism</title>
+        <meta name="description" content={ogDescription} />
+        <meta property="og:title" content={tournament.title} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:url" content={shareUrl} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="ChesTourism" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={tournament.title} />
+        <meta name="twitter:description" content={ogDescription} />
+      </Head>
       <Header title={tournament.title} showBack />
       <ScrollView
         style={styles.scroll}
@@ -255,6 +295,11 @@ export default function TournamentDetailScreen() {
               variant="secondary"
             />
           )}
+          <Button
+            title="Share Tournament"
+            onPress={handleShare}
+            variant="secondary"
+          />
         </View>
 
         {/* Commissar card */}
