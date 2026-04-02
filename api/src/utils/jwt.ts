@@ -7,7 +7,7 @@ const REFRESH_TOKEN_EXPIRY = '7d';
 interface TokenPayload {
   userId: string;
   role: string;
-  type: 'access' | 'refresh' | 'verify' | 'reset';
+  type: 'access' | 'refresh';
 }
 
 export function signAccessToken(userId: string, role: string): string {
@@ -22,18 +22,6 @@ export function signRefreshToken(userId: string, role: string): string {
   });
 }
 
-export function signVerifyToken(userId: string): string {
-  return jwt.sign({ userId, type: 'verify' }, JWT_SECRET, {
-    expiresIn: '24h',
-  });
-}
-
-export function signResetToken(userId: string, passwordHashFragment: string): string {
-  return jwt.sign({ userId, type: 'reset', phf: passwordHashFragment }, JWT_SECRET, {
-    expiresIn: '1h',
-  });
-}
-
-export function verifyToken(token: string): TokenPayload & { phf?: string } {
-  return jwt.verify(token, JWT_SECRET) as TokenPayload & { phf?: string };
+export function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, JWT_SECRET) as TokenPayload;
 }
