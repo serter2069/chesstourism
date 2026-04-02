@@ -200,8 +200,39 @@ export default function EditTournamentScreen() {
     }
   }
 
-  function handleMarkPaidCash(_participantId: string) {
-    Alert.alert('Coming Soon', 'Mark as paid cash feature is coming soon.');
+  const [confirmingCash, setConfirmingCash] = useState<string | null>(null);
+
+  async function handleMarkPaidCash(participant: Participant) {
+    const pUserId = participant.userId || participant.id;
+    const pName = participant.user
+      ? `${participant.user.name} ${participant.user.surname}`
+      : 'this participant';
+    Alert.alert(
+      'Confirm Cash Payment',
+      `Mark ${pName} as paid (cash)?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            try {
+              setConfirmingCash(participant.id);
+              await api.patch(`/tournaments/${id}/participants/${pUserId}/confirm-cash`);
+              Alert.alert('Success', 'Cash payment confirmed');
+              fetchData();
+            } catch (err: unknown) {
+              const message =
+                (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
+                (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.message ||
+                'Failed to confirm cash payment';
+              Alert.alert('Error', message);
+            } finally {
+              setConfirmingCash(null);
+            }
+          },
+        },
+      ],
+    );
   }
 
   if (loading) {
@@ -401,8 +432,14 @@ export default function EditTournamentScreen() {
                     {p.paid ? (
                       <Badge label="Paid" status="success" />
                     ) : (
-                      <TouchableOpacity onPress={() => handleMarkPaidCash(p.id)}>
-                        <Badge label="Mark Paid" status="warning" />
+                      <TouchableOpacity
+                        onPress={() => handleMarkPaidCash(p)}
+                        disabled={confirmingCash === p.id}
+                      >
+                        <Badge
+                          label={confirmingCash === p.id ? 'Confirming...' : 'Mark Paid'}
+                          status="warning"
+                        />
                       </TouchableOpacity>
                     )}
                   </View>
