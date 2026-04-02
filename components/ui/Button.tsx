@@ -24,10 +24,10 @@ interface ButtonProps {
 }
 
 const variantStyles: Record<ButtonVariant, { bg: string; text: string; border: string }> = {
-  primary: { bg: Colors.brandPrimary, text: '#ffffff', border: 'transparent' },
-  secondary: { bg: 'transparent', text: Colors.brandPrimary, border: Colors.brandPrimary },
-  ghost: { bg: 'transparent', text: Colors.textSecondary, border: 'transparent' },
-  danger: { bg: Colors.statusError, text: '#ffffff', border: 'transparent' },
+  primary: { bg: '#C4664A', text: '#ffffff', border: 'transparent' },
+  secondary: { bg: '#F2E8E0', text: '#2A1510', border: '#D9C9BF' },
+  ghost: { bg: 'transparent', text: '#C4664A', border: '#C4664A' },
+  danger: { bg: '#D94F3D', text: '#ffffff', border: 'transparent' },
 };
 
 export default function Button({
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   base: {
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.xl,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',

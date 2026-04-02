@@ -13,10 +13,10 @@ interface BadgeProps {
 }
 
 const statusColors: Record<BadgeStatus, { bg: string; text: string }> = {
-  success: { bg: Colors.statusSuccess + '22', text: Colors.statusSuccess },
-  warning: { bg: Colors.statusWarning + '22', text: Colors.statusWarning },
-  error: { bg: Colors.statusError + '22', text: Colors.statusError },
-  info: { bg: Colors.statusInfo + '22', text: Colors.statusInfo },
+  success: { bg: '#E8F0E8', text: '#3D6B3F' },
+  warning: { bg: '#F5EBD8', text: '#8B6530' },
+  error: { bg: '#F5DDD8', text: '#A63A2C' },
+  info: { bg: '#DDE8EF', text: '#4A6B7A' },
   default: { bg: Colors.bgSurface, text: Colors.textSecondary },
 };
 
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   badge: {
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
-    borderRadius: 6,
+    borderRadius: 4,
     alignSelf: 'flex-start',
   },
   text: {

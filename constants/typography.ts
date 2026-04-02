@@ -1,6 +1,9 @@
-// Typography tokens — source: Trinity brand #36
+// Typography tokens — Clay palette (Nunito, warm and handcrafted)
 export const Typography = {
-  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  fontFamily: 'Nunito_400Regular',
+  fontFamilySemiBold: 'Nunito_600SemiBold',
+  fontFamilyBold: 'Nunito_700Bold',
+  fontFamilyExtraBold: 'Nunito_800ExtraBold',
 
   sizes: {
     xs: 12,
@@ -17,6 +20,7 @@ export const Typography = {
     medium: '500' as const,
     semibold: '600' as const,
     bold: '700' as const,
+    extrabold: '800' as const,
   },
 
   lineHeights: {

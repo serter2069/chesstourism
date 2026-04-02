@@ -21,7 +21,7 @@ export default function SafeContainer({ children, style }: SafeContainerProps) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.bgPrimary,
+    backgroundColor: '#FAF2EC',
     alignItems: 'center',
   },
   inner: {
