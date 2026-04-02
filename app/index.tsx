@@ -254,6 +254,21 @@ export default function HomeScreen() {
           </Card>
         </View>
 
+        {/* Organization Tournament Request CTA */}
+        <View style={styles.section}>
+          <Card style={styles.ctaCard}>
+            <Text style={styles.ctaTitle}>Провести турнир через федерацию?</Text>
+            <Text style={styles.ctaText}>
+              Организации могут подать заявку на проведение турнира. Мы рассмотрим её в течение 3 рабочих дней.
+            </Text>
+            <Button
+              title="Подать заявку"
+              onPress={() => router.push('/organizations/apply')}
+              variant="secondary"
+            />
+          </Card>
+        </View>
+
         <View style={styles.footer} />
       </ScrollView>
     </SafeContainer>
