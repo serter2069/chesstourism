@@ -3,8 +3,9 @@ import prisma from '../lib/prisma';
 
 const router = Router();
 
-// POST /api/organizations/request — public, no auth required
-router.post('/organizations/request', async (req: Request, res: Response) => {
+// POST /api/organization-requests — canonical UC-15 endpoint (public, no auth required)
+// POST /api/organizations/request — legacy alias (kept for backward compatibility)
+async function handleOrganizationRequest(req: Request, res: Response): Promise<void> {
   try {
     const { organizationName, contactName, email, phone, description } = req.body;
 
@@ -42,6 +43,9 @@ router.post('/organizations/request', async (req: Request, res: Response) => {
     console.error('Create organization request error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}
+
+router.post('/organization-requests', handleOrganizationRequest);
+router.post('/organizations/request', handleOrganizationRequest);
 
 export default router;
