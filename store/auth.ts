@@ -5,9 +5,9 @@ import api, { setAuthToken, clearAuthToken, getAuthToken } from '../lib/api';
 export interface User {
   id: string;
   email: string;
-  name: string;
-  surname: string;
-  role: 'participant' | 'commissar' | 'admin';
+  name?: string;
+  surname?: string;
+  role: 'PARTICIPANT' | 'COMMISSAR' | 'ORG_ADMIN' | 'ADMIN';
   country?: string;
   city?: string;
 }
@@ -25,7 +25,8 @@ type AuthAction =
   | { type: 'LOGOUT' };
 
 interface AuthContextValue extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+  requestOtp: (email: string) => Promise<void>;
+  verifyOtp: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
   loadUser: () => Promise<void>;
 }
@@ -55,7 +56,8 @@ const initialState: AuthState = {
 // Context
 export const AuthContext = createContext<AuthContextValue>({
   ...initialState,
-  login: async () => {},
+  requestOtp: async () => {},
+  verifyOtp: async () => {},
   logout: async () => {},
   loadUser: async () => {},
 });
@@ -87,8 +89,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, [loadUser]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await api.post('/auth/login', { email, password });
+  const requestOtp = useCallback(async (email: string) => {
+    await api.post('/auth/request-otp', { email });
+  }, []);
+
+  const verifyOtp = useCallback(async (email: string, code: string) => {
+    const res = await api.post('/auth/verify-otp', { email, code });
     const { token, user } = res.data;
     await setAuthToken(token);
     dispatch({ type: 'SET_TOKEN', payload: token });
@@ -102,7 +108,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value: AuthContextValue = {
     ...state,
-    login,
+    requestOtp,
+    verifyOtp,
     logout,
     loadUser,
   };

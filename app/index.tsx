@@ -248,7 +248,7 @@ export default function HomeScreen() {
             </Text>
             <Button
               title="Apply as Commissar"
-              onPress={() => router.push('/(auth)/register-commissar')}
+              onPress={() => router.push('/(auth)/login')}
               variant="secondary"
             />
           </Card>

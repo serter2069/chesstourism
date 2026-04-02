@@ -51,19 +51,20 @@ enum PaymentStatus {
 // ─── Models ──────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password_hash String
-  role          Role      @default(PARTICIPANT)
-  verified      Boolean   @default(false)
-  name          String
-  surname       String
-  country       String?
-  city          String?
-  avatar_url    String?
-  bio           String?
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
+  id              String    @id @default(uuid())
+  email           String    @unique
+  password_hash   String?
+  role            Role      @default(PARTICIPANT)
+  name            String?
+  surname         String?
+  country         String?
+  city            String?
+  avatar_url      String?
+  bio             String?
+  otp_code        String?
+  otp_expires_at  DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
 
   commissar_profile      CommissarProfile?
   administered_orgs      Organization[]

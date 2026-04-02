@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeContainer } from '../../components/layout';
 import { Button, Input } from '../../components/ui';
 import { Colors } from '../../constants/colors';
@@ -10,25 +10,24 @@ import { useAuth } from '../../store/auth';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { requestOtp } = useAuth();
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  async function handleLogin() {
-    if (!email || !password) {
-      setError('Please fill in all fields');
+  async function handleRequestOtp() {
+    if (!email.trim()) {
+      setError('Please enter your email');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      await login(email.trim(), password);
-      router.replace('/');
+      await requestOtp(email.trim().toLowerCase());
+      router.push({ pathname: '/(auth)/otp', params: { email: email.trim().toLowerCase() } });
     } catch (err: any) {
-      const msg = err.response?.data?.error || 'Login failed. Please try again.';
+      const msg = err.response?.data?.error || 'Failed to send code. Please try again.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -47,7 +46,9 @@ export default function LoginScreen() {
         >
           <Text style={styles.logo}>{'♔'}</Text>
           <Text style={styles.title}>Sign In</Text>
-          <Text style={styles.subtitle}>Welcome back to ChesTourism</Text>
+          <Text style={styles.subtitle}>
+            Enter your email to receive a one-time code
+          </Text>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -61,31 +62,12 @@ export default function LoginScreen() {
             autoComplete="email"
           />
 
-          <Input
-            label="Password"
-            placeholder="Enter password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="password"
-          />
-
           <Button
-            title="Sign In"
-            onPress={handleLogin}
+            title="Get Code"
+            onPress={handleRequestOtp}
             loading={loading}
             style={styles.btn}
           />
-
-          <View style={styles.links}>
-            <Link href="/(auth)/register" style={styles.link}>
-              <Text style={styles.linkText}>Create account</Text>
-            </Link>
-            <Link href="/(auth)/forgot-password" style={styles.link}>
-              <Text style={styles.linkText}>Forgot password?</Text>
-            </Link>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeContainer>
@@ -128,17 +110,5 @@ const styles = StyleSheet.create({
   },
   btn: {
     marginTop: Spacing.sm,
-  },
-  links: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: Spacing.xl,
-  },
-  link: {
-    padding: Spacing.sm,
-  },
-  linkText: {
-    color: Colors.brandPrimary,
-    fontSize: Typography.sizes.sm,
   },
 });
