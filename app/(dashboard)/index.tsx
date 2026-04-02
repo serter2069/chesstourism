@@ -230,12 +230,6 @@ export default function DashboardScreen() {
               variant="secondary"
               style={styles.linkBtn}
             />
-            <Button
-              title="Certificate"
-              onPress={() => router.push('/(dashboard)/certificate')}
-              variant="secondary"
-              style={styles.linkBtn}
-            />
           </View>
           <View style={[styles.linksRow, { marginTop: Spacing.sm }]}>
             <Button
