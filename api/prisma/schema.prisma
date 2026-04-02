@@ -75,6 +75,7 @@ model User {
   uploadedPhotos          TournamentPhoto[]
   watchlist               TournamentWatchlist[]
   notifications           Notification[]
+  tournamentResults       TournamentResult[]
 }
 
 model OtpCode {
@@ -121,6 +122,7 @@ model Tournament {
   payments      Payment[]
   photos        TournamentPhoto[]
   watchlistedBy TournamentWatchlist[]
+  results       TournamentResult[]
 
   @@index([commissionerId])
   @@index([status])
@@ -222,6 +224,22 @@ model TournamentWatchlist {
   @@unique([userId, tournamentId])
   @@index([userId])
   @@index([tournamentId])
+}
+
+model TournamentResult {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place        Int
+  score        Float
+  eloChange    Int
+  createdAt    DateTime   @default(now())
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
 }
 
 model Notification {

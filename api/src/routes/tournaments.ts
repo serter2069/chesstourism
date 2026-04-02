@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
+import { submitResults, getResults, AppError } from '../services/tournament.service';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -314,6 +315,72 @@ router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADM
     res.json({ message: 'Tournament deleted' });
   } catch (err) {
     console.error('Delete tournament error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─── Results Endpoints ──────────────────────────────────
+
+// POST /api/tournaments/:id/results — submit results (Commissioner/Admin only)
+router.post('/tournaments/:id/results', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized to submit results for this tournament' });
+      return;
+    }
+
+    const { results } = req.body;
+    if (!Array.isArray(results) || results.length === 0) {
+      res.status(400).json({ error: 'results must be a non-empty array of { userId, place, score }' });
+      return;
+    }
+
+    // Validate each entry
+    for (const entry of results) {
+      if (!entry.userId || typeof entry.place !== 'number' || typeof entry.score !== 'number') {
+        res.status(400).json({ error: 'Each result must have userId (string), place (number), score (number)' });
+        return;
+      }
+      if (entry.place < 1 || !Number.isInteger(entry.place)) {
+        res.status(400).json({ error: 'place must be a positive integer' });
+        return;
+      }
+    }
+
+    const data = await submitResults(req.params.id, results);
+    res.status(201).json(data);
+  } catch (err) {
+    if (err instanceof AppError) {
+      res.status(err.statusCode).json({ error: err.message });
+      return;
+    }
+    console.error('Submit results error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/tournaments/:id/results — get results (public, only COMPLETED)
+router.get('/tournaments/:id/results', async (req: Request, res: Response) => {
+  try {
+    const data = await getResults(req.params.id);
+    res.json(data);
+  } catch (err) {
+    if (err instanceof AppError) {
+      res.status(err.statusCode).json({ error: err.message });
+      return;
+    }
+    console.error('Get results error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
