@@ -273,9 +273,9 @@ const styles = StyleSheet.create({
     paddingTop: Spacing['3xl'],
     paddingBottom: Spacing['3xl'],
     alignItems: 'center',
-    backgroundColor: Colors.bgSecondary,
+    backgroundColor: '#F2E8E0',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    borderBottomColor: '#D9C9BF',
   },
   heroIcon: {
     fontSize: 56,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingsRowEven: {
-    backgroundColor: Colors.bgSurface + '44',
+    backgroundColor: '#F2E8E0',
   },
   ratingsText: {
     fontSize: Typography.sizes.sm,
