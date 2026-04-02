@@ -47,6 +47,11 @@ const quickLinks: QuickLink[] = [
     description: 'Payments and reports',
     href: '/(admin)/finances',
   },
+  {
+    title: 'Organizations',
+    description: 'Tournament requests from organizations',
+    href: '/(admin)/organizations',
+  },
 ];
 
 export default function AdminDashboardScreen() {
