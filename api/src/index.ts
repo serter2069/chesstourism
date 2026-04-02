@@ -19,6 +19,7 @@ import notificationsRouter from './routes/notifications';
 dotenv.config();
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 3811;
 
 const allowedOrigins = [
@@ -28,7 +29,7 @@ const allowedOrigins = [
   'http://localhost:19006',
 ];
 
-app.use(cors({
+const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -37,7 +38,11 @@ app.use(cors({
     }
   },
   credentials: true, // needed for httpOnly cookies (auth)
-}));
+};
+
+app.use(cors(corsOptions));
+// Handle OPTIONS preflight for all routes (must be before route handlers)
+app.options('*', cors(corsOptions));
 
 // Stripe webhook needs raw body — mount BEFORE express.json()
 app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
