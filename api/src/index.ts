@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRouter from './routes/auth';
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', project: 'chesstourism', version: process.env.npm_package_version });
 });
+
+app.use('/api/auth', authRouter);
 
 app.listen(PORT, () => {
   console.log(`ChesTourism API running on port ${PORT}`);
