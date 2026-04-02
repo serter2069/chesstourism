@@ -3,6 +3,7 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
+import { generateParticipationCertificate } from '../services/pdf.service';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -842,6 +843,82 @@ router.patch('/tournaments/:id/participants/:userId/confirm-cash', authenticate,
     res.json({ success: true, message: 'Cash payment confirmed' });
   } catch (err) {
     console.error('Confirm cash payment error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/tournaments/:id/my-certificate — download participation certificate PDF
+router.get('/tournaments/:id/my-certificate', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const { id: tournamentId } = req.params;
+
+    // Load tournament with commissioner user
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      include: {
+        commissioner: {
+          include: { user: { select: { name: true } } },
+        },
+      },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (tournament.status !== 'COMPLETED') {
+      res.status(400).json({ error: 'Certificate is only available for completed tournaments' });
+      return;
+    }
+
+    // Verify user has an APPROVED registration
+    const registration = await prisma.tournamentRegistration.findUnique({
+      where: { tournamentId_userId: { tournamentId, userId } },
+    });
+
+    if (!registration || registration.status !== 'APPROVED') {
+      res.status(403).json({ error: 'You do not have an approved registration for this tournament' });
+      return;
+    }
+
+    // Load user name
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    });
+
+    // Load tournament result (optional — for place)
+    const result = await prisma.tournamentResult.findUnique({
+      where: { tournamentId_userId: { tournamentId, userId } },
+    });
+
+    const participantName = user?.name ?? user?.email ?? 'Participant';
+    const commissionerName = tournament.commissioner.user.name ?? undefined;
+    const tournamentDate = tournament.startDate
+      ? new Date(tournament.startDate).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const pdfBuffer = await generateParticipationCertificate({
+      participantName,
+      tournamentName: tournament.title,
+      tournamentDate,
+      place: result?.place ?? undefined,
+      commissionerName,
+    });
+
+    const safeTitle = tournament.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="certificate_${safeTitle}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error('Certificate generation error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
