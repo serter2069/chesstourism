@@ -101,8 +101,8 @@ export default function TournamentsListScreen() {
 
       const res = await api.get('/tournaments', { params });
       const data = res.data;
-      const items: Tournament[] = Array.isArray(data) ? data : data.items || data.tournaments || [];
-      const total = data.total || items.length;
+      const items: Tournament[] = Array.isArray(data) ? data : data.data || data.items || data.tournaments || [];
+      const total = data.pagination?.total ?? data.total ?? items.length;
 
       if (append) {
         setTournaments((prev) => [...prev, ...items]);
