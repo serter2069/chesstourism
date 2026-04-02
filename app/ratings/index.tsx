@@ -126,7 +126,7 @@ export default function RatingsScreen() {
 
   return (
     <SafeContainer>
-      <Header title="Ratings" showBack />
+      <Header />
       <View style={styles.filterRow}>
         <TextInput
           style={styles.filterInput}

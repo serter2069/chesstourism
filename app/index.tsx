@@ -114,7 +114,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <SafeContainer>
-        <Header title="ChesTourism" />
+        <Header />
         <LoadingSpinner />
       </SafeContainer>
     );

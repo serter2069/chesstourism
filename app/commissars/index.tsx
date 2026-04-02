@@ -204,7 +204,7 @@ export default function CommissarsScreen() {
 
   return (
     <SafeContainer>
-      <Header title="Commissars" showBack />
+      <Header />
       <View style={styles.filterRow}>
         <TextInput
           style={styles.filterInput}
