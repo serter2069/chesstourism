@@ -4,6 +4,39 @@ import prisma from '../lib/prisma';
 
 const router = Router();
 
+// GET /api/users/me — own profile (authenticated)
+router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        city: true,
+        role: true,
+        rating: true,
+        fideId: true,
+        fideRating: true,
+        fideTitle: true,
+        onboardingCompleted: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error('Get own profile error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/users/:id — public profile
 router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
