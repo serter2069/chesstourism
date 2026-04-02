@@ -525,4 +525,140 @@ router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('C
   }
 });
 
+// GET /api/tournaments/:id/photos — list photos (public)
+router.get('/tournaments/:id/photos', async (req: Request, res: Response) => {
+  try {
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      select: { id: true },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    const photos = await prisma.tournamentPhoto.findMany({
+      where: { tournamentId: req.params.id },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        url: true,
+        caption: true,
+        createdAt: true,
+        uploader: { select: { id: true, name: true } },
+      },
+    });
+
+    res.json(photos);
+  } catch (err) {
+    console.error('List photos error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/tournaments/:id/photos — add photo (Commissioner who owns tournament / Admin)
+router.post('/tournaments/:id/photos', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
+    const { url, caption } = req.body;
+
+    if (!url || typeof url !== 'string' || url.trim() === '') {
+      res.status(400).json({ error: 'url is required' });
+      return;
+    }
+
+    // Validate URL format
+    try {
+      const parsed = new URL(url.trim());
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        res.status(400).json({ error: 'url must use http or https' });
+        return;
+      }
+    } catch {
+      res.status(400).json({ error: 'Invalid url format' });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const photo = await prisma.tournamentPhoto.create({
+      data: {
+        tournamentId: req.params.id,
+        url: url.trim(),
+        caption: caption ? String(caption).trim() || null : null,
+        uploadedBy: userId,
+      },
+      select: {
+        id: true,
+        url: true,
+        caption: true,
+        createdAt: true,
+        uploader: { select: { id: true, name: true } },
+      },
+    });
+
+    res.status(201).json(photo);
+  } catch (err) {
+    console.error('Add photo error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/tournaments/:id/photos/:photoId — remove photo (Commissioner who owns tournament / Admin)
+router.delete('/tournaments/:id/photos/:photoId', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
+    const photo = await prisma.tournamentPhoto.findFirst({
+      where: { id: req.params.photoId, tournamentId: req.params.id },
+    });
+
+    if (!photo) {
+      res.status(404).json({ error: 'Photo not found' });
+      return;
+    }
+
+    await prisma.tournamentPhoto.delete({ where: { id: req.params.photoId } });
+
+    res.status(204).send();
+  } catch (err) {
+    console.error('Delete photo error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

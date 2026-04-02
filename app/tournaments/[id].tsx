@@ -10,6 +10,7 @@ import {
   Alert,
   Share,
   Platform,
+  TextInput,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
@@ -58,7 +59,8 @@ interface Result {
 interface Photo {
   id: string;
   url: string;
-  caption?: string;
+  caption?: string | null;
+  createdAt: string;
 }
 
 interface MyRegistration {
@@ -121,6 +123,15 @@ export default function TournamentDetailScreen() {
   const [registering, setRegistering] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
+  // Photos state
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
+  const [showAddPhoto, setShowAddPhoto] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [photoCaption, setPhotoCaption] = useState('');
+  const [addingPhoto, setAddingPhoto] = useState(false);
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
+
   const fetchTournament = useCallback(async () => {
     if (!id) return;
     try {
@@ -143,6 +154,79 @@ export default function TournamentDetailScreen() {
     setRefreshing(true);
     fetchTournament();
   }, [fetchTournament]);
+
+  const fetchPhotos = useCallback(async () => {
+    if (!id) return;
+    try {
+      setPhotosLoading(true);
+      const res = await api.get(`/tournaments/${id}/photos`);
+      setPhotos(res.data);
+    } catch {
+      // Silent — photos are optional
+    } finally {
+      setPhotosLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) fetchPhotos();
+  }, [id, fetchPhotos]);
+
+  const handleAddPhoto = useCallback(async () => {
+    const trimmedUrl = photoUrl.trim();
+    if (!trimmedUrl) {
+      Alert.alert('Error', 'Please enter a photo URL');
+      return;
+    }
+    try {
+      new URL(trimmedUrl);
+    } catch {
+      Alert.alert('Error', 'Please enter a valid URL (http or https)');
+      return;
+    }
+    try {
+      setAddingPhoto(true);
+      await api.post(`/tournaments/${id}/photos`, {
+        url: trimmedUrl,
+        caption: photoCaption.trim() || undefined,
+      });
+      setPhotoUrl('');
+      setPhotoCaption('');
+      setShowAddPhoto(false);
+      await fetchPhotos();
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to add photo';
+      Alert.alert('Error', message);
+    } finally {
+      setAddingPhoto(false);
+    }
+  }, [id, photoUrl, photoCaption, fetchPhotos]);
+
+  const handleDeletePhoto = useCallback((photoId: string) => {
+    Alert.alert(
+      'Delete Photo',
+      'Are you sure you want to delete this photo?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeletingPhotoId(photoId);
+              await api.delete(`/tournaments/${id}/photos/${photoId}`);
+              await fetchPhotos();
+            } catch (err: unknown) {
+              const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to delete photo';
+              Alert.alert('Error', message);
+            } finally {
+              setDeletingPhotoId(null);
+            }
+          },
+        },
+      ],
+    );
+  }, [id, fetchPhotos]);
 
   const handleRegister = useCallback(async () => {
     if (!id || !user) return;
@@ -239,7 +323,7 @@ export default function TournamentDetailScreen() {
     { key: 'info', label: 'Info' },
     { key: 'participants', label: `Players (${tournament.participants?.length || 0})` },
     ...(hasResults ? [{ key: 'results' as TabKey, label: 'Results' }] : []),
-    ...(tournament.photos?.length ? [{ key: 'photos' as TabKey, label: 'Photos' }] : []),
+    { key: 'photos', label: photos.length ? `Photos (${photos.length})` : 'Photos' },
   ];
 
   const shareUrl = `https://chesstourism.smartlaunchhub.com/tournaments/${tournament.id}`;
@@ -503,15 +587,73 @@ export default function TournamentDetailScreen() {
 
         {activeTab === 'photos' && (
           <View style={styles.section}>
-            {(!tournament.photos || tournament.photos.length === 0) ? (
+            {/* Add photo button for commissioner / admin */}
+            {(isOwner || isAdmin) && (
+              <View style={styles.addPhotoSection}>
+                {!showAddPhoto ? (
+                  <Button
+                    title="Add Photo"
+                    onPress={() => setShowAddPhoto(true)}
+                    variant="secondary"
+                  />
+                ) : (
+                  <Card style={styles.addPhotoCard}>
+                    <Text style={styles.addPhotoTitle}>Add Photo</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Photo URL (https://...)"
+                      placeholderTextColor={Colors.textMuted}
+                      value={photoUrl}
+                      onChangeText={setPhotoUrl}
+                      autoCapitalize="none"
+                      keyboardType="url"
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Caption (optional)"
+                      placeholderTextColor={Colors.textMuted}
+                      value={photoCaption}
+                      onChangeText={setPhotoCaption}
+                    />
+                    <View style={styles.addPhotoActions}>
+                      <Button
+                        title="Cancel"
+                        onPress={() => { setShowAddPhoto(false); setPhotoUrl(''); setPhotoCaption(''); }}
+                        variant="secondary"
+                      />
+                      <Button
+                        title="Add"
+                        onPress={handleAddPhoto}
+                        loading={addingPhoto}
+                      />
+                    </View>
+                  </Card>
+                )}
+              </View>
+            )}
+
+            {photosLoading ? (
+              <LoadingSpinner />
+            ) : photos.length === 0 ? (
               <Text style={styles.emptyTab}>No photos yet.</Text>
             ) : (
               <View style={styles.photoGrid}>
-                {tournament.photos.map((photo) => (
+                {photos.map((photo) => (
                   <View key={photo.id} style={styles.photoItem}>
                     <Image source={{ uri: photo.url }} style={styles.photoImage} resizeMode="cover" />
                     {photo.caption && (
                       <Text style={styles.photoCaption} numberOfLines={1}>{photo.caption}</Text>
+                    )}
+                    {(isOwner || isAdmin) && (
+                      <TouchableOpacity
+                        style={styles.deletePhotoBtn}
+                        onPress={() => handleDeletePhoto(photo.id)}
+                        disabled={deletingPhotoId === photo.id}
+                      >
+                        <Text style={styles.deletePhotoBtnText}>
+                          {deletingPhotoId === photo.id ? '...' : 'Delete'}
+                        </Text>
+                      </TouchableOpacity>
                     )}
                   </View>
                 ))}
@@ -752,6 +894,36 @@ const styles = StyleSheet.create({
     color: Colors.statusError,
   },
   // Photos
+  addPhotoSection: {
+    marginBottom: Spacing.md,
+  },
+  addPhotoCard: {
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  addPhotoTitle: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.xs,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.borderDefault,
+    borderRadius: 8,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    backgroundColor: Colors.bgSecondary,
+    marginBottom: Spacing.xs,
+  },
+  addPhotoActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    justifyContent: 'flex-end',
+    marginTop: Spacing.xs,
+  },
   photoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -771,6 +943,19 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     color: Colors.textSecondary,
     marginTop: Spacing.xs,
+  },
+  deletePhotoBtn: {
+    marginTop: Spacing.xs,
+    alignSelf: 'flex-start',
+    paddingVertical: 2,
+    paddingHorizontal: Spacing.sm,
+    borderRadius: 4,
+    backgroundColor: Colors.statusError + '22',
+  },
+  deletePhotoBtnText: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.statusError,
+    fontWeight: Typography.weights.medium,
   },
   // Error
   errorContainer: {
