@@ -1,25 +1,25 @@
-// Brand color tokens — FIDE Navy Gold palette (prestigious, classic chess federation)
+// Brand color tokens — Clay palette (warm terracotta, source: brand.html)
 export const Colors = {
   // Backgrounds
-  bgPrimary: '#F5F1E8',
-  bgSecondary: '#FAF7F2',
-  bgSurface: '#FAF7F2',
+  bgPrimary: '#FAF2EC',
+  bgSecondary: '#F2E8E0',
+  bgSurface: '#F2E8E0',
   bgCard: '#FFFFFF',
 
   // Text
-  textPrimary: '#0D1B3E',
-  textSecondary: '#5C6B8A',
-  textMuted: '#5C6B8A',
-  textAccent: '#C59A1A',
+  textPrimary: '#2A1510',
+  textSecondary: '#5A3528',
+  textMuted: '#9A7060',
+  textAccent: '#C4664A',
 
   // Borders
-  borderDefault: '#DDE3ED',
-  borderFocus: '#C59A1A',
+  borderDefault: '#DDD0C8',
+  borderFocus: '#C4664A',
 
   // Brand
-  brandPrimary: '#0D1B3E',
-  brandAccent: '#C59A1A',
-  brandSecondary: '#1A2D5A',
+  brandPrimary: '#2A1510',
+  brandAccent: '#C4664A',
+  brandSecondary: '#5A3528',
 
   // Status
   statusSuccess: '#27AE60',
@@ -29,7 +29,7 @@ export const Colors = {
 
   // On-color text
   textOnPrimary: '#FFFFFF',
-  textOnAccent: '#0D1B3E',
+  textOnAccent: '#FFFFFF',
 } as const;
 
 export type ColorKey = keyof typeof Colors;
