@@ -128,7 +128,7 @@ export default function TournamentsListScreen() {
 
   return (
     <SafeContainer>
-      <Header title="Tournaments" showBack />
+      <Header />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -136,6 +136,11 @@ export default function TournamentsListScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brandPrimary} />
         }
       >
+        {/* Page title */}
+        <View style={styles.pageTitle}>
+          <Text style={styles.pageTitleText}>Tournaments</Text>
+        </View>
+
         {/* Filters */}
         <View style={styles.filters}>
           {/* Status filter */}
@@ -292,6 +297,17 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: Spacing['4xl'],
+  },
+  // Page title
+  pageTitle: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.sm,
+  },
+  pageTitleText: {
+    fontSize: Typography.sizes['2xl'],
+    fontWeight: Typography.weights.bold,
+    color: Colors.textPrimary,
   },
   // Filters
   filters: {
