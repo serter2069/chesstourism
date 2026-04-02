@@ -204,6 +204,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.lg,
+    maxWidth: 430,
+    alignSelf: 'center' as const,
+    width: '100%',
   },
   errorCard: {
     marginTop: Spacing.lg,

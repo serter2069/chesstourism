@@ -14,8 +14,8 @@ export default function AdminLayout() {
     return <Redirect href="/(auth)/login" />;
   }
 
-  // Role check: admin only
-  if (user.role !== 'admin') {
+  // Role check: admin only (handle both 'ADMIN' and 'admin' from API)
+  if (user.role.toUpperCase() !== 'ADMIN') {
     return <Redirect href="/" />;
   }
 
