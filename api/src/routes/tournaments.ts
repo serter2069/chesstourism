@@ -290,15 +290,35 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
       return;
     }
 
-    const { status } = req.body;
-    if (!status) {
+    const { status: newStatus } = req.body;
+    if (!newStatus) {
       res.status(400).json({ error: 'status is required' });
+      return;
+    }
+
+    // FSM: valid tournament status transitions
+    const VALID_TRANSITIONS: Record<string, string[]> = {
+      DRAFT: ['PUBLISHED', 'CANCELLED'],
+      PUBLISHED: ['REGISTRATION_OPEN', 'CANCELLED'],
+      REGISTRATION_OPEN: ['REGISTRATION_CLOSED', 'CANCELLED'],
+      REGISTRATION_CLOSED: ['IN_PROGRESS', 'CANCELLED'],
+      IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+      COMPLETED: [],
+      CANCELLED: [],
+    };
+
+    const allowed = VALID_TRANSITIONS[tournament.status] || [];
+    if (!allowed.includes(newStatus)) {
+      res.status(422).json({
+        error: `Invalid status transition: ${tournament.status} → ${newStatus}`,
+        allowed,
+      });
       return;
     }
 
     const updated = await prisma.tournament.update({
       where: { id: req.params.id },
-      data: { status },
+      data: { status: newStatus },
     });
 
     res.json(updated);
