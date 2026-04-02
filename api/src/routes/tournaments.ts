@@ -22,14 +22,30 @@ router.get('/tournaments', async (req: Request, res: Response) => {
     if (req.query.country) where.country = req.query.country as string;
     if (req.query.city) where.city = req.query.city as string;
 
+    // Full-text search: ?q= matches title or description (case-insensitive)
+    if (req.query.q) {
+      const q = req.query.q as string;
+      where.OR = [
+        { title: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+      ];
+    }
+
     // Rating limit filter: show tournaments where ratingLimit <= ratingMax (or ratingLimit is null = Open)
     if (req.query.ratingMax) {
       const ratingMax = parseInt(req.query.ratingMax as string);
       if (!isNaN(ratingMax)) {
-        where.OR = [
+        // Combine with existing OR (from ?q=) using AND if needed
+        const ratingOr = [
           { ratingLimit: { lte: ratingMax } },
           { ratingLimit: null },
         ];
+        if (where.OR) {
+          where.AND = [{ OR: where.OR }, { OR: ratingOr }];
+          delete where.OR;
+        } else {
+          where.OR = ratingOr;
+        }
       }
     }
 
