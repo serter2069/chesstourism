@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { requireRole } from '../middleware/roles';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -124,6 +125,198 @@ router.get('/tournaments/:id', async (req: Request, res: Response) => {
   }
 });
 
+// ─── Helper: get Commissioner record for current user ───
+async function getCommissioner(userId: string) {
+  return prisma.commissioner.findUnique({ where: { userId } });
+}
+
+// POST /api/tournaments — create tournament (Commissioner/Admin only)
+router.post('/tournaments', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const commissioner = await getCommissioner(userId);
+
+    if (!commissioner) {
+      res.status(400).json({ error: 'Complete your commissioner profile first' });
+      return;
+    }
+
+    const { title, city, country, startDate, endDate, maxParticipants, fee, description, ratingLimit, timeControl, currency } = req.body;
+
+    if (!title || !startDate || !endDate) {
+      res.status(400).json({ error: 'title, startDate, and endDate are required' });
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      res.status(400).json({ error: 'Invalid date format' });
+      return;
+    }
+    if (end <= start) {
+      res.status(400).json({ error: 'endDate must be after startDate' });
+      return;
+    }
+
+    const tournament = await prisma.tournament.create({
+      data: {
+        title: title.trim(),
+        city: city?.trim() || '',
+        country: country?.trim() || '',
+        startDate: start,
+        endDate: end,
+        maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : null,
+        fee: fee != null ? parseFloat(fee) : null,
+        currency: currency?.trim() || 'USD',
+        description: description?.trim() || null,
+        ratingLimit: ratingLimit ? parseInt(ratingLimit, 10) : null,
+        timeControl: timeControl?.trim()?.toLowerCase() || null,
+        commissionerId: commissioner.id,
+        status: 'DRAFT',
+      },
+      include: {
+        commissioner: { select: { id: true, userId: true } },
+      },
+    });
+
+    res.status(201).json(tournament);
+  } catch (err) {
+    console.error('Create tournament error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/tournaments/:id — update tournament (owner Commissioner or Admin)
+router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    // Only owner commissioner or admin can update
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized to edit this tournament' });
+      return;
+    }
+
+    const { title, city, country, startDate, endDate, maxParticipants, fee, description, ratingLimit, timeControl, currency, status } = req.body;
+
+    const data: Record<string, unknown> = {};
+    if (title !== undefined) data.title = title.trim();
+    if (city !== undefined) data.city = city.trim();
+    if (country !== undefined) data.country = country.trim();
+    if (description !== undefined) data.description = description?.trim() || null;
+    if (ratingLimit !== undefined) data.ratingLimit = ratingLimit ? parseInt(ratingLimit, 10) : null;
+    if (timeControl !== undefined) data.timeControl = timeControl?.trim()?.toLowerCase() || null;
+    if (currency !== undefined) data.currency = currency?.trim() || 'USD';
+    if (maxParticipants !== undefined) data.maxParticipants = maxParticipants ? parseInt(maxParticipants, 10) : null;
+    if (fee !== undefined) data.fee = fee != null ? parseFloat(fee) : null;
+    if (status !== undefined) data.status = status;
+
+    if (startDate !== undefined) {
+      const start = new Date(startDate);
+      if (isNaN(start.getTime())) {
+        res.status(400).json({ error: 'Invalid startDate format' });
+        return;
+      }
+      data.startDate = start;
+    }
+    if (endDate !== undefined) {
+      const end = new Date(endDate);
+      if (isNaN(end.getTime())) {
+        res.status(400).json({ error: 'Invalid endDate format' });
+        return;
+      }
+      data.endDate = end;
+    }
+
+    const updated = await prisma.tournament.update({
+      where: { id: req.params.id },
+      data,
+      include: {
+        commissioner: { select: { id: true, userId: true } },
+      },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Update tournament error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/tournaments/:id/status — change tournament status
+router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
+    const { status } = req.body;
+    if (!status) {
+      res.status(400).json({ error: 'status is required' });
+      return;
+    }
+
+    const updated = await prisma.tournament.update({
+      where: { id: req.params.id },
+      data: { status },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Update tournament status error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/tournaments/:id — delete tournament (owner Commissioner or Admin)
+router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized to delete this tournament' });
+      return;
+    }
+
+    await prisma.tournament.delete({ where: { id: req.params.id } });
+    res.json({ message: 'Tournament deleted' });
+  } catch (err) {
+    console.error('Delete tournament error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ─── Registration Endpoints ──────────────────────────────
 
 const REGISTRABLE_STATUSES = ['PUBLISHED', 'REGISTRATION_OPEN'];
@@ -154,6 +347,15 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
     if (tournament.maxParticipants && tournament._count.registrations >= tournament.maxParticipants) {
       res.status(400).json({ error: 'Tournament is full' });
       return;
+    }
+
+    // Check rating limit
+    if (tournament.ratingLimit) {
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (user && user.rating > tournament.ratingLimit) {
+        res.status(400).json({ error: `Your rating exceeds the limit of ${tournament.ratingLimit}` });
+        return;
+      }
     }
 
     // Check duplicate
@@ -240,15 +442,87 @@ router.get('/my-registrations', authenticate, async (req: AuthRequest, res: Resp
   }
 });
 
-// TODO: Rewrite remaining tournament endpoints for new schema (#1597)
-// - POST /tournaments (create)
-// - PUT /tournaments/:id (update)
-// - PATCH /tournaments/:id/status
-// - POST /tournaments/:id/photos
-// - POST /tournaments/:id/results
-// - GET /tournaments/:id/participants
-// - GET /tournaments/:id/results
-// - GET /tournaments/:id/photos
-// - Admin endpoints
+// GET /api/tournaments/:id/registrations — list registrations (Commissioner/Admin)
+router.get('/tournaments/:id/registrations', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
+    const registrations = await prisma.tournamentRegistration.findMany({
+      where: { tournamentId: req.params.id },
+      include: {
+        user: { select: { id: true, name: true, email: true, rating: true, city: true, phone: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json(registrations);
+  } catch (err) {
+    console.error('List registrations error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/tournaments/:id/registrations/:regId — update registration status (APPROVED/REJECTED)
+router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
+    const { status } = req.body;
+    if (!status || !['APPROVED', 'REJECTED', 'PENDING'].includes(status)) {
+      res.status(400).json({ error: 'status must be APPROVED, REJECTED, or PENDING' });
+      return;
+    }
+
+    const registration = await prisma.tournamentRegistration.findFirst({
+      where: { id: req.params.regId, tournamentId: req.params.id },
+    });
+
+    if (!registration) {
+      res.status(404).json({ error: 'Registration not found' });
+      return;
+    }
+
+    const updated = await prisma.tournamentRegistration.update({
+      where: { id: req.params.regId },
+      data: { status },
+      include: {
+        user: { select: { id: true, name: true, email: true, rating: true, city: true } },
+      },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Update registration status error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 export default router;

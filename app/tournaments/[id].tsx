@@ -344,8 +344,8 @@ export default function TournamentDetailScreen() {
           )}
           {(isOwner || isAdmin) && (
             <Button
-              title="Manage Tournament"
-              onPress={() => router.push(`/(auth)/commissar/tournament/${tournament.id}` as never)}
+              title="Edit Tournament"
+              onPress={() => router.push(`/(dashboard)/tournaments/${tournament.id}/edit` as never)}
               variant="secondary"
             />
           )}
