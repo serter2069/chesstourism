@@ -5,6 +5,7 @@ import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import { useAuth } from '../../store/auth';
+import { useNotifications } from '../../store/notifications';
 
 interface HeaderProps {
   title?: string;
@@ -22,6 +23,7 @@ export default function Header({ title, showBack = false }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
 
   function isActive(href: string): boolean {
@@ -55,6 +57,20 @@ export default function Header({ title, showBack = false }: HeaderProps) {
               <Text style={styles.userName} numberOfLines={1}>
                 {user.name || user.email.split('@')[0]}
               </Text>
+              <TouchableOpacity
+                onPress={() => router.push('/notifications' as any)}
+                style={styles.bellBtn}
+                accessibilityLabel="Notifications"
+              >
+                <Text style={styles.bellIcon}>{'🔔'}</Text>
+                {unreadCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {unreadCount > 9 ? '9+' : String(unreadCount)}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
               <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
                 <Text style={styles.logoutText}>Logout</Text>
               </TouchableOpacity>
@@ -172,6 +188,34 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
     maxWidth: 120,
+  },
+  bellBtn: {
+    position: 'relative',
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bellIcon: {
+    fontSize: 18,
+  },
+  badge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: Colors.statusError,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: Typography.weights.bold,
+    lineHeight: 14,
   },
   logoutBtn: {
     paddingVertical: Spacing.xs,

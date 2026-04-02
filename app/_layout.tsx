@@ -5,6 +5,7 @@ import { useBrandFonts } from './constants/fonts';
 import { Colors } from '../constants/colors';
 import { AuthProvider } from '../store/auth';
 import { WatchlistProvider } from '../store/watchlist';
+import { NotificationsProvider } from '../store/notifications';
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useBrandFonts();
@@ -20,13 +21,15 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <WatchlistProvider>
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: Colors.bgPrimary },
-          }}
-        />
+        <NotificationsProvider>
+          <StatusBar style="light" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: Colors.bgPrimary },
+            }}
+          />
+        </NotificationsProvider>
       </WatchlistProvider>
     </AuthProvider>
   );
