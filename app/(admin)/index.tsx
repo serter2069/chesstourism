@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
@@ -15,70 +16,75 @@ import { Typography } from '../../constants/typography';
 import api from '../../lib/api';
 
 interface Stats {
+  totalUsers: number;
   totalTournaments: number;
-  totalUsers: string;
-  tournamentsLoading: boolean;
+  totalRegistrations: number;
+  totalRevenue: number;
+  pendingOrgRequests: number;
 }
 
 interface QuickLink {
   title: string;
   description: string;
   href: string;
+  badgeCount?: number;
 }
-
-const quickLinks: QuickLink[] = [
-  {
-    title: 'Moderation',
-    description: 'Review pending applications',
-    href: '/(admin)/moderation',
-  },
-  {
-    title: 'Users',
-    description: 'Manage user accounts',
-    href: '/(admin)/users',
-  },
-  {
-    title: 'Tournaments',
-    description: 'View all tournaments',
-    href: '/(admin)/tournaments',
-  },
-  {
-    title: 'Finances',
-    description: 'Payments and reports',
-    href: '/(admin)/finances',
-  },
-  {
-    title: 'Organizations',
-    description: 'Tournament requests from organizations',
-    href: '/(admin)/organizations',
-  },
-];
 
 export default function AdminDashboardScreen() {
   const router = useRouter();
-  const [stats, setStats] = useState<Stats>({
-    totalTournaments: 0,
-    totalUsers: 'Coming soon',
-    tournamentsLoading: true,
-  });
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function fetchStats() {
+    try {
+      const res = await api.get('/admin/stats');
+      setStats(res.data);
+    } catch {
+      // Stats fetch failed — show zeroes
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const res = await api.get('/admin/tournaments');
-        const data = res.data;
-        const items = Array.isArray(data) ? data : data.items || data.tournaments || [];
-        setStats((prev) => ({
-          ...prev,
-          totalTournaments: items.length,
-          tournamentsLoading: false,
-        }));
-      } catch {
-        setStats((prev) => ({ ...prev, tournamentsLoading: false }));
-      }
-    }
     fetchStats();
   }, []);
+
+  function onRefresh() {
+    setRefreshing(true);
+    fetchStats();
+  }
+
+  const quickLinks: QuickLink[] = [
+    {
+      title: 'Moderation',
+      description: 'Review pending applications',
+      href: '/(admin)/moderation',
+    },
+    {
+      title: 'Users',
+      description: 'Manage user accounts and roles',
+      href: '/(admin)/users',
+    },
+    {
+      title: 'Tournaments',
+      description: 'View all tournaments',
+      href: '/(admin)/tournaments',
+    },
+    {
+      title: 'Finances',
+      description: 'Payments and reports',
+      href: '/(admin)/finances',
+    },
+    {
+      title: 'Organizations',
+      description: 'Tournament requests from organizations',
+      href: '/(admin)/organizations',
+      badgeCount: stats?.pendingOrgRequests || 0,
+    },
+  ];
 
   return (
     <SafeContainer>
@@ -86,22 +92,51 @@ export default function AdminDashboardScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.brandPrimary}
+          />
+        }
       >
         {/* Stats */}
         <Text style={styles.sectionTitle}>Overview</Text>
-        <View style={styles.statsRow}>
-          <Card style={styles.statCard}>
-            <Text style={styles.statValue}>
-              {stats.tournamentsLoading ? '...' : stats.totalTournaments}
-            </Text>
-            <Text style={styles.statLabel}>Tournaments</Text>
-          </Card>
-          <Card style={styles.statCard}>
-            <Text style={styles.statValue}>--</Text>
-            <Text style={styles.statLabel}>Users</Text>
-            <Text style={styles.comingSoon}>Coming soon</Text>
-          </Card>
-        </View>
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <View style={styles.statsRow}>
+              <Card style={styles.statCard}>
+                <Text style={styles.statValueGold}>{stats?.totalUsers ?? 0}</Text>
+                <Text style={styles.statLabel}>Users</Text>
+              </Card>
+              <Card style={styles.statCard}>
+                <Text style={styles.statValueGold}>{stats?.totalTournaments ?? 0}</Text>
+                <Text style={styles.statLabel}>Tournaments</Text>
+              </Card>
+            </View>
+            <View style={styles.statsRow}>
+              <Card style={styles.statCard}>
+                <Text style={styles.statValueGold}>{stats?.totalRegistrations ?? 0}</Text>
+                <Text style={styles.statLabel}>Registrations</Text>
+              </Card>
+              <Card style={styles.statCard}>
+                <Text style={styles.statValueGold}>
+                  ${stats?.totalRevenue?.toFixed(0) ?? '0'}
+                </Text>
+                <Text style={styles.statLabel}>Revenue</Text>
+              </Card>
+            </View>
+            {(stats?.pendingOrgRequests ?? 0) > 0 && (
+              <Card style={styles.alertCard}>
+                <Text style={styles.alertText}>
+                  {stats!.pendingOrgRequests} pending organization request{stats!.pendingOrgRequests > 1 ? 's' : ''}
+                </Text>
+              </Card>
+            )}
+          </>
+        )}
 
         {/* Quick Links */}
         <Text style={styles.sectionTitle}>Quick Links</Text>
@@ -118,7 +153,14 @@ export default function AdminDashboardScreen() {
                   <Text style={styles.linkTitle}>{link.title}</Text>
                   <Text style={styles.linkDescription}>{link.description}</Text>
                 </View>
-                <Text style={styles.linkArrow}>{'>'}</Text>
+                <View style={styles.linkRight}>
+                  {(link.badgeCount ?? 0) > 0 && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{link.badgeCount}</Text>
+                    </View>
+                  )}
+                  <Text style={styles.linkArrow}>{'>'}</Text>
+                </View>
               </View>
             </Card>
           </TouchableOpacity>
@@ -137,6 +179,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.lg,
+    maxWidth: 430,
+    alignSelf: 'center' as const,
+    width: '100%',
   },
   sectionTitle: {
     fontSize: Typography.sizes.lg,
@@ -148,26 +193,35 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     gap: Spacing.md,
+    marginBottom: Spacing.md,
   },
   statCard: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.xl,
+    backgroundColor: Colors.brandPrimary,
   },
-  statValue: {
+  statValueGold: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: Colors.brandPrimary,
+    color: Colors.brandAccent,
     marginBottom: Spacing.xs,
   },
   statLabel: {
     fontSize: Typography.sizes.sm,
-    color: Colors.textSecondary,
+    color: Colors.textOnPrimary,
   },
-  comingSoon: {
-    fontSize: Typography.sizes.xs,
-    color: Colors.textMuted,
-    marginTop: Spacing.xs,
+  alertCard: {
+    backgroundColor: Colors.statusWarning + '15',
+    borderWidth: 1,
+    borderColor: Colors.statusWarning,
+    marginBottom: Spacing.md,
+  },
+  alertText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.statusWarning,
+    fontWeight: Typography.weights.semibold,
+    textAlign: 'center',
   },
   linkWrapper: {
     marginBottom: Spacing.sm,
@@ -184,6 +238,11 @@ const styles = StyleSheet.create({
   linkText: {
     flex: 1,
   },
+  linkRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
   linkTitle: {
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.semibold,
@@ -197,7 +256,20 @@ const styles = StyleSheet.create({
   linkArrow: {
     fontSize: Typography.sizes.lg,
     color: Colors.textMuted,
-    marginLeft: Spacing.md,
+  },
+  badge: {
+    backgroundColor: Colors.statusWarning,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textOnPrimary,
   },
   bottomSpacer: {
     height: Spacing['4xl'],

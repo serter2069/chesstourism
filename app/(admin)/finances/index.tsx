@@ -51,6 +51,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.xl,
+    maxWidth: 430,
+    alignSelf: 'center' as const,
+    width: '100%',
   },
   card: {
     alignItems: 'center',
