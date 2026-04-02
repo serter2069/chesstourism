@@ -26,8 +26,11 @@ interface Tournament {
   country?: string;
   venueAddress?: string;
   maxParticipants?: number;
+  fee?: number;
   entryFee?: number;
   currency?: string;
+  ratingLimit?: number;
+  timeControl?: string;
   rules?: string;
   schedule?: string;
   status: string;
@@ -89,6 +92,8 @@ export default function EditTournamentScreen() {
   const [maxParticipants, setMaxParticipants] = useState('');
   const [entryFee, setEntryFee] = useState('');
   const [currency, setCurrency] = useState('USD');
+  const [ratingLimit, setRatingLimit] = useState('');
+  const [timeControl, setTimeControl] = useState('');
   const [rules, setRules] = useState('');
   const [schedule, setSchedule] = useState('');
 
@@ -97,7 +102,7 @@ export default function EditTournamentScreen() {
       setLoading(true);
       const [tRes, pRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
-        api.get(`/tournaments/${id}/participants`).catch(() => ({ data: [] })),
+        api.get(`/tournaments/${id}/registrations`).catch(() => ({ data: [] })),
       ]);
 
       const t: Tournament = tRes.data;
@@ -106,15 +111,18 @@ export default function EditTournamentScreen() {
       // Pre-fill form
       setTitle(t.title || '');
       setDescription(t.description || '');
-      setFormat(t.format || 'CLASSICAL');
+      setFormat(t.format || t.timeControl?.toUpperCase() || 'CLASSICAL');
       setStartDate(t.startDate ? t.startDate.split('T')[0] : '');
       setEndDate(t.endDate ? t.endDate.split('T')[0] : '');
       setCity(t.city || '');
       setCountry(t.country || '');
       setVenueAddress(t.venueAddress || '');
       setMaxParticipants(t.maxParticipants ? String(t.maxParticipants) : '');
-      setEntryFee(t.entryFee != null ? String(t.entryFee) : '');
+      const feeVal = t.fee != null ? t.fee : t.entryFee;
+      setEntryFee(feeVal != null ? String(feeVal) : '');
       setCurrency(t.currency || 'USD');
+      setRatingLimit(t.ratingLimit ? String(t.ratingLimit) : '');
+      setTimeControl(t.timeControl || '');
       setRules(t.rules || '');
       setSchedule(t.schedule || '');
 
@@ -153,17 +161,15 @@ export default function EditTournamentScreen() {
       await api.put(`/tournaments/${id}`, {
         title: title.trim(),
         description: description.trim() || undefined,
-        format,
+        timeControl: timeControl.trim() || format.toLowerCase(),
         startDate: startDate || undefined,
         endDate: endDate || undefined,
         city: city.trim() || undefined,
         country: country.trim() || undefined,
-        venueAddress: venueAddress.trim() || undefined,
         maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : undefined,
-        entryFee: entryFee ? parseFloat(entryFee) : undefined,
+        fee: entryFee ? parseFloat(entryFee) : undefined,
         currency: currency.trim() || 'USD',
-        rules: rules.trim() || undefined,
-        schedule: schedule.trim() || undefined,
+        ratingLimit: ratingLimit ? parseInt(ratingLimit, 10) : undefined,
       });
 
       Alert.alert('Success', 'Tournament updated');
@@ -256,6 +262,12 @@ export default function EditTournamentScreen() {
         {/* Quick links */}
         <View style={styles.quickLinks}>
           <Button
+            title="Registrations"
+            variant="secondary"
+            onPress={() => router.push(`/(dashboard)/tournaments/${id}/registrations` as never)}
+            style={styles.quickBtn}
+          />
+          <Button
             title="Photos"
             variant="secondary"
             onPress={() => router.push(`/(dashboard)/tournaments/${id}/photos` as never)}
@@ -341,21 +353,18 @@ export default function EditTournamentScreen() {
           <Input label="Currency" value={currency} onChangeText={setCurrency} />
 
           <Input
-            label="Rules"
-            value={rules}
-            onChangeText={setRules}
-            multiline
-            numberOfLines={4}
-            style={styles.multiline}
+            label="Rating Limit"
+            placeholder="e.g. 2200 (leave empty for open)"
+            value={ratingLimit}
+            onChangeText={setRatingLimit}
+            keyboardType="numeric"
           />
 
           <Input
-            label="Schedule"
-            value={schedule}
-            onChangeText={setSchedule}
-            multiline
-            numberOfLines={4}
-            style={styles.multiline}
+            label="Time Control"
+            placeholder="e.g. 90+30, 15+10"
+            value={timeControl}
+            onChangeText={setTimeControl}
           />
 
           <Button

@@ -33,6 +33,8 @@ export default function CreateTournamentScreen() {
   const [maxParticipants, setMaxParticipants] = useState('');
   const [entryFee, setEntryFee] = useState('');
   const [currency, setCurrency] = useState('USD');
+  const [ratingLimit, setRatingLimit] = useState('');
+  const [timeControl, setTimeControl] = useState('');
   const [rules, setRules] = useState('');
   const [schedule, setSchedule] = useState('');
 
@@ -52,6 +54,10 @@ export default function CreateTournamentScreen() {
     if (entryFee && (isNaN(fee) || fee < 0)) {
       errs.entryFee = 'Must be a non-negative number';
     }
+    const rl = parseInt(ratingLimit, 10);
+    if (ratingLimit && (isNaN(rl) || rl <= 0)) {
+      errs.ratingLimit = 'Must be a positive number';
+    }
     // Validate date format YYYY-MM-DD
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (startDate && !dateRegex.test(startDate)) {
@@ -70,24 +76,27 @@ export default function CreateTournamentScreen() {
 
     try {
       setLoading(true);
-      await api.post('/tournaments', {
+      const res = await api.post('/tournaments', {
         title: title.trim(),
         description: description.trim() || undefined,
-        format,
+        timeControl: timeControl.trim() || format.toLowerCase(),
         startDate,
         endDate,
         city: city.trim() || undefined,
         country: country.trim() || undefined,
-        venueAddress: venueAddress.trim() || undefined,
         maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : undefined,
-        entryFee: entryFee ? parseFloat(entryFee) : undefined,
+        fee: entryFee ? parseFloat(entryFee) : undefined,
         currency: currency.trim() || 'USD',
-        rules: rules.trim() || undefined,
-        schedule: schedule.trim() || undefined,
+        ratingLimit: ratingLimit ? parseInt(ratingLimit, 10) : undefined,
       });
 
       Alert.alert('Success', 'Tournament created successfully');
-      router.back();
+      const newId = res.data?.id;
+      if (newId) {
+        router.replace(`/tournaments/${newId}` as never);
+      } else {
+        router.back();
+      }
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -204,23 +213,19 @@ export default function CreateTournamentScreen() {
           />
 
           <Input
-            label="Rules"
-            placeholder="Tournament rules..."
-            value={rules}
-            onChangeText={setRules}
-            multiline
-            numberOfLines={4}
-            style={styles.multiline}
+            label="Rating Limit"
+            placeholder="e.g. 2200 (leave empty for open)"
+            value={ratingLimit}
+            onChangeText={setRatingLimit}
+            keyboardType="numeric"
+            error={errors.ratingLimit}
           />
 
           <Input
-            label="Schedule"
-            placeholder="Round schedule..."
-            value={schedule}
-            onChangeText={setSchedule}
-            multiline
-            numberOfLines={4}
-            style={styles.multiline}
+            label="Time Control"
+            placeholder="e.g. 90+30, 15+10"
+            value={timeControl}
+            onChangeText={setTimeControl}
           />
 
           <Button
