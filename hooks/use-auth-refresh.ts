@@ -27,8 +27,8 @@ export function useAuthRefresh(isLoggedIn: boolean) {
     // On app resume (foreground) — refresh if enough time passed
     let subscription: ReturnType<typeof AppState.addEventListener> | undefined;
 
-    if (Platform.OS === 'web') {
-      // Web: visibilitychange event
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      // Web: visibilitychange event (guarded for SSR)
       const onVisibility = () => {
         if (
           document.visibilityState === 'visible' &&
@@ -43,7 +43,7 @@ export function useAuthRefresh(isLoggedIn: boolean) {
         clearInterval(interval);
         document.removeEventListener('visibilitychange', onVisibility);
       };
-    } else {
+    } else if (Platform.OS !== 'web') {
       // Native: AppState change
       subscription = AppState.addEventListener('change', (nextState) => {
         if (
@@ -59,5 +59,10 @@ export function useAuthRefresh(isLoggedIn: boolean) {
         subscription?.remove();
       };
     }
+
+    // Fallback cleanup (SSR or web without document)
+    return () => {
+      clearInterval(interval);
+    };
   }, [isLoggedIn]);
 }
