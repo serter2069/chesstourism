@@ -120,7 +120,7 @@ export default function Header({ title, showBack = false }: HeaderProps) {
 
 const styles = StyleSheet.create({
   headerWrap: {
-    backgroundColor: '#F2E8E0',
+    backgroundColor: Colors.brandPrimary,
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderDefault,
   },
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   backText: {
-    color: Colors.brandPrimary,
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
   },
@@ -149,10 +149,12 @@ const styles = StyleSheet.create({
   logoIcon: {
     fontSize: 24,
     marginRight: Spacing.sm,
+    color: Colors.brandAccent,
   },
   logoText: {
-    color: Colors.textPrimary,
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.lg,
+    fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
   },
   rightSection: {
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   userName: {
-    color: Colors.textPrimary,
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
     maxWidth: 120,
@@ -176,10 +178,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.borderDefault,
+    borderColor: Colors.brandAccent,
   },
   logoutText: {
-    color: Colors.textSecondary,
+    color: Colors.brandAccent,
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.medium,
   },
@@ -187,10 +189,10 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
     borderRadius: 4,
-    backgroundColor: Colors.brandPrimary,
+    backgroundColor: Colors.brandAccent,
   },
   loginText: {
-    color: '#ffffff',
+    color: Colors.textOnAccent,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
   },
@@ -201,7 +203,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   hamburgerText: {
-    color: Colors.textPrimary,
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
   },
@@ -218,29 +220,31 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   navLinkActive: {
-    borderBottomColor: Colors.brandPrimary,
+    borderBottomColor: Colors.brandAccent,
   },
   navLinkText: {
-    color: Colors.textSecondary,
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
+    opacity: 0.7,
   },
   navLinkTextActive: {
-    color: Colors.brandPrimary,
+    color: Colors.brandAccent,
     fontWeight: Typography.weights.semibold,
+    opacity: 1,
   },
   // Mobile menu
   mobileMenu: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderDefault,
+    borderTopColor: Colors.brandSecondary,
   },
   menuItem: {
     paddingVertical: Spacing.md,
   },
   menuItemText: {
-    color: Colors.textPrimary,
+    color: Colors.textOnPrimary,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },

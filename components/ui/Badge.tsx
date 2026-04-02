@@ -13,10 +13,10 @@ interface BadgeProps {
 }
 
 const statusColors: Record<BadgeStatus, { bg: string; text: string }> = {
-  success: { bg: '#E8F0E8', text: '#3D6B3F' },
-  warning: { bg: '#F5EBD8', text: '#8B6530' },
-  error: { bg: '#F5DDD8', text: '#A63A2C' },
-  info: { bg: '#DDE8EF', text: '#4A6B7A' },
+  success: { bg: '#E8F5E9', text: '#1B5E20' },
+  warning: { bg: '#FFF8E1', text: '#E65100' },
+  error: { bg: '#FFEBEE', text: '#B71C1C' },
+  info: { bg: '#E3F2FD', text: '#0D47A1' },
   default: { bg: Colors.bgSurface, text: Colors.textSecondary },
 };
 

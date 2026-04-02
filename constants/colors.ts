@@ -1,30 +1,35 @@
-// Brand color tokens — Clay palette (warm, handcrafted, chess tournament feeling)
+// Brand color tokens — FIDE Navy Gold palette (prestigious, classic chess federation)
 export const Colors = {
   // Backgrounds
-  bgPrimary: '#FAF2EC',
-  bgSecondary: '#F2E8E0',
-  bgSurface: '#F2E8E0',
-  bgCard: '#FAF2EC',
+  bgPrimary: '#F5F1E8',
+  bgSecondary: '#FAF7F2',
+  bgSurface: '#FAF7F2',
+  bgCard: '#FFFFFF',
 
   // Text
-  textPrimary: '#2A1510',
-  textSecondary: '#6B4F45',
-  textMuted: '#9A7060',
-  textAccent: '#C4664A',
+  textPrimary: '#0D1B3E',
+  textSecondary: '#5C6B8A',
+  textMuted: '#5C6B8A',
+  textAccent: '#C59A1A',
 
   // Borders
-  borderDefault: '#D9C9BF',
-  borderFocus: '#C4664A',
+  borderDefault: '#DDE3ED',
+  borderFocus: '#C59A1A',
 
   // Brand
-  brandPrimary: '#C4664A',
-  brandSecondary: '#A8523A',
+  brandPrimary: '#0D1B3E',
+  brandAccent: '#C59A1A',
+  brandSecondary: '#1A2D5A',
 
   // Status
-  statusSuccess: '#5A8A5C',
-  statusWarning: '#C4884A',
-  statusError: '#D94F3D',
-  statusInfo: '#6B8A9A',
+  statusSuccess: '#27AE60',
+  statusWarning: '#E2A83E',
+  statusError: '#C0392B',
+  statusInfo: '#2563EB',
+
+  // On-color text
+  textOnPrimary: '#FFFFFF',
+  textOnAccent: '#0D1B3E',
 } as const;
 
 export type ColorKey = keyof typeof Colors;
