@@ -46,7 +46,7 @@ jobs:
           cd api
           npm ci
           npx prisma generate
-          npx prisma db push
+          npx prisma db push --accept-data-loss
           npm run build
           # Write .env for PM2 process (dotenv.config reads from .env at runtime)
           echo "DATABASE_URL=${DATABASE_URL}" > .env
