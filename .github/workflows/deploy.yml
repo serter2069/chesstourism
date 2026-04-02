@@ -34,7 +34,10 @@ jobs:
 
       - name: Deploy frontend
         run: |
+          sudo mkdir -p /var/www/chesstourism/web
+          sudo chown -R $(whoami) /var/www/chesstourism/web/
           rsync -av --delete dist/ /var/www/chesstourism/web/
+          sudo chown -R www-data:www-data /var/www/chesstourism/web/
 
       - name: Deploy API
         env:
@@ -49,4 +52,3 @@ jobs:
           echo "DATABASE_URL=${DATABASE_URL}" > .env
           echo "PORT=3811" >> .env
           pm2 restart chesstourism-api || pm2 start dist/index.js --name chesstourism-api
-          sudo chown -R www-data:www-data /var/www/chesstourism/web/
