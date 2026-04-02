@@ -7,5 +7,221 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models will be added during development
-// Stage 1: INFRA only — no models yet
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  PARTICIPANT
+  COMMISSAR
+  ORG_ADMIN
+  ADMIN
+}
+
+enum TournamentFormat {
+  CLASSICAL
+  RAPID
+  BLITZ
+}
+
+enum TournamentStatus {
+  DRAFT
+  REGISTRATION_OPEN
+  REGISTRATION_CLOSED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  ONLINE
+  CASH
+}
+
+enum PaymentProvider {
+  STRIPE
+  YUKASSA
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password_hash String
+  role          Role      @default(PARTICIPANT)
+  verified      Boolean   @default(false)
+  name          String
+  surname       String
+  country       String?
+  city          String?
+  avatar_url    String?
+  bio           String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  commissar_profile      CommissarProfile?
+  administered_orgs      Organization[]
+  tournament_participations TournamentParticipant[]
+  tournament_results     TournamentResult[]
+  rating                 Rating?
+  uploaded_photos        TournamentPhoto[]
+  commissioned_tournaments Tournament[]
+
+  @@map("users")
+}
+
+model CommissarProfile {
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  license_number  String   @unique
+  experience_years Int
+  specializations String[]
+  rating          Float    @default(0)
+  approved        Boolean  @default(false)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("commissar_profiles")
+}
+
+model Organization {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  contact_email String?
+  website       String?
+  logo_url      String?
+  admin_id      String
+  created_at    DateTime @default(now())
+
+  admin       User         @relation(fields: [admin_id], references: [id])
+  tournaments Tournament[]
+
+  @@map("organizations")
+}
+
+model Tournament {
+  id               String           @id @default(uuid())
+  title            String
+  description      String?
+  format           TournamentFormat
+  status           TournamentStatus @default(DRAFT)
+  start_date       DateTime
+  end_date         DateTime
+  city             String
+  country          String
+  venue_address    String?
+  max_participants Int?
+  entry_fee        Decimal?         @db.Decimal(10, 2)
+  currency         String?          @default("USD")
+  commissar_id     String?
+  organization_id  String?
+  hero_image_url   String?
+  rules            String?
+  schedule         String?
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+
+  commissar    User?         @relation(fields: [commissar_id], references: [id])
+  organization Organization? @relation(fields: [organization_id], references: [id])
+  participants TournamentParticipant[]
+  results      TournamentResult[]
+  photos       TournamentPhoto[]
+
+  @@map("tournaments")
+}
+
+model TournamentParticipant {
+  id                  String        @id @default(uuid())
+  tournament_id       String
+  user_id             String
+  registered_at       DateTime      @default(now())
+  paid                Boolean       @default(false)
+  payment_method      PaymentMethod?
+  payment_confirmed_at DateTime?
+
+  tournament Tournament @relation(fields: [tournament_id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  payment    Payment?
+
+  @@unique([tournament_id, user_id])
+  @@map("tournament_participants")
+}
+
+model TournamentResult {
+  id            String   @id @default(uuid())
+  tournament_id String
+  user_id       String
+  place         Int
+  score         Decimal  @db.Decimal(5, 1)
+  elo_change    Int      @default(0)
+  elo_before    Int?
+  elo_after     Int?
+
+  tournament Tournament @relation(fields: [tournament_id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([tournament_id, user_id])
+  @@map("tournament_results")
+}
+
+model Rating {
+  id           String   @id @default(uuid())
+  user_id      String   @unique
+  elo          Int      @default(1200)
+  peak_elo     Int      @default(1200)
+  games_played Int      @default(0)
+  wins         Int      @default(0)
+  losses       Int      @default(0)
+  draws        Int      @default(0)
+  updated_at   DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("ratings")
+}
+
+model TournamentPhoto {
+  id            String   @id @default(uuid())
+  tournament_id String
+  url           String
+  uploaded_by   String
+  created_at    DateTime @default(now())
+
+  tournament Tournament @relation(fields: [tournament_id], references: [id], onDelete: Cascade)
+  uploader   User       @relation(fields: [uploaded_by], references: [id])
+
+  @@map("tournament_photos")
+}
+
+model Payment {
+  id                        String        @id @default(uuid())
+  tournament_participant_id String        @unique
+  amount                    Decimal       @db.Decimal(10, 2)
+  currency                  String        @default("USD")
+  provider                  PaymentProvider
+  provider_payment_id       String?
+  status                    PaymentStatus @default(PENDING)
+  created_at                DateTime      @default(now())
+
+  participant TournamentParticipant @relation(fields: [tournament_participant_id], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model HeroSettings {
+  id          Int      @id @default(1)
+  title       String   @default("International Chess Tourism")
+  subtitle    String?
+  image_url   String?
+  button_text String   @default("Find Tournaments")
+  updated_at  DateTime @updatedAt
+
+  @@map("hero_settings")
+}
