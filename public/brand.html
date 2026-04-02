@@ -10,7 +10,7 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: #E8E6E3;
+  background: #FFFFFF;
   font-family: Inter, sans-serif;
   padding: 32px 24px;
   min-height: 100vh;
@@ -19,14 +19,14 @@ h1 {
   text-align: center;
   font-size: 28px;
   font-weight: 700;
-  color: #1A1918;
+  color: #2A1510;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
 }
 .subtitle {
   text-align: center;
   font-size: 14px;
-  color: #6B6560;
+  color: #9A7060;
   margin-bottom: 32px;
 }
 .grid {
@@ -364,7 +364,7 @@ variants.forEach(v => {
 }
 .ds-divider {
   border: none;
-  border-top: 2px solid #1A1918;
+  border-top: 2px solid #2A1510;
   margin-bottom: 48px;
 }
 .ds-header-block {
@@ -374,10 +374,10 @@ variants.forEach(v => {
   margin-bottom: 48px;
 }
 .ds-main-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 32px;
   font-weight: 700;
-  color: #1A1918;
+  color: #2A1510;
   letter-spacing: -0.5px;
 }
 .ds-main-sub {
@@ -385,7 +385,7 @@ variants.forEach(v => {
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: #C8952A;
+  color: #C4664A;
 }
 .ds-section { margin-bottom: 48px; }
 .ds-section-label {
@@ -393,8 +393,8 @@ variants.forEach(v => {
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: #6B6560;
-  border-bottom: 1px solid #D8D3CA;
+  color: #9A7060;
+  border-bottom: 1px solid #DDD0C8;
   padding-bottom: 8px;
   margin-bottom: 24px;
 }
@@ -403,33 +403,33 @@ variants.forEach(v => {
 .ds-colors { display: flex; flex-wrap: wrap; gap: 8px; }
 .ds-chip { width: 120px; }
 .ds-swatch { height: 52px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.08); }
-.ds-clabel { font-size: 11px; font-weight: 600; color: #1A1918; margin-top: 5px; }
-.ds-cval { font-size: 10px; color: #6B6560; font-family: monospace; }
+.ds-clabel { font-size: 11px; font-weight: 600; color: #2A1510; margin-top: 5px; }
+.ds-cval { font-size: 10px; color: #9A7060; font-family: monospace; }
 
 /* TYPOGRAPHY */
-.ds-type-row { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F0EDE6; }
+.ds-type-row { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F2E8E0; }
 .ds-type-row:last-child { border: none; }
-.ds-type-meta { font-size: 10px; color: #6B6560; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
-.ds-t-h1 { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; color: #1A1918; line-height: 1.2; letter-spacing: -0.5px; }
-.ds-t-h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #1A1918; line-height: 1.3; }
-.ds-t-h3 { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 500; color: #1A1918; }
-.ds-t-body { font-size: 16px; color: #1A1918; line-height: 1.65; }
-.ds-t-small { font-size: 14px; color: #6B6560; }
-.ds-t-cap { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #6B6560; }
+.ds-type-meta { font-size: 10px; color: #9A7060; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+.ds-t-h1 { font-family: 'Nunito', sans-serif; font-size: 38px; font-weight: 700; color: #2A1510; line-height: 1.2; letter-spacing: -0.5px; }
+.ds-t-h2 { font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 600; color: #2A1510; line-height: 1.3; }
+.ds-t-h3 { font-family: 'Nunito', sans-serif; font-size: 19px; font-weight: 500; color: #2A1510; }
+.ds-t-body { font-size: 16px; color: #2A1510; line-height: 1.65; }
+.ds-t-small { font-size: 14px; color: #9A7060; }
+.ds-t-cap { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #9A7060; }
 
 /* SPACING */
 .ds-spacing { display: flex; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
 .ds-sp-item { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-.ds-sp-bar { width: 36px; background: #C8952A; opacity: 0.55; border-radius: 2px; }
-.ds-sp-lbl { font-size: 10px; color: #6B6560; font-family: monospace; }
+.ds-sp-bar { width: 36px; background: #C4664A; opacity: 0.55; border-radius: 2px; }
+.ds-sp-lbl { font-size: 10px; color: #9A7060; font-family: monospace; }
 
 /* BUTTONS */
 .ds-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
-.ds-row-lbl { font-size: 10px; color: #6B6560; font-weight: 600; width: 72px; flex-shrink: 0; letter-spacing: 0.5px; text-transform: uppercase; }
+.ds-row-lbl { font-size: 10px; color: #9A7060; font-weight: 600; width: 72px; flex-shrink: 0; letter-spacing: 0.5px; text-transform: uppercase; }
 .ds-btn {
-  font-family: Inter, sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 9px 20px;
   border-radius: 4px;
   border: none;
@@ -437,32 +437,32 @@ variants.forEach(v => {
   letter-spacing: 0.3px;
 }
 .ds-btn-sm { font-size: 12px; padding: 6px 14px; }
-.ds-btn-primary { background: #1A1918; color: #FAF8F4; }
-.ds-btn-accent { background: #C8952A; color: #fff; }
-.ds-btn-secondary { background: transparent; color: #1A1918; border: 1.5px solid #1A1918; }
-.ds-btn-ghost { background: transparent; color: #6B6560; border: 1.5px solid #D8D3CA; }
+.ds-btn-primary { background: #2A1510; color: #FAF2EC; }
+.ds-btn-accent { background: #C4664A; color: #fff; }
+.ds-btn-secondary { background: transparent; color: #2A1510; border: 1.5px solid #2A1510; }
+.ds-btn-ghost { background: transparent; color: #9A7060; border: 1.5px solid #DDD0C8; }
 .ds-btn-danger { background: #C0392B; color: #fff; }
-.ds-btn-disabled { background: #D8D3CA; color: #6B6560; cursor: not-allowed; opacity: 0.55; }
+.ds-btn-disabled { background: #DDD0C8; color: #9A7060; cursor: not-allowed; opacity: 0.55; }
 
 /* INPUTS */
 .ds-inputs { display: flex; flex-wrap: wrap; gap: 20px; }
 .ds-input-block { display: flex; flex-direction: column; gap: 4px; width: 240px; }
-.ds-input-lbl { font-size: 11px; font-weight: 600; color: #3D3A35; }
+.ds-input-lbl { font-size: 11px; font-weight: 600; color: #5A3528; }
 .ds-input {
   font-family: Inter, sans-serif;
   font-size: 14px;
-  color: #1A1918;
+  color: #2A1510;
   background: #FFFFFF;
-  border: 1.5px solid #D8D3CA;
+  border: 1.5px solid #DDD0C8;
   border-radius: 4px;
   padding: 9px 12px;
   width: 100%;
   outline: none;
 }
-.ds-input-focus { border-color: #C8952A; box-shadow: 0 0 0 3px rgba(200,149,42,0.15); }
+.ds-input-focus { border-color: #C4664A; box-shadow: 0 0 0 3px rgba(196,102,74,0.15); }
 .ds-input-err { border-color: #C0392B; }
 .ds-input-errmsg { font-size: 11px; color: #C0392B; font-weight: 500; }
-.ds-input-disabled { background: #F0EDE6; color: #6B6560; }
+.ds-input-disabled { background: #F2E8E0; color: #9A7060; }
 
 /* CARDS */
 .ds-cards { display: flex; flex-wrap: wrap; gap: 20px; }
@@ -472,49 +472,49 @@ variants.forEach(v => {
   background: #FFFFFF;
   overflow: hidden;
 }
-.ds-card-default { border: 1px solid #D8D3CA; }
+.ds-card-default { border: 1px solid #DDD0C8; }
 .ds-card-elevated { box-shadow: 0 4px 18px rgba(26,25,24,0.10); }
-.ds-card-outlined { background: transparent; border: 1.5px solid #1A1918; }
+.ds-card-outlined { background: transparent; border: 1.5px solid #2A1510; }
 .ds-card-img {
   height: 120px;
-  background: linear-gradient(135deg, #F0EDE6 0%, #D8D3CA 100%);
+  background: linear-gradient(135deg, #F2E8E0 0%, #DDD0C8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32px;
-  color: #6B6560;
+  color: #9A7060;
 }
 .ds-card-body { padding: 16px; }
-.ds-card-over { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #C8952A; margin-bottom: 4px; }
-.ds-card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: #1A1918; margin-bottom: 4px; }
-.ds-card-text { font-size: 12px; color: #6B6560; line-height: 1.5; margin-bottom: 12px; }
+.ds-card-over { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #C4664A; margin-bottom: 4px; }
+.ds-card-title { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 600; color: #2A1510; margin-bottom: 4px; }
+.ds-card-text { font-size: 12px; color: #9A7060; line-height: 1.5; margin-bottom: 12px; }
 .ds-card-footer { display: flex; align-items: center; justify-content: space-between; }
-.ds-card-price { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #1A1918; }
+.ds-card-price { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700; color: #2A1510; }
 .ds-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 100px; }
-.ds-badge-a { background: rgba(200,149,42,0.12); color: #C8952A; }
+.ds-badge-a { background: rgba(196,102,74,0.12); color: #C4664A; }
 .ds-badge-s { background: rgba(39,174,96,0.12); color: #27AE60; }
-.ds-badge-n { background: #F0EDE6; color: #6B6560; }
+.ds-badge-n { background: #F2E8E0; color: #9A7060; }
 </style>
 
 <div class="ds-wrap">
   <hr class="ds-divider">
   <div class="ds-header-block">
     <div class="ds-main-title">Design System</div>
-    <div class="ds-main-sub">Ivory Ink · Selected Brand · Stage 5</div>
+    <div class="ds-main-sub">Clay · Selected Brand · Stage 5</div>
   </div>
 
   <!-- COLORS -->
   <div class="ds-section">
     <div class="ds-section-label">Color Tokens</div>
     <div class="ds-colors">
-      <div class="ds-chip"><div class="ds-swatch" style="background:#FAF8F4;"></div><div class="ds-clabel">Background</div><div class="ds-cval">#FAF8F4</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#F0EDE6;"></div><div class="ds-clabel">Surface</div><div class="ds-cval">#F0EDE6</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#1A1918;"></div><div class="ds-clabel">Primary</div><div class="ds-cval">#1A1918</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#3D3A35;"></div><div class="ds-clabel">Secondary</div><div class="ds-cval">#3D3A35</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#C8952A;"></div><div class="ds-clabel">Accent</div><div class="ds-cval">#C8952A</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#E8B84B;"></div><div class="ds-clabel">Accent Light</div><div class="ds-cval">#E8B84B</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#6B6560;"></div><div class="ds-clabel">Text Muted</div><div class="ds-cval">#6B6560</div></div>
-      <div class="ds-chip"><div class="ds-swatch" style="background:#D8D3CA;"></div><div class="ds-clabel">Border</div><div class="ds-cval">#D8D3CA</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#FAF2EC;"></div><div class="ds-clabel">Background</div><div class="ds-cval">#FAF2EC</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#F2E8E0;"></div><div class="ds-clabel">Surface</div><div class="ds-cval">#F2E8E0</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#2A1510;"></div><div class="ds-clabel">Primary</div><div class="ds-cval">#2A1510</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#5A3528;"></div><div class="ds-clabel">Secondary</div><div class="ds-cval">#5A3528</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#C4664A;"></div><div class="ds-clabel">Accent</div><div class="ds-cval">#C4664A</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#D8886A;"></div><div class="ds-clabel">Accent Light</div><div class="ds-cval">#D8886A</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#9A7060;"></div><div class="ds-clabel">Text Muted</div><div class="ds-cval">#9A7060</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#DDD0C8;"></div><div class="ds-clabel">Border</div><div class="ds-cval">#DDD0C8</div></div>
       <div class="ds-chip"><div class="ds-swatch" style="background:#C0392B;"></div><div class="ds-clabel">Error</div><div class="ds-cval">#C0392B</div></div>
       <div class="ds-chip"><div class="ds-swatch" style="background:#27AE60;"></div><div class="ds-clabel">Success</div><div class="ds-cval">#27AE60</div></div>
     </div>
@@ -522,10 +522,10 @@ variants.forEach(v => {
 
   <!-- TYPOGRAPHY -->
   <div class="ds-section">
-    <div class="ds-section-label">Typography — Playfair Display + Source Sans 3</div>
-    <div class="ds-type-row"><div class="ds-type-meta">H1 · Playfair 700 · 38px</div><div class="ds-t-h1">Шахматный туризм</div></div>
-    <div class="ds-type-row"><div class="ds-type-meta">H2 · Playfair 600 · 26px</div><div class="ds-t-h2">Турниры мирового уровня</div></div>
-    <div class="ds-type-row"><div class="ds-type-meta">H3 · Playfair 500 · 19px</div><div class="ds-t-h3">Международные соревнования</div></div>
+    <div class="ds-section-label">Typography — Nunito</div>
+    <div class="ds-type-row"><div class="ds-type-meta">H1 · Nunito 800 · 38px</div><div class="ds-t-h1">Шахматный туризм</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">H2 · Nunito 700 · 26px</div><div class="ds-t-h2">Турниры мирового уровня</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">H3 · Nunito 600 · 19px</div><div class="ds-t-h3">Международные соревнования</div></div>
     <div class="ds-type-row"><div class="ds-type-meta">Body · 16px · lh 1.65</div><div class="ds-t-body">Организуем шахматные туры по легендарным городам. Участвуйте в официальных турнирах и открывайте новые направления вместе с нами.</div></div>
     <div class="ds-type-row"><div class="ds-type-meta">Small · 14px</div><div class="ds-t-small">Рейтинг FIDE учитывается при регистрации. Все туры сертифицированы федерацией.</div></div>
     <div class="ds-type-row"><div class="ds-type-meta">Caption · 11px · uppercase</div><div class="ds-t-cap">Официальный партнёр FIDE</div></div>
@@ -601,9 +601,9 @@ variants.forEach(v => {
     </div>
   </div>
 
-  <div style="padding-top:24px;border-top:1px solid #D8D3CA;margin-bottom:48px;">
-    <div style="font-size:10px;color:#6B6560;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">
-      Chess Tourism · Ivory Ink · Stage 5: BRAND_STYLE · Radius: sm 2px / md 4px / lg 8px · Font: Playfair Display + Source Sans 3
+  <div style="padding-top:24px;border-top:1px solid #DDD0C8;margin-bottom:48px;">
+    <div style="font-size:10px;color:#9A7060;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">
+      Chess Tourism · Clay · Stage 5: BRAND_STYLE · Radius: sm 2px / md 4px / lg 8px · Font: Nunito
     </div>
   </div>
 </div>
