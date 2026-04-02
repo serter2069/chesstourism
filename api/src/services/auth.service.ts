@@ -3,6 +3,12 @@ import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/
 import { sendOtpEmail } from './email.service';
 import { Response } from 'express';
 import prisma from '../lib/prisma';
+import Redis from 'ioredis';
+
+const redis = new Redis({ host: '127.0.0.1', port: 6379 });
+redis.on('error', (err) => console.error('[Redis] connection error:', err.message));
+
+const OTP_ATTEMPT_TTL = 15 * 60; // 15 minutes in seconds
 
 const DEV_MODE = process.env.NODE_ENV !== 'production';
 const OTP_TTL_MINUTES = 10;
@@ -96,9 +102,6 @@ export async function requestOtp(email: string) {
   return { message: 'OTP sent' };
 }
 
-// In-memory attempt tracker (per OTP record id)
-const attemptMap = new Map<string, number>();
-
 export async function verifyOtp(email: string, code: string) {
   // Find the latest unused, unexpired OTP for this email
   const otpRecord = await prisma.otpCode.findFirst({
@@ -114,21 +117,32 @@ export async function verifyOtp(email: string, code: string) {
     throw Object.assign(new Error('No valid OTP found. Request a new code.'), { status: 401 });
   }
 
-  // Check attempts
-  const attempts = attemptMap.get(otpRecord.id) || 0;
+  // Check attempts via Redis (persistent across restarts and multi-instance)
+  const attemptsKey = `otp_attempts:${email}`;
+  let attempts = 0;
+  try {
+    attempts = parseInt((await redis.get(attemptsKey)) || '0');
+  } catch (err) {
+    // Redis unavailable — fail open to avoid blocking legitimate users
+    console.error('[Redis] failed to read OTP attempts, failing open:', (err as Error).message);
+  }
+
   if (attempts >= OTP_MAX_ATTEMPTS) {
     // Invalidate the OTP
     await prisma.otpCode.update({
       where: { id: otpRecord.id },
       data: { usedAt: new Date() },
     });
-    attemptMap.delete(otpRecord.id);
     throw Object.assign(new Error('Too many attempts. Request a new code.'), { status: 429 });
   }
 
   // Check if code matches
   if (otpRecord.code !== code) {
-    attemptMap.set(otpRecord.id, attempts + 1);
+    try {
+      await redis.setex(attemptsKey, OTP_ATTEMPT_TTL, String(attempts + 1));
+    } catch (err) {
+      console.error('[Redis] failed to increment OTP attempts:', (err as Error).message);
+    }
     const remaining = OTP_MAX_ATTEMPTS - attempts - 1;
     throw Object.assign(
       new Error(`Invalid code. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`),
@@ -136,12 +150,16 @@ export async function verifyOtp(email: string, code: string) {
     );
   }
 
-  // Mark OTP as used
+  // Mark OTP as used and clear attempt counter
   await prisma.otpCode.update({
     where: { id: otpRecord.id },
     data: { usedAt: new Date() },
   });
-  attemptMap.delete(otpRecord.id);
+  try {
+    await redis.del(attemptsKey);
+  } catch (err) {
+    console.error('[Redis] failed to clear OTP attempts:', (err as Error).message);
+  }
 
   // Find or create user
   let user = await prisma.user.findUnique({
