@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { calculateEloChanges, TournamentResultEntry } from './elo.service';
 import { generateCertificate } from './pdf.service';
 import { sendResultsWithCertificate } from './email.service';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 export interface ResultInput {
   userId: string;

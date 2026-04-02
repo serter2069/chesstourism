@@ -1,12 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
+import prisma from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET /api/tournaments — list published tournaments
 router.get('/tournaments', async (req: Request, res: Response) => {
