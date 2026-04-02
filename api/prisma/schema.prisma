@@ -73,6 +73,7 @@ model User {
   payments                Payment[]
   tournamentRegistrations TournamentRegistration[]
   uploadedPhotos          TournamentPhoto[]
+  watchlist               TournamentWatchlist[]
 }
 
 model OtpCode {
@@ -118,6 +119,7 @@ model Tournament {
   registrations TournamentRegistration[]
   payments      Payment[]
   photos        TournamentPhoto[]
+  watchlistedBy TournamentWatchlist[]
 
   @@index([commissionerId])
   @@index([status])
@@ -205,5 +207,18 @@ model TournamentPhoto {
   uploader     User       @relation(fields: [uploadedBy], references: [id])
   createdAt    DateTime   @default(now())
 
+  @@index([tournamentId])
+}
+
+model TournamentWatchlist {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([userId, tournamentId])
+  @@index([userId])
   @@index([tournamentId])
 }

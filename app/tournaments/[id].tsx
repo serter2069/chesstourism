@@ -14,7 +14,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import { SafeContainer, Header } from '../../components/layout';
-import { Button, Card, Badge, LoadingSpinner, Avatar } from '../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, Avatar, WatchlistButton } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
@@ -234,7 +234,10 @@ export default function TournamentDetailScreen() {
         {/* Title section */}
         <View style={styles.titleSection}>
           <Badge label={badge.label} status={badge.status} style={styles.statusBadge} />
-          <Text style={styles.title}>{tournament.title}</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{tournament.title}</Text>
+            <WatchlistButton tournamentId={tournament.id} size={26} />
+          </View>
           <Text style={styles.dates}>
             {formatDate(tournament.startDate)} - {formatDate(tournament.endDate)}
           </Text>
@@ -482,7 +485,14 @@ const styles = StyleSheet.create({
   statusBadge: {
     marginBottom: Spacing.sm,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
   title: {
+    flex: 1,
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
