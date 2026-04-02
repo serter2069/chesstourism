@@ -11,19 +11,13 @@ datasource db {
 
 enum Role {
   PARTICIPANT
-  COMMISSAR
-  ORG_ADMIN
+  COMMISSIONER
   ADMIN
-}
-
-enum TournamentFormat {
-  CLASSICAL
-  RAPID
-  BLITZ
 }
 
 enum TournamentStatus {
   DRAFT
+  PUBLISHED
   REGISTRATION_OPEN
   REGISTRATION_CLOSED
   IN_PROGRESS
@@ -31,198 +25,178 @@ enum TournamentStatus {
   CANCELLED
 }
 
-enum PaymentMethod {
-  ONLINE
-  CASH
-}
-
-enum PaymentProvider {
-  STRIPE
-  YUKASSA
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
 }
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
+  PAID
   FAILED
   REFUNDED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
 }
 
 // ─── Models ──────────────────────────────────────────────
 
 model User {
-  id              String    @id @default(uuid())
-  email           String    @unique
-  password_hash   String?
-  role            Role      @default(PARTICIPANT)
-  name            String?
-  surname         String?
-  country         String?
-  city            String?
-  avatar_url      String?
-  bio             String?
-  otp_code        String?
-  otp_expires_at  DateTime?
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  role      Role     @default(PARTICIPANT)
+  name      String?
+  phone     String?
+  city      String?
+  rating    Int      @default(0)
+  createdAt DateTime @default(now())
 
-  commissar_profile      CommissarProfile?
-  administered_orgs      Organization[]
-  tournament_participations TournamentParticipant[]
-  tournament_results     TournamentResult[]
-  rating                 Rating?
-  uploaded_photos        TournamentPhoto[]
-  commissioned_tournaments Tournament[]
-
-  @@map("users")
+  sessions                Session[]
+  commissioner            Commissioner?
+  memberships             Membership[]
+  payments                Payment[]
+  tournamentRegistrations TournamentRegistration[]
+  uploadedPhotos          TournamentPhoto[]
 }
 
-model CommissarProfile {
-  id              String   @id @default(uuid())
-  user_id         String   @unique
-  license_number  String   @unique
-  experience_years Int
-  specializations String[]
-  rating          Float    @default(0)
-  approved        Boolean  @default(false)
+model OtpCode {
+  id        String    @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("commissar_profiles")
+  @@index([email])
 }
 
-model Organization {
-  id            String   @id @default(uuid())
-  name          String
-  description   String?
-  contact_email String?
-  website       String?
-  logo_url      String?
-  admin_id      String
-  created_at    DateTime @default(now())
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
 
-  admin       User         @relation(fields: [admin_id], references: [id])
-  tournaments Tournament[]
-
-  @@map("organizations")
+  @@index([userId])
 }
 
 model Tournament {
-  id               String           @id @default(uuid())
-  title            String
+  id              String           @id @default(cuid())
+  title           String
+  city            String
+  country         String
+  startDate       DateTime
+  endDate         DateTime
+  status          TournamentStatus @default(DRAFT)
+  commissionerId  String
+  commissioner    Commissioner     @relation(fields: [commissionerId], references: [id])
+  maxParticipants Int?
+  fee             Float?
+  currency        String           @default("USD")
+  description     String?
+  createdAt       DateTime         @default(now())
+
+  registrations TournamentRegistration[]
+  payments      Payment[]
+  photos        TournamentPhoto[]
+
+  @@index([commissionerId])
+  @@index([status])
+}
+
+model TournamentRegistration {
+  id           String             @id @default(cuid())
+  tournamentId String
+  tournament   Tournament         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       RegistrationStatus @default(PENDING)
+  paymentId    String?            @unique
+  payment      Payment?           @relation(fields: [paymentId], references: [id])
+  createdAt    DateTime           @default(now())
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
+}
+
+model Commissioner {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio            String?
+  specialization String?
+  country        String?
+  city           String?
+  photoUrl       String?
+  isVerified     Boolean @default(false)
+
+  tournaments Tournament[]
+}
+
+model OrganizationRequest {
+  id               String        @id @default(cuid())
+  organizationName String
+  contactName      String
+  email            String
+  phone            String?
   description      String?
-  format           TournamentFormat
-  status           TournamentStatus @default(DRAFT)
-  start_date       DateTime
-  end_date         DateTime
-  city             String
-  country          String
-  venue_address    String?
-  max_participants Int?
-  entry_fee        Decimal?         @db.Decimal(10, 2)
-  currency         String?          @default("USD")
-  commissar_id     String?
-  organization_id  String?
-  hero_image_url   String?
-  rules            String?
-  schedule         String?
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-
-  commissar    User?         @relation(fields: [commissar_id], references: [id])
-  organization Organization? @relation(fields: [organization_id], references: [id])
-  participants TournamentParticipant[]
-  results      TournamentResult[]
-  photos       TournamentPhoto[]
-
-  @@map("tournaments")
+  status           RequestStatus @default(PENDING)
+  createdAt        DateTime      @default(now())
 }
 
-model TournamentParticipant {
-  id                  String        @id @default(uuid())
-  tournament_id       String
-  user_id             String
-  registered_at       DateTime      @default(now())
-  paid                Boolean       @default(false)
-  payment_method      PaymentMethod?
-  payment_confirmed_at DateTime?
+model Membership {
+  id             String           @id @default(cuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate      DateTime
+  endDate        DateTime
+  status         MembershipStatus @default(ACTIVE)
+  certificateUrl String?
+  createdAt      DateTime         @default(now())
 
-  tournament Tournament @relation(fields: [tournament_id], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  payment    Payment?
-
-  @@unique([tournament_id, user_id])
-  @@map("tournament_participants")
-}
-
-model TournamentResult {
-  id            String   @id @default(uuid())
-  tournament_id String
-  user_id       String
-  place         Int
-  score         Decimal  @db.Decimal(5, 1)
-  elo_change    Int      @default(0)
-  elo_before    Int?
-  elo_after     Int?
-
-  tournament Tournament @relation(fields: [tournament_id], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([tournament_id, user_id])
-  @@map("tournament_results")
-}
-
-model Rating {
-  id           String   @id @default(uuid())
-  user_id      String   @unique
-  elo          Int      @default(1200)
-  peak_elo     Int      @default(1200)
-  games_played Int      @default(0)
-  wins         Int      @default(0)
-  losses       Int      @default(0)
-  draws        Int      @default(0)
-  updated_at   DateTime @updatedAt
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("ratings")
-}
-
-model TournamentPhoto {
-  id            String   @id @default(uuid())
-  tournament_id String
-  url           String
-  uploaded_by   String
-  created_at    DateTime @default(now())
-
-  tournament Tournament @relation(fields: [tournament_id], references: [id], onDelete: Cascade)
-  uploader   User       @relation(fields: [uploaded_by], references: [id])
-
-  @@map("tournament_photos")
+  @@index([userId])
 }
 
 model Payment {
-  id                        String        @id @default(uuid())
-  tournament_participant_id String        @unique
-  amount                    Decimal       @db.Decimal(10, 2)
-  currency                  String        @default("USD")
-  provider                  PaymentProvider
-  provider_payment_id       String?
-  status                    PaymentStatus @default(PENDING)
-  created_at                DateTime      @default(now())
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tournamentId String?
+  tournament   Tournament?   @relation(fields: [tournamentId], references: [id])
+  amount       Float
+  currency     String        @default("USD")
+  status       PaymentStatus @default(PENDING)
+  externalId   String?
+  createdAt    DateTime      @default(now())
 
-  participant TournamentParticipant @relation(fields: [tournament_participant_id], references: [id], onDelete: Cascade)
+  registration TournamentRegistration?
 
-  @@map("payments")
+  @@index([userId])
+  @@index([tournamentId])
 }
 
-model HeroSettings {
-  id          Int      @id @default(1)
-  title       String   @default("International Chess Tourism")
-  subtitle    String?
-  image_url   String?
-  button_text String   @default("Find Tournaments")
-  updated_at  DateTime @updatedAt
+model TournamentPhoto {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  url          String
+  caption      String?
+  uploadedBy   String
+  uploader     User       @relation(fields: [uploadedBy], references: [id])
+  createdAt    DateTime   @default(now())
 
-  @@map("hero_settings")
+  @@index([tournamentId])
 }
