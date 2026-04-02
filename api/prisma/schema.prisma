@@ -74,6 +74,7 @@ model User {
   tournamentRegistrations TournamentRegistration[]
   uploadedPhotos          TournamentPhoto[]
   watchlist               TournamentWatchlist[]
+  notifications           Notification[]
 }
 
 model OtpCode {
@@ -221,4 +222,18 @@ model TournamentWatchlist {
   @@unique([userId, tournamentId])
   @@index([userId])
   @@index([tournamentId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "REGISTRATION_APPROVED" | "REGISTRATION_REJECTED" | "TOURNAMENT_OPEN"
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
 }

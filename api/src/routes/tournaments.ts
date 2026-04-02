@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
+import { createNotification } from '../utils/notifications';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -517,6 +518,25 @@ router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('C
         user: { select: { id: true, name: true, email: true, rating: true, city: true } },
       },
     });
+
+    // Send in-app notification when registration is approved or rejected
+    if (status === 'APPROVED') {
+      await createNotification(
+        registration.userId,
+        'REGISTRATION_APPROVED',
+        'Заявка одобрена',
+        `Ваша заявка на турнир "${tournament.title}" одобрена. Вы приняты!`,
+        { tournamentId: tournament.id, registrationId: registration.id },
+      );
+    } else if (status === 'REJECTED') {
+      await createNotification(
+        registration.userId,
+        'REGISTRATION_REJECTED',
+        'Заявка отклонена',
+        `Ваша заявка на турнир "${tournament.title}" была отклонена.`,
+        { tournamentId: tournament.id, registrationId: registration.id },
+      );
+    }
 
     res.json(updated);
   } catch (err) {
