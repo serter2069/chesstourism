@@ -81,6 +81,7 @@ interface TournamentDetail {
   format: string;
   status: string;
   entryFee: number | null;
+  fee: number | null;
   currency?: string;
   maxParticipants?: number;
   commissar: Commissar;
@@ -334,7 +335,15 @@ export default function TournamentDetailScreen() {
             </View>
           )}
           {isRegistered && regStatus === 'APPROVED' && (
-            <Badge label="You're In!" status="success" style={styles.regStatusBadge} />
+            <View style={styles.regStatusRow}>
+              <Badge label="Approved" status="success" style={styles.regStatusBadge} />
+              {(tournament.fee ?? tournament.entryFee ?? 0) > 0 ? (
+                <Button
+                  title={`Pay Registration Fee: ${tournament.fee ?? tournament.entryFee} ${tournament.currency || 'USD'}`}
+                  onPress={() => router.push(`/(dashboard)/payment/${tournament.id}` as never)}
+                />
+              ) : null}
+            </View>
           )}
           {isRegistered && regStatus === 'REJECTED' && (
             <Badge label="Registration Rejected" status="error" style={styles.regStatusBadge} />
