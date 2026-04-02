@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeContainer } from '../components/layout';
 import { Button, Card, Badge } from '../components/ui';
 import { Colors } from '../constants/colors';
@@ -6,6 +7,8 @@ import { Spacing } from '../constants/spacing';
 import { Typography } from '../constants/typography';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
   return (
     <SafeContainer>
       <View style={styles.content}>
@@ -25,8 +28,8 @@ export default function HomeScreen() {
           </View>
         </Card>
 
-        <Button title="Get Started" onPress={() => {}} style={styles.cta} />
-        <Button title="Sign In" onPress={() => {}} variant="secondary" />
+        <Button title="Get Started" onPress={() => router.push('/(auth)/register')} style={styles.cta} />
+        <Button title="Sign In" onPress={() => router.push('/(auth)/login')} variant="secondary" />
       </View>
     </SafeContainer>
   );
