@@ -27,6 +27,8 @@ interface Tournament {
   status: string;
   entryFee: number | null;
   currency?: string;
+  ratingLimit?: number | null;
+  timeControl?: string | null;
   _count?: { participants: number };
   commissar?: {
     id: string;
@@ -43,12 +45,18 @@ const STATUS_OPTIONS = [
   { value: 'COMPLETED', label: 'Completed' },
 ];
 
-const FORMAT_OPTIONS = [
-  { value: '', label: 'All Formats' },
-  { value: 'CLASSICAL', label: 'Classical' },
-  { value: 'RAPID', label: 'Rapid' },
-  { value: 'BLITZ', label: 'Blitz' },
-  { value: 'BULLET', label: 'Bullet' },
+const RATING_OPTIONS = [
+  { value: '', label: 'Open' },
+  { value: '2200', label: 'U2200' },
+  { value: '1800', label: 'U1800' },
+  { value: '1400', label: 'U1400' },
+];
+
+const TIME_CONTROL_OPTIONS = [
+  { value: '', label: 'All' },
+  { value: 'classical', label: 'Classical' },
+  { value: 'rapid', label: 'Rapid' },
+  { value: 'blitz', label: 'Blitz' },
 ];
 
 const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
@@ -74,7 +82,8 @@ export default function TournamentsListScreen() {
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('');
-  const [formatFilter, setFormatFilter] = useState('');
+  const [ratingFilter, setRatingFilter] = useState('');
+  const [timeControlFilter, setTimeControlFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -86,7 +95,8 @@ export default function TournamentsListScreen() {
 
       const params: Record<string, string | number> = { page: pageNum, limit: 10 };
       if (statusFilter) params.status = statusFilter;
-      if (formatFilter) params.format = formatFilter;
+      if (ratingFilter) params.ratingMax = ratingFilter;
+      if (timeControlFilter) params.timeControl = timeControlFilter;
       if (countryFilter) params.country = countryFilter;
 
       const res = await api.get('/tournaments', { params });
@@ -107,7 +117,7 @@ export default function TournamentsListScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [statusFilter, formatFilter, countryFilter]);
+  }, [statusFilter, ratingFilter, timeControlFilter, countryFilter]);
 
   useEffect(() => {
     fetchTournaments(1);
@@ -163,18 +173,38 @@ export default function TournamentsListScreen() {
             </ScrollView>
           </View>
 
-          {/* Format filter */}
+          {/* Rating category filter */}
           <View style={styles.filterRow}>
-            <Text style={styles.filterLabel}>Format</Text>
+            <Text style={styles.filterLabel}>Rating</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.chipRow}>
-                {FORMAT_OPTIONS.map((opt) => (
+                {RATING_OPTIONS.map((opt) => (
                   <TouchableOpacity
                     key={opt.value}
-                    onPress={() => setFormatFilter(opt.value)}
-                    style={[styles.chip, formatFilter === opt.value && styles.chipActive]}
+                    onPress={() => setRatingFilter(opt.value)}
+                    style={[styles.chip, ratingFilter === opt.value && styles.chipActive]}
                   >
-                    <Text style={[styles.chipText, formatFilter === opt.value && styles.chipTextActive]}>
+                    <Text style={[styles.chipText, ratingFilter === opt.value && styles.chipTextActive]}>
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Time control filter */}
+          <View style={styles.filterRow}>
+            <Text style={styles.filterLabel}>Time Control</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.chipRow}>
+                {TIME_CONTROL_OPTIONS.map((opt) => (
+                  <TouchableOpacity
+                    key={opt.value}
+                    onPress={() => setTimeControlFilter(opt.value)}
+                    style={[styles.chip, timeControlFilter === opt.value && styles.chipActive]}
+                  >
+                    <Text style={[styles.chipText, timeControlFilter === opt.value && styles.chipTextActive]}>
                       {opt.label}
                     </Text>
                   </TouchableOpacity>
@@ -313,6 +343,9 @@ const styles = StyleSheet.create({
   filters: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.lg,
+    maxWidth: 430,
+    alignSelf: 'center' as const,
+    width: '100%' as unknown as number,
   },
   filterRow: {
     marginBottom: Spacing.md,
@@ -337,8 +370,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderDefault,
   },
   chipActive: {
-    backgroundColor: Colors.brandPrimary,
-    borderColor: Colors.brandPrimary,
+    backgroundColor: Colors.brandAccent,
+    borderColor: Colors.brandAccent,
   },
   chipText: {
     fontSize: Typography.sizes.xs,
@@ -346,7 +379,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
   },
   chipTextActive: {
-    color: Colors.textOnPrimary,
+    color: Colors.textOnAccent,
   },
   // Create button
   createRow: {

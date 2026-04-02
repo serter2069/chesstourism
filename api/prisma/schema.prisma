@@ -106,6 +106,8 @@ model Tournament {
   fee             Float?
   currency        String           @default("USD")
   description     String?
+  ratingLimit     Int?
+  timeControl     String?
   createdAt       DateTime         @default(now())
 
   registrations TournamentRegistration[]

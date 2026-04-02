@@ -19,6 +19,22 @@ router.get('/tournaments', async (req: Request, res: Response) => {
     if (req.query.country) where.country = req.query.country as string;
     if (req.query.city) where.city = req.query.city as string;
 
+    // Rating limit filter: show tournaments where ratingLimit <= ratingMax (or ratingLimit is null = Open)
+    if (req.query.ratingMax) {
+      const ratingMax = parseInt(req.query.ratingMax as string);
+      if (!isNaN(ratingMax)) {
+        where.OR = [
+          { ratingLimit: { lte: ratingMax } },
+          { ratingLimit: null },
+        ];
+      }
+    }
+
+    // Time control filter (exact match: classical, rapid, blitz)
+    if (req.query.timeControl) {
+      where.timeControl = (req.query.timeControl as string).toLowerCase();
+    }
+
     const [tournaments, total] = await Promise.all([
       prisma.tournament.findMany({
         where,
