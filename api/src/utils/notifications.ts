@@ -4,7 +4,8 @@ import prisma from '../lib/prisma';
 export type NotificationType =
   | 'REGISTRATION_APPROVED'
   | 'REGISTRATION_REJECTED'
-  | 'TOURNAMENT_OPEN';
+  | 'TOURNAMENT_OPEN'
+  | 'PAYMENT_CONFIRMED';
 
 export async function createNotification(
   userId: string,
