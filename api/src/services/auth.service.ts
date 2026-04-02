@@ -19,9 +19,18 @@ function generateOtp(): string {
 }
 
 function sanitizeUser(user: any) {
-  // Strip any internal fields before sending to client
-  const { ...rest } = user;
-  return rest;
+  // Explicitly pick only safe fields — never leak phone, fideId, sessions, etc.
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    city: user.city,
+    rating: user.rating,
+    fideTitle: user.fideTitle,
+    fideRating: user.fideRating,
+    onboardingCompleted: user.onboardingCompleted,
+  };
 }
 
 // Set httpOnly cookies for tokens
