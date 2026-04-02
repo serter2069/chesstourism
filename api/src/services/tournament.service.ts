@@ -54,7 +54,7 @@ export async function submitResults(
     where: {
       tournamentId,
       userId: { in: userIds },
-      status: 'APPROVED',
+      status: { in: ['APPROVED', 'PAID'] },
     },
     select: { userId: true },
   });
