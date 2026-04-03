@@ -223,12 +223,14 @@ export default function RatingsScreen() {
     const isTop3 = item.rank <= 3;
 
     return (
-      <View
+      <TouchableOpacity
         style={[
           styles.row,
           isTop3 && styles.top3Row,
           isCurrentUser && styles.currentUserRow,
         ]}
+        activeOpacity={0.7}
+        onPress={() => router.push(`/users/${item.userId}` as never)}
       >
         {/* Rank */}
         <View style={styles.colRank}>
@@ -272,9 +274,9 @@ export default function RatingsScreen() {
             {item.rating}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
-  }, [user?.id]);
+  }, [user?.id, router]);
 
   const ListHeader = useCallback(() => (
     <View style={styles.tableHeader}>
