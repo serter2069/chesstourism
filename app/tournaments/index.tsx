@@ -24,17 +24,18 @@ interface Tournament {
   endDate: string;
   city: string;
   country: string;
-  format: string;
+  timeControl: string | null;
   status: string;
-  entryFee: number | null;
+  fee: number | null;
   currency?: string;
   ratingLimit?: number | null;
-  timeControl?: string | null;
-  _count?: { participants: number };
-  commissar?: {
+  _count?: { registrations: number };
+  commissioner?: {
     id: string;
-    name: string;
-    surname: string;
+    userId: string;
+    country?: string | null;
+    city?: string | null;
+    user?: { name: string; surname: string };
   };
 }
 
@@ -286,27 +287,29 @@ export default function TournamentsListScreen() {
                       </Text>
                     </View>
                     <View style={styles.cardFooter}>
-                      <View style={styles.footerItem}>
-                        <Text style={styles.footerLabel}>Format</Text>
-                        <Text style={styles.footerValue}>{t.format}</Text>
-                      </View>
-                      {t.commissar && (
+                      {t.timeControl && (
+                        <View style={styles.footerItem}>
+                          <Text style={styles.footerLabel}>Format</Text>
+                          <Text style={styles.footerValue}>{t.timeControl}</Text>
+                        </View>
+                      )}
+                      {t.commissioner?.user && (
                         <View style={styles.footerItem}>
                           <Text style={styles.footerLabel}>Commissar</Text>
-                          <Text style={styles.footerValue}>{t.commissar.name} {t.commissar.surname}</Text>
+                          <Text style={styles.footerValue}>{t.commissioner.user.name} {t.commissioner.user.surname}</Text>
                         </View>
                       )}
-                      {t._count?.participants != null && (
+                      {t._count?.registrations != null && (
                         <View style={styles.footerItem}>
                           <Text style={styles.footerLabel}>Players</Text>
-                          <Text style={styles.footerValue}>{t._count.participants}</Text>
+                          <Text style={styles.footerValue}>{t._count.registrations}</Text>
                         </View>
                       )}
-                      {t.entryFee != null && (
+                      {t.fee != null && (
                         <View style={styles.footerItem}>
                           <Text style={styles.footerLabel}>Fee</Text>
                           <Text style={styles.footerValue}>
-                            {t.entryFee === 0 ? 'Free' : `${t.entryFee} ${t.currency || 'EUR'}`}
+                            {t.fee === 0 ? 'Free' : `${t.fee} ${t.currency || 'EUR'}`}
                           </Text>
                         </View>
                       )}

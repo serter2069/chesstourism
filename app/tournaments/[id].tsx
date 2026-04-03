@@ -22,13 +22,13 @@ import { Typography } from '../../constants/typography';
 import { useAuth } from '../../store/auth';
 import api from '../../lib/api';
 
-interface Commissar {
+interface Commissioner {
   id: string;
-  name: string;
-  surname: string;
-  avatarUrl?: string | null;
-  country?: string;
-  city?: string;
+  userId: string;
+  photoUrl?: string | null;
+  country?: string | null;
+  city?: string | null;
+  user?: { name: string; surname: string };
 }
 
 interface Participant {
@@ -80,20 +80,19 @@ interface TournamentDetail {
   city: string;
   country: string;
   venue?: string;
-  format: string;
+  timeControl: string | null;
   status: string;
-  entryFee: number | null;
   fee: number | null;
   currency?: string;
   maxParticipants?: number;
-  commissar: Commissar;
-  commissarId: string;
+  commissioner: Commissioner;
+  commissionerId: string;
   participants: Participant[];
   results: Result[];
   photos: Photo[];
   registrationCount?: number;
   myRegistration?: MyRegistration | null;
-  _count?: { participants: number };
+  _count?: { registrations: number };
 }
 
 type TabKey = 'info' | 'participants' | 'results' | 'photos';
@@ -311,7 +310,7 @@ export default function TournamentDetailScreen() {
   }
 
   const badge = STATUS_BADGE[tournament.status] || { label: tournament.status, status: 'default' as const };
-  const isOwner = user?.role === 'COMMISSIONER' && user?.id === tournament.commissarId;
+  const isOwner = user?.role === 'COMMISSIONER' && user?.id === tournament.commissioner?.userId;
   const isAdmin = user?.role === 'ADMIN';
   const myReg = tournament.myRegistration;
   const isRegistered = !!myReg;
@@ -367,15 +366,17 @@ export default function TournamentDetailScreen() {
             {tournament.venue ? `${tournament.venue}, ` : ''}{tournament.city}, {tournament.country}
           </Text>
           <View style={styles.metaRow}>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Format</Text>
-              <Text style={styles.metaValue}>{tournament.format}</Text>
-            </View>
-            {tournament.entryFee != null && (
+            {tournament.timeControl && (
+              <View style={styles.metaItem}>
+                <Text style={styles.metaLabel}>Format</Text>
+                <Text style={styles.metaValue}>{tournament.timeControl}</Text>
+              </View>
+            )}
+            {tournament.fee != null && (
               <View style={styles.metaItem}>
                 <Text style={styles.metaLabel}>Entry Fee</Text>
                 <Text style={styles.metaValue}>
-                  {tournament.entryFee === 0 ? 'Free' : `${tournament.entryFee} ${tournament.currency || 'EUR'}`}
+                  {tournament.fee === 0 ? 'Free' : `${tournament.fee} ${tournament.currency || 'EUR'}`}
                 </Text>
               </View>
             )}
@@ -421,9 +422,9 @@ export default function TournamentDetailScreen() {
           {isRegistered && regStatus === 'APPROVED' && (
             <View style={styles.regStatusRow}>
               <Badge label="Approved" status="success" style={styles.regStatusBadge} />
-              {(tournament.fee ?? tournament.entryFee ?? 0) > 0 ? (
+              {(tournament.fee ?? 0) > 0 ? (
                 <Button
-                  title={`Pay Registration Fee: ${tournament.fee ?? tournament.entryFee} ${tournament.currency || 'USD'}`}
+                  title={`Pay Registration Fee: ${tournament.fee} ${tournament.currency || 'USD'}`}
                   onPress={() => router.push(`/(dashboard)/payment/${tournament.id}` as never)}
                 />
               ) : null}
@@ -455,17 +456,17 @@ export default function TournamentDetailScreen() {
           <Card>
             <View style={styles.commissarRow}>
               <Avatar
-                uri={tournament.commissar?.avatarUrl}
-                name={`${tournament.commissar?.name || ''} ${tournament.commissar?.surname || ''}`}
+                uri={tournament.commissioner?.photoUrl}
+                name={`${tournament.commissioner?.user?.name || ''} ${tournament.commissioner?.user?.surname || ''}`}
                 size={48}
               />
               <View style={styles.commissarInfo}>
                 <Text style={styles.commissarName}>
-                  {tournament.commissar?.name} {tournament.commissar?.surname}
+                  {tournament.commissioner?.user?.name} {tournament.commissioner?.user?.surname}
                 </Text>
-                {(tournament.commissar?.city || tournament.commissar?.country) && (
+                {(tournament.commissioner?.city || tournament.commissioner?.country) && (
                   <Text style={styles.commissarMeta}>
-                    {[tournament.commissar?.city, tournament.commissar?.country].filter(Boolean).join(', ')}
+                    {[tournament.commissioner?.city, tournament.commissioner?.country].filter(Boolean).join(', ')}
                   </Text>
                 )}
               </View>

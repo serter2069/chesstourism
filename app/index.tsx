@@ -28,10 +28,10 @@ interface Tournament {
   endDate: string;
   city: string;
   country: string;
-  format: string;
+  timeControl: string | null;
   status: string;
-  entryFee: number | null;
-  _count?: { participants: number };
+  fee: number | null;
+  _count?: { registrations: number };
 }
 
 interface RatingEntry {
@@ -180,7 +180,7 @@ export default function HomeScreen() {
                           {formatDate(t.startDate)} - {formatDate(t.endDate)}
                         </Text>
                         <Text style={styles.tournamentMeta}>
-                          {t.city}, {t.country} | {t.format}
+                          {t.city}, {t.country}{t.timeControl ? ` | ${t.timeControl}` : ''}
                         </Text>
                       </View>
                       <Badge label={badge.label} status={badge.status} />
