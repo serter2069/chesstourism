@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { generateMembershipCertificate } from '../services/pdf.service';
+import { signDownloadToken } from '../utils/jwt';
 const router = Router();
 
 // POST /api/profile/preferences — save onboarding quiz answers
@@ -68,6 +69,19 @@ router.get('/preferences', authenticate, async (req: AuthRequest, res: Response)
     res.json(user);
   } catch (err: any) {
     console.error('Get preferences error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/profile/download-token — issue a short-lived download token (5min, scope:'download')
+// Used by native clients to avoid passing full access JWT via query param
+router.get('/download-token', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const downloadToken = signDownloadToken(userId);
+    res.json({ downloadToken });
+  } catch (err: any) {
+    console.error('Download token error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

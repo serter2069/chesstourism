@@ -24,6 +24,11 @@ interface TokenPayload {
   type: 'access' | 'refresh';
 }
 
+interface DownloadTokenPayload {
+  userId: string;
+  scope: 'download';
+}
+
 export function signAccessToken(userId: string, role: string): string {
   return jwt.sign({ userId, role, type: 'access' }, JWT_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRY,
@@ -47,4 +52,16 @@ export function verifyRefreshToken(token: string): TokenPayload {
 // Keep backward-compatible export for middleware
 export function verifyToken(token: string): TokenPayload {
   return verifyAccessToken(token);
+}
+
+export function signDownloadToken(userId: string): string {
+  return jwt.sign({ userId, scope: 'download' }, JWT_SECRET, { expiresIn: '5m' });
+}
+
+export function verifyDownloadToken(token: string): DownloadTokenPayload {
+  const payload = jwt.verify(token, JWT_SECRET) as DownloadTokenPayload;
+  if (payload.scope !== 'download') {
+    throw new Error('Invalid token scope');
+  }
+  return payload;
 }
