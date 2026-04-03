@@ -20,7 +20,7 @@ router.get('/tournaments', async (req: Request, res: Response) => {
     };
 
     if (req.query.status) where.status = req.query.status as string;
-    if (req.query.country) where.country = req.query.country as string;
+    if (req.query.country) where.country = { contains: req.query.country as string, mode: 'insensitive' };
     if (req.query.city) where.city = req.query.city as string;
 
     // Full-text search: ?q= matches title or description (case-insensitive)

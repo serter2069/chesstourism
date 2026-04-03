@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -89,8 +89,21 @@ export default function TournamentsListScreen() {
   const [ratingFilter, setRatingFilter] = useState('');
   const [timeControlFilter, setTimeControlFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
+  const [debouncedCountryFilter, setDebouncedCountryFilter] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+
+  // Debounce country filter: only update debouncedCountryFilter after 300ms of no typing
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedCountryFilter(countryFilter);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [countryFilter]);
 
   const fetchTournaments = useCallback(async (pageNum = 1, append = false) => {
     try {
@@ -101,7 +114,7 @@ export default function TournamentsListScreen() {
       if (statusFilter) params.status = statusFilter;
       if (ratingFilter) params.ratingMax = ratingFilter;
       if (timeControlFilter) params.timeControl = timeControlFilter;
-      if (countryFilter) params.country = countryFilter;
+      if (debouncedCountryFilter) params.country = debouncedCountryFilter;
 
       const res = await api.get('/tournaments', { params });
       const data = res.data;
@@ -121,7 +134,7 @@ export default function TournamentsListScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [statusFilter, ratingFilter, timeControlFilter, countryFilter]);
+  }, [statusFilter, ratingFilter, timeControlFilter, debouncedCountryFilter]);
 
   useEffect(() => {
     fetchTournaments(1);
