@@ -9,6 +9,7 @@ import {
   TextInput,
   ListRenderItemInfo,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
 import { LoadingSpinner } from '../../components/ui';
 import { Colors } from '../../constants/colors';
@@ -100,13 +101,16 @@ function TitleBadge({ title }: { title: string }) {
   );
 }
 
-function MyRankCard({ myRank }: { myRank: MyRank }) {
+function MyRankCard({ myRank, onHistoryPress }: { myRank: MyRank; onHistoryPress: () => void }) {
   return (
     <View style={styles.myRankCard}>
       <View style={styles.myRankLeft}>
         <Text style={styles.myRankLabel}>MY RANK</Text>
         <Text style={styles.myRankName} numberOfLines={1}>{myRank.name}</Text>
         {myRank.fideTitle ? <TitleBadge title={myRank.fideTitle} /> : null}
+        <TouchableOpacity style={styles.historyBtn} onPress={onHistoryPress} activeOpacity={0.75}>
+          <Text style={styles.historyBtnText}>View History</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.myRankRight}>
         <Text style={styles.myRankPosition}>#{myRank.rank}</Text>
@@ -118,6 +122,7 @@ function MyRankCard({ myRank }: { myRank: MyRank }) {
 }
 
 export default function RatingsScreen() {
+  const router = useRouter();
   const { user } = useAuth();
   const [ratings, setRatings] = useState<RatingEntry[]>([]);
   const [myRank, setMyRank] = useState<MyRank | null>(null);
@@ -294,7 +299,12 @@ export default function RatingsScreen() {
 
       <View style={styles.container}>
         {/* My Rank card */}
-        {myRank ? <MyRankCard myRank={myRank} /> : null}
+        {myRank ? (
+          <MyRankCard
+            myRank={myRank}
+            onHistoryPress={() => router.push('/ratings/history')}
+          />
+        ) : null}
 
         {/* Search */}
         <View style={styles.searchRow}>
@@ -427,6 +437,22 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
     color: '#FFFFFF',
     marginBottom: 4,
+  },
+  historyBtn: {
+    marginTop: Spacing.sm,
+    alignSelf: 'flex-start',
+    paddingVertical: 4,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  historyBtnText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.semibold,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
   myRankRight: {
     alignItems: 'flex-end',
