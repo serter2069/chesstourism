@@ -57,6 +57,7 @@ model User {
   email     String   @unique
   role      Role     @default(PARTICIPANT)
   name      String?
+  surname             String?
   phone     String?
   city      String?
   country             String?
