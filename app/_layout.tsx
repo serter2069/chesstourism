@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator } from 'react-native';
-import { useBrandFonts } from './constants/fonts';
+import { useBrandFonts } from './constants/_fonts';
 import { Colors } from '../constants/colors';
 import { AuthProvider } from '../store/auth';
 import { WatchlistProvider } from '../store/watchlist';
