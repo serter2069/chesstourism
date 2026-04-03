@@ -81,7 +81,7 @@ export default function OrganizationApplyScreen() {
       });
       setSubmitted(true);
     } catch (err: any) {
-      const msg = err?.response?.data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.';
+      const msg = err?.response?.data?.error || 'Failed to submit application. Please try again.';
       setSubmitError(msg);
     } finally {
       setLoading(false);
@@ -91,13 +91,13 @@ export default function OrganizationApplyScreen() {
   if (submitted) {
     return (
       <SafeContainer>
-        <Header title="Заявка на турнир" showBack />
+        <Header title="Organization Application" showBack />
         <View style={styles.successContainer}>
           <Card style={styles.successCard}>
             <Text style={styles.successIcon}>{'[OK]'}</Text>
-            <Text style={styles.successTitle}>Заявка отправлена!</Text>
+            <Text style={styles.successTitle}>Application Submitted!</Text>
             <Text style={styles.successText}>
-              Заявка отправлена. Мы свяжемся с вами в течение 3 рабочих дней.
+              Your application has been submitted. We will contact you within 3 business days.
             </Text>
           </Card>
         </View>
@@ -107,7 +107,7 @@ export default function OrganizationApplyScreen() {
 
   return (
     <SafeContainer>
-      <Header title="Заявка на турнир" showBack />
+      <Header title="Organization Application" showBack />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -118,20 +118,20 @@ export default function OrganizationApplyScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.subtitle}>
-            Подайте заявку на проведение турнира через федерацию. Администратор рассмотрит её в течение 3 рабочих дней.
+            Submit an application to host a tournament through the federation. An administrator will review it within 3 business days.
           </Text>
 
           <Input
-            label="Название организации"
-            placeholder="например, Шахматный клуб «Ладья»"
+            label="Organization Name"
+            placeholder="e.g., Chess Club «Ladya»"
             value={form.organizationName}
             onChangeText={(v) => updateField('organizationName', v)}
             error={errors.organizationName}
           />
 
           <Input
-            label="Контактное лицо"
-            placeholder="Фамилия Имя Отчество"
+            label="Contact Person"
+            placeholder="Full Name"
             value={form.contactName}
             onChangeText={(v) => updateField('contactName', v)}
             error={errors.contactName}
@@ -148,8 +148,8 @@ export default function OrganizationApplyScreen() {
           />
 
           <Input
-            label="Телефон (необязательно)"
-            placeholder="+7 900 000 00 00"
+            label="Phone (optional)"
+            placeholder="+1 234 567 8900"
             value={form.phone}
             onChangeText={(v) => updateField('phone', v)}
             error={errors.phone}
@@ -157,8 +157,8 @@ export default function OrganizationApplyScreen() {
           />
 
           <Input
-            label="Описание заявки"
-            placeholder="Опишите турнир: формат, предполагаемые даты, место проведения, ожидаемое количество участников"
+            label="Application Description"
+            placeholder="Describe the tournament: format, expected dates, venue, anticipated number of participants"
             value={form.description}
             onChangeText={(v) => updateField('description', v)}
             error={errors.description}
@@ -168,7 +168,7 @@ export default function OrganizationApplyScreen() {
           />
 
           <Button
-            title="Отправить заявку"
+            title="Submit Application"
             onPress={handleSubmit}
             loading={loading}
             style={styles.submitBtn}
