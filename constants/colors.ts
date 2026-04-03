@@ -28,6 +28,10 @@ export const Colors = {
   statusApprovedBg: '#EAF3E8',
   statusRejectedBg: '#FAEAEA',
   white: '#FFFFFF',
+  // ELO change indicators
+  eloPositive: '#1A7A3A',
+  eloNegative: '#C0392B',
+
 } as const
 
 export type Color = keyof typeof Colors

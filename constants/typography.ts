@@ -21,6 +21,9 @@ export const Typography = {
     xl: 20,
     '2xl': 24,
     '3xl': 30,
+    // Icon sizes (emoji/chess pieces in UI)
+    icon: 48,
+    iconLg: 56,
   },
 
   weights: {

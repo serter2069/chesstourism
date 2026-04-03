@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   eloPositive: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
-    color: '#1A7A3A',
+    color: Colors.eloPositive,
     textAlign: 'right',
   },
   eloNegative: {
