@@ -24,14 +24,17 @@ function generateOtp(): string {
 }
 
 function sanitizeUser(user: any) {
-  // Explicitly pick only safe fields — never leak phone, fideId, sessions, etc.
+  // Explicitly pick only safe fields — never leak phone, sessions, etc.
   return {
     id: user.id,
     email: user.email,
     role: user.role,
     name: user.name,
+    surname: user.surname,
     city: user.city,
+    country: user.country,
     rating: user.rating,
+    fideId: user.fideId,
     fideTitle: user.fideTitle,
     fideRating: user.fideRating,
     onboardingCompleted: user.onboardingCompleted,
