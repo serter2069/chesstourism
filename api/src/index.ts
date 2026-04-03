@@ -16,6 +16,7 @@ import watchlistRouter from './routes/watchlist';
 import organizationsRouter from './routes/organizations';
 import adminRouter from './routes/admin';
 import notificationsRouter from './routes/notifications';
+import settingsRouter from './routes/settings';
 
 dotenv.config();
 
@@ -88,6 +89,7 @@ app.use('/api', watchlistRouter);
 app.use('/api', organizationsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', notificationsRouter);
+app.use('/api/settings', settingsRouter);
 
 app.listen(PORT, () => {
   console.log(`ChesTourism API running on port ${PORT}`);
