@@ -37,24 +37,27 @@ export default function ModerationScreen() {
       setError(null);
       const pendingItems: PendingItem[] = [];
 
-      // Fetch unapproved commissars
+      // Fetch pending commissars from admin endpoint
       try {
-        const res = await api.get('/commissars', { params: { all: true } });
-        const data = Array.isArray(res.data) ? res.data : res.data.items || [];
-        const unapproved = data.filter((c: { approved?: boolean }) => !c.approved);
-        unapproved.forEach((c: { id: string; userId?: string; user_id?: string; name?: string; email?: string }) => {
+        const res = await api.get('/admin/commissars', { params: { status: 'pending' } });
+        const data: Array<{
+          id: string;
+          userId?: string;
+          user?: { id?: string; name?: string; email?: string };
+        }> = Array.isArray(res.data) ? res.data : res.data.items || [];
+        data.forEach((c) => {
           pendingItems.push({
             id: c.id,
-            userId: c.userId || c.user_id || c.id,
-            name: c.name || 'Unknown',
-            email: c.email,
+            userId: c.userId || c.user?.id || c.id,
+            name: c.user?.name || 'Unknown',
+            email: c.user?.email,
             role: 'Commissar',
             type: 'commissar',
             approved: false,
           });
         });
       } catch {
-        // Commissars endpoint may not support all=true — continue
+        // Admin commissars endpoint unavailable — continue
       }
 
       // Fetch unverified users (if admin endpoint exists)
@@ -97,13 +100,12 @@ export default function ModerationScreen() {
     setActionLoading(item.id);
     try {
       if (item.type === 'commissar') {
-        await api.put(`/commissars/${item.userId}`, { approved: true });
+        await api.patch(`/admin/commissars/${item.id}/approve`);
       }
       // Remove from list on success
       setItems((prev) => prev.filter((i) => i.id !== item.id));
     } catch {
-      Alert.alert('Info', 'Approval request sent. Status will update shortly.');
-      setItems((prev) => prev.filter((i) => i.id !== item.id));
+      Alert.alert('Error', 'Failed to approve. Please try again.');
     } finally {
       setActionLoading(null);
     }
@@ -118,8 +120,18 @@ export default function ModerationScreen() {
         {
           text: 'Reject',
           style: 'destructive',
-          onPress: () => {
-            setItems((prev) => prev.filter((i) => i.id !== item.id));
+          onPress: async () => {
+            setActionLoading(item.id);
+            try {
+              if (item.type === 'commissar') {
+                await api.patch(`/admin/commissars/${item.id}/reject`);
+              }
+              setItems((prev) => prev.filter((i) => i.id !== item.id));
+            } catch {
+              Alert.alert('Error', 'Failed to reject. Please try again.');
+            } finally {
+              setActionLoading(null);
+            }
           },
         },
       ],
