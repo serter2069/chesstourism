@@ -165,14 +165,13 @@ router.post('/register', authenticate, async (req: AuthRequest, res: Response) =
       return;
     }
 
-    // Update user role to COMMISSIONER and create Commissioner record in transaction
-    const [user, commissioner] = await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data: { role: 'COMMISSIONER' },
-      }),
+    // Create Commissioner record — role stays PARTICIPANT until admin approves (UC-02)
+    const [commissioner, user] = await prisma.$transaction([
       prisma.commissioner.create({
         data: { userId },
+      }),
+      prisma.user.findUniqueOrThrow({
+        where: { id: userId },
       }),
     ]);
 

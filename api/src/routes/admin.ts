@@ -332,15 +332,22 @@ router.patch('/commissars/:id/approve', async (req: AuthRequest, res: Response) 
       return;
     }
 
-    const updated = await prisma.commissioner.update({
-      where: { id },
-      data: { isVerified: true },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
+    // Approve commissioner and elevate user role to COMMISSIONER in one transaction
+    const [updated] = await prisma.$transaction([
+      prisma.commissioner.update({
+        where: { id },
+        data: { isVerified: true },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
         },
-      },
-    });
+      }),
+      prisma.user.update({
+        where: { id: existing.userId },
+        data: { role: 'COMMISSIONER' },
+      }),
+    ]);
 
     res.json(updated);
   } catch (err) {
