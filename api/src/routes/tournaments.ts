@@ -21,7 +21,21 @@ router.get('/tournaments', async (req: Request, res: Response) => {
 
     if (req.query.status) where.status = req.query.status as string;
     if (req.query.country) where.country = { contains: req.query.country as string, mode: 'insensitive' };
-    if (req.query.city) where.city = req.query.city as string;
+    if (req.query.city) where.city = { contains: req.query.city as string, mode: 'insensitive' };
+
+    // Date range filter: ?startFrom= and ?startTo= (ISO date YYYY-MM-DD)
+    if (req.query.startFrom || req.query.startTo) {
+      const dateFilter: Record<string, Date> = {};
+      if (req.query.startFrom) {
+        const d = new Date(req.query.startFrom as string);
+        if (!isNaN(d.getTime())) dateFilter.gte = d;
+      }
+      if (req.query.startTo) {
+        const d = new Date(req.query.startTo as string);
+        if (!isNaN(d.getTime())) dateFilter.lte = d;
+      }
+      if (Object.keys(dateFilter).length > 0) where.startDate = dateFilter;
+    }
 
     // Full-text search: ?q= matches title or description (case-insensitive)
     if (req.query.q) {

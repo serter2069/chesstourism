@@ -95,6 +95,11 @@ export default function TournamentsListScreen() {
   const [countryFilter, setCountryFilter] = useState('');
   const [debouncedCountryFilter, setDebouncedCountryFilter] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [cityFilter, setCityFilter] = useState('');
+  const [debouncedCityFilter, setDebouncedCityFilter] = useState('');
+  const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
@@ -120,6 +125,17 @@ export default function TournamentsListScreen() {
     };
   }, [countryFilter]);
 
+  // Debounce city filter: only update debouncedCityFilter after 300ms of no typing
+  useEffect(() => {
+    if (cityDebounceRef.current) clearTimeout(cityDebounceRef.current);
+    cityDebounceRef.current = setTimeout(() => {
+      setDebouncedCityFilter(cityFilter);
+    }, 300);
+    return () => {
+      if (cityDebounceRef.current) clearTimeout(cityDebounceRef.current);
+    };
+  }, [cityFilter]);
+
   const fetchTournaments = useCallback(async (pageNum = 1, append = false) => {
     try {
       setError(null);
@@ -131,6 +147,9 @@ export default function TournamentsListScreen() {
       if (ratingFilter) params.ratingMax = ratingFilter;
       if (timeControlFilter) params.timeControl = timeControlFilter;
       if (debouncedCountryFilter) params.country = debouncedCountryFilter;
+      if (debouncedCityFilter) params.city = debouncedCityFilter;
+      if (dateFrom) params.startFrom = dateFrom;
+      if (dateTo) params.startTo = dateTo;
 
       const res = await api.get('/tournaments', { params });
       const data = res.data;
@@ -150,7 +169,7 @@ export default function TournamentsListScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [debouncedSearchQuery, statusFilter, ratingFilter, timeControlFilter, debouncedCountryFilter]);
+  }, [debouncedSearchQuery, statusFilter, ratingFilter, timeControlFilter, debouncedCountryFilter, debouncedCityFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchTournaments(1);
@@ -271,13 +290,51 @@ export default function TournamentsListScreen() {
             </ScrollView>
           </View>
 
-          {/* Country text filter */}
+          {/* Country + City text filters */}
+          <View style={[styles.filterRow, styles.locationRow]}>
+            <View style={styles.locationInput}>
+              <Input
+                placeholder="Country..."
+                value={countryFilter}
+                onChangeText={setCountryFilter}
+              />
+            </View>
+            <View style={styles.locationInput}>
+              <Input
+                placeholder="City..."
+                value={cityFilter}
+                onChangeText={setCityFilter}
+              />
+            </View>
+          </View>
+
+          {/* Date range filter */}
           <View style={styles.filterRow}>
-            <Input
-              placeholder="Filter by country..."
-              value={countryFilter}
-              onChangeText={setCountryFilter}
-            />
+            <Text style={styles.filterLabel}>Date Range</Text>
+            <View style={styles.dateRow}>
+              <View style={styles.dateInput}>
+                <TextInput
+                  style={styles.dateTextInput}
+                  placeholder="From (YYYY-MM-DD)"
+                  placeholderTextColor={Colors.textMuted}
+                  value={dateFrom}
+                  onChangeText={setDateFrom}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+              </View>
+              <View style={styles.dateInput}>
+                <TextInput
+                  style={styles.dateTextInput}
+                  placeholder="To (YYYY-MM-DD)"
+                  placeholderTextColor={Colors.textMuted}
+                  value={dateTo}
+                  onChangeText={setDateTo}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
           </View>
         </View>
 
@@ -578,5 +635,31 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: Colors.textMuted,
     lineHeight: 24,
+  },
+  // Location filters (country + city side by side)
+  locationRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  locationInput: {
+    flex: 1,
+  },
+  // Date range filters
+  dateRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  dateInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    backgroundColor: Colors.background,
+    paddingHorizontal: Spacing.md,
+  },
+  dateTextInput: {
+    paddingVertical: Spacing.sm,
+    fontSize: Typography.sizes.sm,
+    color: Colors.text,
   },
 });
