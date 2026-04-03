@@ -298,7 +298,7 @@ export default function TournamentsListScreen() {
                       {t.commissioner?.user && (
                         <View style={styles.footerItem}>
                           <Text style={styles.footerLabel}>Commissar</Text>
-                          <Text style={styles.footerValue}>{t.commissioner.user.name} {t.commissioner.user.surname}</Text>
+                          <Text style={styles.footerValue}>{[t.commissioner.user.name, t.commissioner.user.surname].filter(Boolean).join(' ')}</Text>
                         </View>
                       )}
                       {t._count?.registrations != null && (
