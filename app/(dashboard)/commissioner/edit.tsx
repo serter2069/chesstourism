@@ -177,10 +177,10 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     padding: Spacing.md,
     borderRadius: 4,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: Colors.statusErrorBg,
   },
   successBox: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.statusSuccessBg,
   },
   errorText: {
     color: Colors.error,

@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   itemUnread: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: Colors.statusUnreadBg,
   },
   iconWrap: {
     width: 36,
@@ -187,10 +187,10 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   iconApproved: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: Colors.statusApprovedBg,
   },
   iconRejected: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: Colors.statusRejectedBg,
   },
   iconText: {
     fontSize: 16,
