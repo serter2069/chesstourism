@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
+import { generateMembershipCertificate } from '../services/pdf.service';
 const router = Router();
 
 // POST /api/profile/preferences — save onboarding quiz answers
@@ -67,6 +68,55 @@ router.get('/preferences', authenticate, async (req: AuthRequest, res: Response)
     res.json(user);
   } catch (err: any) {
     console.error('Get preferences error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/profile/membership-certificate — download membership certificate PDF
+router.get('/membership-certificate', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, surname: true, email: true },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const membership = await prisma.membership.findFirst({
+      where: { userId, status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!membership) {
+      res.status(404).json({ error: 'No active membership found' });
+      return;
+    }
+
+    const memberName = [user.name, user.surname].filter(Boolean).join(' ') || user.email;
+    const profileUrl = `https://chesstourism.smartlaunchhub.com/profile/${user.id}`;
+
+    const pdfBuffer = await generateMembershipCertificate(
+      memberName,
+      user.email,
+      membership.id,
+      membership.startDate,
+      membership.endDate,
+      profileUrl,
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=membership-certificate.pdf',
+      'Content-Length': pdfBuffer.length,
+    });
+    res.send(pdfBuffer);
+  } catch (err: any) {
+    console.error('Membership certificate error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
