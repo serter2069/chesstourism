@@ -63,8 +63,15 @@ router.get('/tournaments', async (req: Request, res: Response) => {
         orderBy: { startDate: 'desc' },
         include: {
           commissioner: {
-            select: { id: true, userId: true },
+            select: {
+              id: true,
+              userId: true,
+              country: true,
+              city: true,
+              user: { select: { name: true, surname: true } },
+            },
           },
+          _count: { select: { registrations: true } },
         },
       }),
       prisma.tournament.count({ where }),
@@ -105,10 +112,30 @@ router.get('/tournaments/:id', async (req: Request, res: Response) => {
       where: { id: req.params.id },
       include: {
         commissioner: {
-          select: { id: true, userId: true },
+          select: {
+            id: true,
+            userId: true,
+            country: true,
+            city: true,
+            photoUrl: true,
+            user: { select: { name: true, surname: true } },
+          },
         },
         _count: {
           select: { registrations: true },
+        },
+        registrations: {
+          orderBy: { createdAt: 'asc' },
+          include: {
+            user: { select: { id: true, name: true, surname: true, country: true } },
+            payment: { select: { status: true } },
+          },
+        },
+        results: {
+          orderBy: { place: 'asc' },
+          include: {
+            user: { select: { id: true, name: true, surname: true, country: true } },
+          },
         },
       },
     });
@@ -132,9 +159,27 @@ router.get('/tournaments/:id', async (req: Request, res: Response) => {
       });
     }
 
+    // Shape participants and results for frontend consumption
+    const participants = tournament.registrations.map((r) => ({
+      id: r.id,
+      user: r.user,
+      paid: r.payment?.status === 'PAID',
+      registeredAt: r.createdAt,
+    }));
+
+    const results = tournament.results.map((r) => ({
+      id: r.id,
+      rank: r.place,
+      player: r.user,
+      score: r.score,
+      ratingChange: r.eloChange,
+    }));
+
     res.json({
       ...tournament,
       registrationCount: tournament._count.registrations,
+      participants,
+      results,
       myRegistration,
     });
   } catch (err) {
