@@ -379,13 +379,13 @@ const styles = StyleSheet.create({
   fideTitleText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: '#FFFFFF',
+    color: Colors.white,
     letterSpacing: 1,
   },
   fideRatingText: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   fideIdText: {
     fontSize: Typography.sizes.sm,

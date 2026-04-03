@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: Typography.sizes.sm,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   filterScroll: {
     marginBottom: Spacing.lg,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
   },
   filterTabTextActive: {
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   errorCard: {
     marginTop: Spacing.lg,

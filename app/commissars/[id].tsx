@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   backBtnText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },
@@ -318,12 +318,12 @@ const styles = StyleSheet.create({
   },
   verifiedIcon: {
     fontSize: 10,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   verifiedText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   specialization: {
     fontSize: Typography.sizes.sm,

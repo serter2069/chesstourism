@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   retryBtnText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontWeight: Typography.weights.semibold,
     fontSize: Typography.sizes.sm,
   },

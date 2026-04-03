@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
   },
   chipTextActive: {
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   // Create button
   createRow: {

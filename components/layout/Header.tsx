@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   backText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     color: Colors.gold,
   },
   logoText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.lg,
     fontFamily: Typography.fontFamilyHeading,
     fontWeight: Typography.weights.bold,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   userName: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
     maxWidth: 120,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   badgeText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: 10,
     fontWeight: Typography.weights.bold,
     lineHeight: 14,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gold,
   },
   loginText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
   },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   hamburgerText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
   },
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.gold,
   },
   navLinkText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
     opacity: 0.7,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   menuItemText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   menuSignInText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
   },
