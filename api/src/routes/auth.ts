@@ -12,6 +12,30 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// Per-email OTP rate limiter: max 5 requests per 15 minutes
+const OTP_RATE_LIMIT_MAX = 5;
+const OTP_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+interface OtpRateEntry { count: number; resetAt: number }
+const otpRequestMap = new Map<string, OtpRateEntry>();
+
+function checkOtpRateLimit(email: string): boolean {
+  const now = Date.now();
+  const entry = otpRequestMap.get(email);
+
+  if (!entry || now >= entry.resetAt) {
+    // New window — reset or create entry
+    otpRequestMap.set(email, { count: 1, resetAt: now + OTP_RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= OTP_RATE_LIMIT_MAX) {
+    return false; // limit exceeded
+  }
+
+  entry.count += 1;
+  return true;
+}
+
 // POST /api/auth/send-code — aliases: /request-otp
 router.post('/send-code', handleSendCode);
 router.post('/request-otp', handleSendCode);
@@ -25,7 +49,14 @@ async function handleSendCode(req: Request, res: Response) {
       return;
     }
 
-    const result = await requestOtp(email.trim().toLowerCase());
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!checkOtpRateLimit(normalizedEmail)) {
+      res.status(429).json({ error: 'Too many OTP requests. Try again later.' });
+      return;
+    }
+
+    const result = await requestOtp(normalizedEmail);
     res.json(result);
   } catch (err: any) {
     const status = err.status || 500;
