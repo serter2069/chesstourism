@@ -12,7 +12,7 @@ router.get('/', async (req: any, res: Response) => {
   try {
     const { country } = req.query as { country?: string };
 
-    const where: Record<string, any> = {};
+    const where: Record<string, any> = { isVerified: true };
     if (country && typeof country === 'string' && country.trim()) {
       where.country = { equals: country.trim(), mode: 'insensitive' };
     }
@@ -44,7 +44,7 @@ router.get('/', async (req: any, res: Response) => {
 
     // Also return the list of distinct countries for the country filter chips
     const allCountries = await prisma.commissioner.findMany({
-      where: { country: { not: null } },
+      where: { isVerified: true, country: { not: null } },
       select: { country: true },
       distinct: ['country'],
       orderBy: { country: 'asc' },
