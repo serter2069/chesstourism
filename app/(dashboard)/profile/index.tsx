@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Linking,
 } from 'react-native';
 import { SafeContainer, Header } from '../../../components/layout';
 import { Button, Input, Badge } from '../../../components/ui';
@@ -14,6 +15,8 @@ import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 import { useAuth } from '../../../store/auth';
 import api from '../../../lib/api';
+
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'https://chesstourism.smartlaunchhub.com/api';
 
 interface FideLookupResult {
   name: string | null;
@@ -42,6 +45,22 @@ export default function ProfileScreen() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [certLoading, setCertLoading] = useState(false);
+
+  async function handleDownloadCertificate() {
+    setCertLoading(true);
+    try {
+      const res = await api.get('/profile/download-token');
+      const { downloadToken } = res.data;
+      const url = `${API_BASE}/profile/membership-certificate?token=${encodeURIComponent(downloadToken)}`;
+      await Linking.openURL(url);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || 'Failed to download certificate';
+      Alert.alert('Error', msg);
+    } finally {
+      setCertLoading(false);
+    }
+  }
 
   async function handleLookup() {
     const cleanId = fideId.trim();
@@ -223,6 +242,20 @@ export default function ProfileScreen() {
               <Text style={styles.successText}>{success}</Text>
             </View>
           )}
+        </View>
+
+        {/* Membership certificate download */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Membership Certificate</Text>
+          <Text style={styles.description}>
+            Download your membership certificate as a PDF file.
+          </Text>
+          <Button
+            title="Download Certificate"
+            onPress={handleDownloadCertificate}
+            loading={certLoading}
+            variant="secondary"
+          />
         </View>
       </ScrollView>
     </SafeContainer>
