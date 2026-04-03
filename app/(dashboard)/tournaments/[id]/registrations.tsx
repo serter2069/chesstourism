@@ -13,6 +13,7 @@ import { Button, Card, Badge, LoadingSpinner } from '../../../../components/ui';
 import { Colors } from '../../../../constants/colors';
 import { Spacing } from '../../../../constants/spacing';
 import { Typography } from '../../../../constants/typography';
+import { useAuth } from '../../../../store/auth';
 import api from '../../../../lib/api';
 
 interface Registration {
@@ -43,10 +44,13 @@ function formatDate(dateStr: string): string {
 
 export default function RegistrationsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
+  const canConfirmCash = user?.role === 'COMMISSIONER' || user?.role === 'ADMIN';
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [confirmingCashId, setConfirmingCashId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchRegistrations = useCallback(async () => {
@@ -72,6 +76,23 @@ export default function RegistrationsScreen() {
     setRefreshing(true);
     fetchRegistrations();
   }, [fetchRegistrations]);
+
+  async function handleConfirmCash(userId: string) {
+    try {
+      setConfirmingCashId(userId);
+      await api.patch(`/tournaments/${id}/participants/${userId}/confirm-cash`);
+      setRegistrations(prev =>
+        prev.map(r => r.user.id === userId ? { ...r, status: 'PAID' } : r)
+      );
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
+        'Failed to confirm cash payment';
+      Alert.alert('Error', message);
+    } finally {
+      setConfirmingCashId(null);
+    }
+  }
 
   async function handleUpdateStatus(regId: string, status: string) {
     try {
@@ -132,6 +153,7 @@ export default function RegistrationsScreen() {
         {registrations.map((reg) => {
           const badge = STATUS_BADGE_MAP[reg.status] || { label: reg.status, status: 'default' as const };
           const isUpdating = updatingId === reg.id;
+          const isConfirmingCash = confirmingCashId === reg.user.id;
 
           return (
             <Card key={reg.id} style={styles.regCard}>
@@ -172,12 +194,22 @@ export default function RegistrationsScreen() {
 
               {reg.status === 'APPROVED' && (
                 <View style={styles.actionRow}>
+                  {canConfirmCash && (
+                    <Button
+                      title="Confirm Cash"
+                      variant="secondary"
+                      onPress={() => handleConfirmCash(reg.user.id)}
+                      loading={isConfirmingCash}
+                      disabled={isUpdating || isConfirmingCash}
+                      style={styles.actionBtn}
+                    />
+                  )}
                   <Button
                     title="Reject"
                     variant="danger"
                     onPress={() => handleUpdateStatus(reg.id, 'REJECTED')}
                     loading={isUpdating}
-                    disabled={isUpdating}
+                    disabled={isUpdating || isConfirmingCash}
                     style={styles.actionBtn}
                   />
                 </View>
