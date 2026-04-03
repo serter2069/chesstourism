@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
   },
   filterTabTextActive: {
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   errorCard: {
     marginTop: Spacing.lg,

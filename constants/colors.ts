@@ -27,6 +27,7 @@ export const Colors = {
   statusUnreadBg: '#EEF1F8',
   statusApprovedBg: '#EAF3E8',
   statusRejectedBg: '#FAEAEA',
+  white: '#FFFFFF',
 } as const
 
 export type Color = keyof typeof Colors

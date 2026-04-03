@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   profileInfo: {
     flex: 1,

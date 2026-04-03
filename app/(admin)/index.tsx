@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: Typography.sizes.sm,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   alertCard: {
     backgroundColor: Colors.gold + '15',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   bottomSpacer: {
     height: Spacing['4xl'],

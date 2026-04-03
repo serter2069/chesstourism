@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
   },
   filterTabTextActive: {
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   errorCard: {
     marginTop: Spacing.lg,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
   },
   roleOptionTextActive: {
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   roleOptionTextDisabled: {
     color: Colors.textMuted,
