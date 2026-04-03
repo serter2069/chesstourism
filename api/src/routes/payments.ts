@@ -1,15 +1,20 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
+import Stripe from 'stripe';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
+
 const router = Router();
 
-// POST /api/payments/tournament/:tournamentId — initiate payment for tournament registration
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2026-03-25.dahlia',
+});
+
+// POST /api/payments/tournament/:tournamentId — create Stripe Checkout session
 router.post('/payments/tournament/:tournamentId', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
     const { tournamentId } = req.params;
 
-    // Find tournament
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
     });
@@ -19,11 +24,8 @@ router.post('/payments/tournament/:tournamentId', authenticate, async (req: Auth
       return;
     }
 
-    // Check user has an APPROVED registration
     const registration = await prisma.tournamentRegistration.findUnique({
-      where: {
-        tournamentId_userId: { tournamentId, userId },
-      },
+      where: { tournamentId_userId: { tournamentId, userId } },
     });
 
     if (!registration) {
@@ -42,123 +44,139 @@ router.post('/payments/tournament/:tournamentId', authenticate, async (req: Auth
     }
 
     const fee = tournament.fee ?? 0;
-    const currency = tournament.currency || 'USD';
+    const currency = (tournament.currency || 'USD').toLowerCase();
 
     if (fee === 0) {
       res.status(400).json({ error: 'This tournament is free — no payment required' });
       return;
     }
 
-    // Check if there's already a pending payment
-    const existingPayment = await prisma.payment.findFirst({
-      where: {
-        userId,
-        tournamentId,
-        status: 'PENDING',
-      },
+    // Reuse existing pending payment if checkout session still valid
+    const existing = await prisma.payment.findFirst({
+      where: { userId, tournamentId, status: 'PENDING', externalId: { not: null } },
+      orderBy: { createdAt: 'desc' },
     });
 
-    if (existingPayment) {
-      res.json({
-        paymentId: existingPayment.id,
-        amount: existingPayment.amount,
-        currency: existingPayment.currency,
-        status: existingPayment.status,
-      });
-      return;
+    if (existing?.externalId) {
+      try {
+        const session = await stripe.checkout.sessions.retrieve(existing.externalId);
+        if (session.status === 'open') {
+          res.json({ checkoutUrl: session.url, paymentId: existing.id });
+          return;
+        }
+      } catch {
+        // session expired or invalid — create new one
+      }
     }
 
-    // Create new payment record
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true },
+    });
+
+    const origin = process.env.APP_URL || 'https://chesstourism.smartlaunchhub.com';
+
+    // Create Stripe Checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      customer_email: user?.email || undefined,
+      line_items: [
+        {
+          price_data: {
+            currency,
+            product_data: {
+              name: `Tournament Registration: ${tournament.title}`,
+              description: `${tournament.city}, ${tournament.country}`,
+            },
+            unit_amount: Math.round(fee * 100), // Stripe expects cents
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        tournamentId,
+        userId,
+        registrationId: registration.id,
+      },
+      success_url: `${origin}/payment-success?tournamentId=${tournamentId}`,
+      cancel_url: `${origin}/tournaments/${tournamentId}`,
+    });
+
+    // Store payment record
     const payment = await prisma.payment.create({
       data: {
         userId,
         tournamentId,
         amount: fee,
-        currency,
+        currency: currency.toUpperCase(),
         status: 'PENDING',
+        externalId: session.id,
       },
     });
 
     res.status(201).json({
+      checkoutUrl: session.url,
       paymentId: payment.id,
-      amount: payment.amount,
-      currency: payment.currency,
-      status: payment.status,
+      sessionId: session.id,
     });
   } catch (err) {
-    console.error('Initiate payment error:', err);
+    console.error('Create checkout session error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// POST /api/payments/:paymentId/confirm — confirm payment (mock: only works in dev/test)
-// TODO: integrate Stripe — replace mock confirmation with Stripe payment intent verification
-// SECURITY(#1702): mock confirm disabled in production to prevent free PAID status
-router.post('/payments/:paymentId/confirm', authenticate, async (req: AuthRequest, res: Response) => {
+// POST /api/payments/webhook — Stripe webhook handler
+// Note: raw body middleware is applied in index.ts before express.json()
+router.post('/payments/webhook', async (req: Request, res: Response) => {
+  const sig = req.headers['stripe-signature'] as string;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+  let event: Stripe.Event;
   try {
-    if (process.env.NODE_ENV === 'production') {
-      res.status(503).json({ error: 'Payment integration not yet configured' });
-      return;
-    }
-
-    const userId = req.user!.userId;
-    const { paymentId } = req.params;
-
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
-    });
-
-    if (!payment) {
-      res.status(404).json({ error: 'Payment not found' });
-      return;
-    }
-
-    if (payment.userId !== userId) {
-      res.status(403).json({ error: 'Not your payment' });
-      return;
-    }
-
-    if (payment.status === 'PAID') {
-      res.status(400).json({ error: 'Payment already confirmed' });
-      return;
-    }
-
-    if (payment.status !== 'PENDING') {
-      res.status(400).json({ error: 'Payment cannot be confirmed in current status' });
-      return;
-    }
-
-    // Mock confirmation — in production, verify Stripe payment intent here
-    const [updatedPayment] = await prisma.$transaction([
-      prisma.payment.update({
-        where: { id: paymentId },
-        data: { status: 'PAID' },
-      }),
-      prisma.tournamentRegistration.update({
-        where: {
-          tournamentId_userId: {
-            tournamentId: payment.tournamentId!,
-            userId,
-          },
-        },
-        data: {
-          status: 'PAID',
-          paymentId: paymentId,
-        },
-      }),
-    ]);
-
-    res.json({
-      paymentId: updatedPayment.id,
-      status: updatedPayment.status,
-      amount: updatedPayment.amount,
-      currency: updatedPayment.currency,
-      message: 'Payment confirmed successfully',
-    });
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
   } catch (err) {
-    console.error('Confirm payment error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Webhook signature verification failed:', err);
+    res.status(400).json({ error: 'Invalid signature' });
+    return;
   }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    if (session.payment_status !== 'paid') {
+      res.json({ received: true });
+      return;
+    }
+
+    const { tournamentId, userId } = session.metadata || {};
+    if (!tournamentId || !userId) {
+      console.error('Webhook: missing metadata', session.metadata);
+      res.json({ received: true });
+      return;
+    }
+
+    try {
+      await prisma.$transaction([
+        prisma.payment.updateMany({
+          where: { externalId: session.id, status: 'PENDING' },
+          data: { status: 'PAID' },
+        }),
+        prisma.tournamentRegistration.update({
+          where: { tournamentId_userId: { tournamentId, userId } },
+          data: { status: 'PAID' },
+        }),
+      ]);
+      console.log(`Payment confirmed for user ${userId}, tournament ${tournamentId}`);
+    } catch (err) {
+      console.error('Webhook: DB update failed:', err);
+      // Return 500 so Stripe retries
+      res.status(500).json({ error: 'DB update failed' });
+      return;
+    }
+  }
+
+  res.json({ received: true });
 });
 
 // GET /api/payments/my — list current user's payments

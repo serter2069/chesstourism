@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView, Linking } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../../components/layout';
 import { Card, Button, LoadingSpinner, Badge } from '../../../components/ui';
@@ -62,7 +62,14 @@ export default function PaymentScreen() {
       setPaying(true);
       const res = await api.post(`/payments/tournament/${tournamentId}`);
       setPaymentId(res.data.paymentId);
-      setStep('processing');
+      const checkoutUrl = res.data.checkoutUrl;
+      if (checkoutUrl) {
+        // Redirect to Stripe Checkout (web: opens in same tab; native: opens browser)
+        await Linking.openURL(checkoutUrl);
+        setStep('processing');
+      } else {
+        setStep('processing');
+      }
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to initiate payment';
       Alert.alert('Error', message);
@@ -168,10 +175,14 @@ export default function PaymentScreen() {
             </>
           )}
 
-          {/* Step: Processing — confirm payment */}
+          {/* Step: Processing — redirected to Stripe Checkout */}
           {!isFree && step === 'processing' && (
             <Card style={styles.card}>
-              <Text style={styles.confirmTitle}>Confirm Payment</Text>
+              <Text style={styles.confirmTitle}>Complete Payment</Text>
+              <Text style={styles.mockNote}>
+                You were redirected to the Stripe secure checkout page.
+                After completing payment, your registration will be automatically confirmed.
+              </Text>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Amount</Text>
                 <Text style={styles.summaryValue}>{fee} {tournament.currency}</Text>
@@ -181,19 +192,11 @@ export default function PaymentScreen() {
                 <Text style={styles.summaryValue}>{tournament.title}</Text>
               </View>
               <View style={styles.divider} />
-              <Text style={styles.mockNote}>
-                Mock payment — no real charge will be made.
-              </Text>
               <Button
-                title="Confirm Payment"
-                onPress={handleConfirmPayment}
-                loading={confirming}
-                style={styles.confirmBtn}
-              />
-              <Button
-                title="Cancel"
-                onPress={() => setStep('info')}
+                title="Back to Tournament"
+                onPress={() => router.push(`/tournaments/${tournamentId}` as never)}
                 variant="secondary"
+                style={styles.confirmBtn}
               />
             </Card>
           )}
