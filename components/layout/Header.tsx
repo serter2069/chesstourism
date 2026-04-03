@@ -139,18 +139,48 @@ export default function Header({ title, showBack = false }: HeaderProps) {
         )}
       </View>
 
-      {/* Collapsible mobile menu (for dashboard links when logged in) */}
-      {isMobile && menuOpen && user && (
+      {/* Collapsible mobile menu */}
+      {isMobile && menuOpen && (
         <View style={styles.mobileMenu}>
-          <TouchableOpacity
-            onPress={() => {
-              router.push('/(dashboard)' as any);
-              setMenuOpen(false);
-            }}
-            style={styles.menuItem}
-          >
-            <Text style={styles.menuItemText}>Dashboard</Text>
-          </TouchableOpacity>
+          {user ? (
+            <TouchableOpacity
+              onPress={() => {
+                router.push('/(dashboard)' as any);
+                setMenuOpen(false);
+              }}
+              style={styles.menuItem}
+            >
+              <Text style={styles.menuItemText}>Dashboard</Text>
+            </TouchableOpacity>
+          ) : (
+            <>
+              {[
+                { href: '/tournaments', label: 'Tournaments' },
+                { href: '/commissars', label: 'Commissars' },
+                { href: '/ratings', label: 'Ratings' },
+              ].map((link) => (
+                <TouchableOpacity
+                  key={link.href}
+                  onPress={() => {
+                    router.push(link.href as any);
+                    setMenuOpen(false);
+                  }}
+                  style={styles.menuItem}
+                >
+                  <Text style={styles.menuItemText}>{link.label}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                onPress={() => {
+                  router.push('/(auth)/login' as any);
+                  setMenuOpen(false);
+                }}
+                style={styles.menuSignIn}
+              >
+                <Text style={styles.menuSignInText}>Sign In</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       )}
     </View>
@@ -314,5 +344,18 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
+  },
+  menuSignIn: {
+    marginTop: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 4,
+    backgroundColor: Colors.gold,
+    alignSelf: 'flex-start',
+  },
+  menuSignInText: {
+    color: '#FFFFFF',
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
   },
 });
