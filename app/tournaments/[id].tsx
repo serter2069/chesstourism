@@ -236,14 +236,19 @@ export default function TournamentDetailScreen() {
     try {
       setRegistering(true);
       await api.post(`/tournaments/${id}/register`);
-      await fetchTournament();
+      // UC-28: if tournament has a fee, redirect to payment page immediately after registration
+      if (tournament && tournament.fee != null && tournament.fee > 0) {
+        router.push(`/(dashboard)/payment/${id}` as never);
+      } else {
+        await fetchTournament();
+      }
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Registration failed';
       Alert.alert('Error', message);
     } finally {
       setRegistering(false);
     }
-  }, [id, user, fetchTournament]);
+  }, [id, user, tournament, fetchTournament, router]);
 
   const handleCancelRegistration = useCallback(async () => {
     if (!id) return;
