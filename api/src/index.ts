@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import commissarsRouter from './routes/commissars';
@@ -49,6 +50,24 @@ app.options('*', cors(corsOptions));
 app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
   next();
 });
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/auth/', authLimiter);
 
 app.use(express.json());
 app.use(cookieParser());
