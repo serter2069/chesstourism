@@ -553,9 +553,11 @@ export default function TournamentDetailScreen() {
             ) : (
               <Card style={styles.listCard}>
                 {tournament.participants.map((p, idx) => (
-                  <View
+                  <TouchableOpacity
                     key={p.id}
                     style={[styles.participantRow, idx % 2 === 0 && styles.rowEven]}
+                    activeOpacity={0.7}
+                    onPress={() => router.push(`/users/${p.user.id}` as never)}
                   >
                     <Text style={styles.participantRank}>{idx + 1}</Text>
                     <View style={styles.participantInfo}>
@@ -567,7 +569,7 @@ export default function TournamentDetailScreen() {
                       )}
                     </View>
                     {p.paid && <Badge label="Paid" status="success" />}
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </Card>
             )}
@@ -587,9 +589,11 @@ export default function TournamentDetailScreen() {
                   <Text style={[styles.resultsHeaderText, styles.resultRating]}>+/-</Text>
                 </View>
                 {tournament.results.map((r, idx) => (
-                  <View
+                  <TouchableOpacity
                     key={r.id}
                     style={[styles.resultRow, idx % 2 === 0 && styles.rowEven]}
+                    activeOpacity={0.7}
+                    onPress={() => router.push(`/users/${r.player.id}` as never)}
                   >
                     <Text style={[styles.resultText, styles.resultRank]}>{r.rank}</Text>
                     <View style={styles.resultName}>
@@ -609,7 +613,7 @@ export default function TournamentDetailScreen() {
                     ]}>
                       {r.ratingChange != null ? (r.ratingChange > 0 ? `+${r.ratingChange}` : `${r.ratingChange}`) : '-'}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </Card>
             )}
