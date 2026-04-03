@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../store/auth';
 import { useWatchlist } from '../../store/watchlist';
+import { Colors } from '../../constants/colors';
 
 interface WatchlistButtonProps {
   tournamentId: string;
@@ -48,6 +49,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   iconActive: {
-    color: '#C59A1A',
+    color: Colors.gold,
   },
 });

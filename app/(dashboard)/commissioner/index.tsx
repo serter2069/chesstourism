@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
   errorBox: {
     padding: Spacing.md,
     borderRadius: 4,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: Colors.statusErrorBg,
     marginBottom: Spacing.lg,
   },
   errorText: {
