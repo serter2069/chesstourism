@@ -16,7 +16,6 @@ export const colors = {
   surface: Colors.backgroundAlt,
   text: Colors.text,
   textMuted: Colors.textMuted,
-  textOnPrimary: '#FFFFFF',
   textOnAccent: '#FFFFFF',
   border: Colors.border,
   error: Colors.error,
