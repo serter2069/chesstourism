@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { Avatar, Badge, Card, LoadingSpinner } from '../../components/ui';
+import { Avatar, Badge, Card } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { getCountryFlag } from '../../constants/countryFlags';
 import { Spacing } from '../../constants/spacing';
@@ -206,7 +206,11 @@ export default function CommissarsScreen() {
       </View>
 
       {loading ? (
-        <LoadingSpinner />
+        <View style={styles.skeletonContainer}>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <View key={i} style={styles.skeletonCard} />
+          ))}
+        </View>
       ) : error ? (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>{error}</Text>
@@ -329,6 +333,19 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: Typography.weights.medium,
     marginTop: Spacing.xs,
+  },
+  skeletonContainer: {
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: Spacing.md,
+  },
+  skeletonCard: {
+    backgroundColor: Colors.backgroundAlt,
+    height: 70,
+    borderRadius: 8,
+    marginBottom: 8,
+    marginHorizontal: 16,
   },
   empty: {
     flex: 1,

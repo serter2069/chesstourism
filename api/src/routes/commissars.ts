@@ -17,18 +17,26 @@ router.get('/', async (req: any, res: Response) => {
       where.country = { equals: country.trim(), mode: 'insensitive' };
     }
 
-    const commissioners = await prisma.commissioner.findMany({
-      where,
-      orderBy: { country: 'asc' },
-      include: {
-        user: {
-          select: { id: true, name: true },
+    const [commissioners, allCountries] = await Promise.all([
+      prisma.commissioner.findMany({
+        where,
+        orderBy: { country: 'asc' },
+        include: {
+          user: {
+            select: { id: true, name: true },
+          },
+          _count: {
+            select: { tournaments: true },
+          },
         },
-        _count: {
-          select: { tournaments: true },
-        },
-      },
-    });
+      }),
+      prisma.commissioner.findMany({
+        where: { isVerified: true, country: { not: null } },
+        select: { country: true },
+        distinct: ['country'],
+        orderBy: { country: 'asc' },
+      }),
+    ]);
 
     const data = commissioners.map((c: any) => ({
       id: c.id,
@@ -41,14 +49,6 @@ router.get('/', async (req: any, res: Response) => {
       user: c.user,
       tournamentsCount: c._count.tournaments,
     }));
-
-    // Also return the list of distinct countries for the country filter chips
-    const allCountries = await prisma.commissioner.findMany({
-      where: { isVerified: true, country: { not: null } },
-      select: { country: true },
-      distinct: ['country'],
-      orderBy: { country: 'asc' },
-    });
 
     const countries = allCountries
       .map((c: any) => c.country as string)
