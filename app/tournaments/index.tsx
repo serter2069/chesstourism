@@ -315,6 +315,12 @@ export default function TournamentsListScreen() {
                           </Text>
                         </View>
                       )}
+                      <View style={styles.footerItem}>
+                        <Text style={styles.footerLabel}>Rating</Text>
+                        <Text style={styles.footerValue}>
+                          {t.ratingLimit != null ? `\u2264 ${t.ratingLimit}` : 'Open'}
+                        </Text>
+                      </View>
                     </View>
                   </Card>
                 </TouchableOpacity>
