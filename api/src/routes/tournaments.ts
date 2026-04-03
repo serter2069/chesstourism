@@ -414,6 +414,11 @@ router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADM
 
     if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
+    if (['COMPLETED', 'IN_PROGRESS'].includes(tournament.status)) {
+      res.status(400).json({ error: 'Cannot delete a tournament that is in progress or completed' });
+      return;
+    }
+
     await prisma.tournament.delete({ where: { id: req.params.id } });
     res.json({ message: 'Tournament deleted' });
   } catch (err) {
