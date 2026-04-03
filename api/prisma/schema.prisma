@@ -158,6 +158,8 @@ model Commissioner {
   isVerified     Boolean @default(false)
 
   tournaments Tournament[]
+
+  @@index([isVerified, country])
 }
 
 model OrganizationRequest {
