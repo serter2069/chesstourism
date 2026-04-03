@@ -11,6 +11,7 @@ import {
   Share,
   Platform,
   TextInput,
+  Linking,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
@@ -123,6 +124,7 @@ export default function TournamentDetailScreen() {
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [registering, setRegistering] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [downloadingCertificate, setDownloadingCertificate] = useState(false);
 
   // Photos state
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -270,6 +272,23 @@ export default function TournamentDetailScreen() {
     );
   }, [id, fetchTournament]);
 
+  const handleDownloadCertificate = useCallback(async () => {
+    if (!id) return;
+    try {
+      setDownloadingCertificate(true);
+      const tokenRes = await api.get('/profile/download-token');
+      const { downloadToken } = tokenRes.data;
+      const apiBase = process.env.EXPO_PUBLIC_API_URL || 'https://chesstourism.smartlaunchhub.com/api';
+      const url = `${apiBase}/tournaments/${id}/my-certificate?token=${encodeURIComponent(downloadToken)}`;
+      await Linking.openURL(url);
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to download certificate';
+      Alert.alert('Error', message);
+    } finally {
+      setDownloadingCertificate(false);
+    }
+  }, [id]);
+
   const handleShare = useCallback(async () => {
     if (!tournament) return;
     const url = `https://chesstourism.smartlaunchhub.com/tournaments/${tournament.id}`;
@@ -320,6 +339,7 @@ export default function TournamentDetailScreen() {
   const isFull = !!(tournament.maxParticipants && (tournament.registrationCount ?? 0) >= tournament.maxParticipants);
   const canRegister = ['PUBLISHED', 'REGISTRATION_OPEN'].includes(tournament.status) && user && !isRegistered && !isFull;
   const hasResults = tournament.status === 'COMPLETED' || tournament.status === 'IN_PROGRESS';
+  const canDownloadCertificate = tournament.status === 'COMPLETED' && !!user && !!myReg && ['APPROVED', 'PAID'].includes(myReg.status);
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'info', label: 'Info' },
     { key: 'participants', label: `Players (${tournament.participants?.length || 0})` },
@@ -442,6 +462,14 @@ export default function TournamentDetailScreen() {
             <Button
               title="Edit Tournament"
               onPress={() => router.push(`/(dashboard)/tournaments/${tournament.id}/edit` as never)}
+              variant="secondary"
+            />
+          )}
+          {canDownloadCertificate && (
+            <Button
+              title="Download Certificate"
+              onPress={handleDownloadCertificate}
+              loading={downloadingCertificate}
               variant="secondary"
             />
           )}
