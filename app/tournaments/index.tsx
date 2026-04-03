@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
@@ -85,6 +86,9 @@ export default function TournamentsListScreen() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
   const [timeControlFilter, setTimeControlFilter] = useState('');
@@ -93,6 +97,17 @@ export default function TournamentsListScreen() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+
+  // Debounce search query: only update debouncedSearchQuery after 300ms of no typing
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [searchQuery]);
 
   // Debounce country filter: only update debouncedCountryFilter after 300ms of no typing
   useEffect(() => {
@@ -111,6 +126,7 @@ export default function TournamentsListScreen() {
       if (!append) setLoading(true);
 
       const params: Record<string, string | number> = { page: pageNum, limit: 10 };
+      if (debouncedSearchQuery) params.q = debouncedSearchQuery;
       if (statusFilter) params.status = statusFilter;
       if (ratingFilter) params.ratingMax = ratingFilter;
       if (timeControlFilter) params.timeControl = timeControlFilter;
@@ -134,7 +150,7 @@ export default function TournamentsListScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [statusFilter, ratingFilter, timeControlFilter, debouncedCountryFilter]);
+  }, [debouncedSearchQuery, statusFilter, ratingFilter, timeControlFilter, debouncedCountryFilter]);
 
   useEffect(() => {
     fetchTournaments(1);
@@ -167,6 +183,30 @@ export default function TournamentsListScreen() {
         {/* Page title */}
         <View style={styles.pageTitle}>
           <Text style={styles.pageTitleText}>Tournaments</Text>
+        </View>
+
+        {/* Search input */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchInputWrapper}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search tournaments..."
+              placeholderTextColor={Colors.textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              autoCorrect={false}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                style={styles.searchClear}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.searchClearText}>{'×'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* Filters */}
@@ -510,5 +550,33 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: Spacing['2xl'],
+  },
+  // Search
+  searchRow: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    paddingHorizontal: Spacing.md,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: Spacing.sm,
+    fontSize: Typography.sizes.sm,
+    color: Colors.text,
+  },
+  searchClear: {
+    paddingLeft: Spacing.sm,
+  },
+  searchClearText: {
+    fontSize: 20,
+    color: Colors.textMuted,
+    lineHeight: 24,
   },
 });
