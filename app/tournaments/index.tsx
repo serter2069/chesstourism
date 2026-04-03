@@ -136,7 +136,7 @@ export default function TournamentsListScreen() {
     }
   }, [hasMore, page, fetchTournaments]);
 
-  const isCommissar = user?.role === 'commissar' || user?.role === 'admin';
+  const isCommissar = user?.role === 'COMMISSIONER' || user?.role === 'ADMIN';
   const { columns } = usePlatform();
 
   return (
