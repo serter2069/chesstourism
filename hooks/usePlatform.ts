@@ -5,7 +5,7 @@ export type ScreenSize = 'mobile' | 'tablet' | 'desktop';
 export const BREAKPOINTS = {
   mobile: 430,
   tablet: 1024,
-  desktop: 1280,
+  desktop: 1200,
 } as const;
 
 export function usePlatform() {
