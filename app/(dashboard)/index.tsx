@@ -226,7 +226,7 @@ export default function DashboardScreen() {
           <View style={styles.linksRow}>
             <Button
               title="My Tournaments"
-              onPress={() => router.push('/(dashboard)/tournaments')}
+              onPress={() => router.push('/(dashboard)/tournaments/my-tournaments')}
               variant="secondary"
               style={styles.linkBtn}
             />
