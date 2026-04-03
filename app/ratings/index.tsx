@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  ActivityIndicator,
   ListRenderItemInfo,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -127,9 +128,12 @@ export default function RatingsScreen() {
   const [ratings, setRatings] = useState<RatingEntry[]>([]);
   const [myRank, setMyRank] = useState<MyRank | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [countries, setCountries] = useState<CountryInfo[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string>(ALL_COUNTRIES);
   const countriesLoaded = useRef(false);
@@ -145,21 +149,34 @@ export default function RatingsScreen() {
       .catch(() => {});
   }, []);
 
-  const fetchData = useCallback(async (country: string) => {
+  const fetchData = useCallback(async (country: string, pageNum: number = 1) => {
     try {
-      setLoading(true);
+      if (pageNum === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       setError(null);
 
-      const params: Record<string, string | number> = { page: 1, limit: 50 };
+      const params: Record<string, string | number> = { page: pageNum, limit: 50 };
       if (country !== ALL_COUNTRIES) params.country = country;
 
       const ratingsReq = api.get('/ratings', { params });
-      const myRankReq = user ? api.get('/ratings/my').catch(() => null) : Promise.resolve(null);
+      const myRankReq = (pageNum === 1 && user) ? api.get('/ratings/my').catch(() => null) : Promise.resolve(null);
 
       const [ratingsRes, myRankRes] = await Promise.all([ratingsReq, myRankReq]);
 
-      setRatings(ratingsRes.data.data);
-      setPagination(ratingsRes.data.pagination);
+      const newData: RatingEntry[] = ratingsRes.data.data;
+      const pag: Pagination = ratingsRes.data.pagination;
+
+      if (pageNum === 1) {
+        setRatings(newData);
+      } else {
+        setRatings((prev) => [...prev, ...newData]);
+      }
+      setPagination(pag);
+      setPage(pag.page);
+      setHasMore(pag.page < pag.totalPages);
 
       if (myRankRes) {
         setMyRank(myRankRes.data);
@@ -168,12 +185,20 @@ export default function RatingsScreen() {
       setError('Failed to load ratings');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [user]);
 
   useEffect(() => {
-    fetchData(selectedCountry);
+    setPage(1);
+    setHasMore(false);
+    fetchData(selectedCountry, 1);
   }, [fetchData, selectedCountry]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!hasMore || loadingMore) return;
+    fetchData(selectedCountry, page + 1);
+  }, [hasMore, loadingMore, fetchData, selectedCountry, page]);
 
   const handleSelectCountry = useCallback((country: string) => {
     setSelectedCountry(country);
@@ -343,12 +368,22 @@ export default function RatingsScreen() {
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={
-              pagination && !searchQuery.trim() ? (
+              !searchQuery.trim() ? (
                 <View style={styles.footer}>
-                  <Text style={styles.footerText}>
-                    Showing {filteredRatings.length} of {pagination.total} players
-                    {selectedCountry !== ALL_COUNTRIES ? ` in ${selectedCountry}` : ''}
-                  </Text>
+                  {pagination ? (
+                    <Text style={styles.footerText}>
+                      Showing {filteredRatings.length} of {pagination.total} players
+                      {selectedCountry !== ALL_COUNTRIES ? ` in ${selectedCountry}` : ''}
+                    </Text>
+                  ) : null}
+                  {hasMore && !loadingMore ? (
+                    <TouchableOpacity style={styles.loadMoreBtn} onPress={handleLoadMore} activeOpacity={0.75}>
+                      <Text style={styles.loadMoreText}>Load More</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                  {loadingMore ? (
+                    <ActivityIndicator size="small" color={Colors.primary} style={styles.loadMoreSpinner} />
+                  ) : null}
                 </View>
               ) : null
             }
@@ -615,9 +650,24 @@ const styles = StyleSheet.create({
   footer: {
     paddingVertical: Spacing.lg,
     alignItems: 'center',
+    gap: Spacing.md,
   },
   footerText: {
     fontSize: Typography.sizes.xs,
     color: Colors.textMuted,
+  },
+  loadMoreBtn: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing['2xl'],
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+  },
+  loadMoreText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+    color: '#FFFFFF',
+  },
+  loadMoreSpinner: {
+    marginVertical: Spacing.sm,
   },
 });
