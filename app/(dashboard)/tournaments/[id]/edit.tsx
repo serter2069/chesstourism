@@ -53,16 +53,18 @@ interface Participant {
 const FORMAT_OPTIONS = ['CLASSICAL', 'RAPID', 'BLITZ'] as const;
 
 const STATUS_TRANSITIONS: Record<string, { label: string; nextStatus: string } | null> = {
-  DRAFT: { label: 'Open Registration', nextStatus: 'REGISTRATION_OPEN' },
+  DRAFT: { label: 'Publish', nextStatus: 'PUBLISHED' },
+  PUBLISHED: { label: 'Open Registration', nextStatus: 'REGISTRATION_OPEN' },
   REGISTRATION_OPEN: { label: 'Close Registration', nextStatus: 'REGISTRATION_CLOSED' },
   REGISTRATION_CLOSED: { label: 'Start Tournament', nextStatus: 'IN_PROGRESS' },
-  IN_PROGRESS: null, // Navigate to results page instead
+  IN_PROGRESS: { label: 'Complete Tournament', nextStatus: 'COMPLETED' },
   COMPLETED: null,
   CANCELLED: null,
 };
 
 const STATUS_BADGE_MAP: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
   DRAFT: { label: 'Draft', status: 'default' },
+  PUBLISHED: { label: 'Published', status: 'info' },
   REGISTRATION_OPEN: { label: 'Registration Open', status: 'success' },
   REGISTRATION_CLOSED: { label: 'Registration Closed', status: 'warning' },
   IN_PROGRESS: { label: 'In Progress', status: 'info' },
