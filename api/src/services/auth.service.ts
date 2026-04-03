@@ -126,8 +126,9 @@ export async function verifyOtp(email: string, code: string) {
   try {
     attempts = parseInt((await redis.get(attemptsKey)) || '0');
   } catch (err) {
-    // Redis unavailable — fail open to avoid blocking legitimate users
-    console.error('[Redis] failed to read OTP attempts, failing open:', (err as Error).message);
+    // Redis unavailable — fail closed to prevent brute-force when attempt tracking is broken
+    console.error('[Redis] failed to read OTP attempts, failing closed:', (err as Error).message);
+    throw Object.assign(new Error('Verification service temporarily unavailable'), { status: 503 });
   }
 
   if (attempts >= OTP_MAX_ATTEMPTS) {
