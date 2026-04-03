@@ -130,8 +130,8 @@ export default function TournamentResultsScreen() {
 
           {participants.map((p, index) => {
             const pName = p.user
-              ? `${p.user.name} ${p.user.surname}`
-              : `${p.name || ''} ${p.surname || ''}`.trim() || 'Unknown';
+              ? [p.user.name, p.user.surname].filter(Boolean).join(' ')
+              : [p.name, p.surname].filter(Boolean).join(' ') || 'Unknown';
 
             return (
               <Card key={p.id} style={styles.resultCard}>

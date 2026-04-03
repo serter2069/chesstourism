@@ -205,7 +205,7 @@ export default function EditTournamentScreen() {
   async function handleMarkPaidCash(participant: Participant) {
     const pUserId = participant.userId || participant.id;
     const pName = participant.user
-      ? `${participant.user.name} ${participant.user.surname}`
+      ? [participant.user.name, participant.user.surname].filter(Boolean).join(' ')
       : 'this participant';
     Alert.alert(
       'Confirm Cash Payment',
@@ -417,8 +417,8 @@ export default function EditTournamentScreen() {
           )}
           {participants.map((p) => {
             const pName = p.user
-              ? `${p.user.name} ${p.user.surname}`
-              : `${p.name || ''} ${p.surname || ''}`.trim() || 'Unknown';
+              ? [p.user.name, p.user.surname].filter(Boolean).join(' ')
+              : [p.name, p.surname].filter(Boolean).join(' ') || 'Unknown';
             return (
               <Card key={p.id} style={styles.participantCard}>
                 <View style={styles.participantRow}>

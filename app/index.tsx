@@ -212,7 +212,7 @@ export default function HomeScreen() {
                   <Text style={[styles.ratingsText, styles.rankCol]}>{entry.rank || idx + 1}</Text>
                   <View style={styles.nameCol}>
                     <Text style={styles.ratingsText} numberOfLines={1}>
-                      {entry.player.name} {entry.player.surname}
+                      {[entry.player.name, entry.player.surname].filter(Boolean).join(' ')}
                     </Text>
                     {entry.player.country && (
                       <Text style={styles.ratingsMeta}>{entry.player.country}</Text>

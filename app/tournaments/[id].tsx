@@ -459,12 +459,12 @@ export default function TournamentDetailScreen() {
             <View style={styles.commissarRow}>
               <Avatar
                 uri={tournament.commissioner?.photoUrl}
-                name={`${tournament.commissioner?.user?.name || ''} ${tournament.commissioner?.user?.surname || ''}`}
+                name={[tournament.commissioner?.user?.name, tournament.commissioner?.user?.surname].filter(Boolean).join(' ')}
                 size={48}
               />
               <View style={styles.commissarInfo}>
                 <Text style={styles.commissarName}>
-                  {tournament.commissioner?.user?.name} {tournament.commissioner?.user?.surname}
+                  {[tournament.commissioner?.user?.name, tournament.commissioner?.user?.surname].filter(Boolean).join(' ')}
                 </Text>
                 {(tournament.commissioner?.city || tournament.commissioner?.country) && (
                   <Text style={styles.commissarMeta}>
@@ -532,7 +532,7 @@ export default function TournamentDetailScreen() {
                     <Text style={styles.participantRank}>{idx + 1}</Text>
                     <View style={styles.participantInfo}>
                       <Text style={styles.participantName}>
-                        {p.user.name} {p.user.surname}
+                        {[p.user.name, p.user.surname].filter(Boolean).join(' ')}
                       </Text>
                       {p.user.country && (
                         <Text style={styles.participantMeta}>{p.user.country}</Text>
@@ -566,7 +566,7 @@ export default function TournamentDetailScreen() {
                     <Text style={[styles.resultText, styles.resultRank]}>{r.rank}</Text>
                     <View style={styles.resultName}>
                       <Text style={styles.resultText}>
-                        {r.player.name} {r.player.surname}
+                        {[r.player.name, r.player.surname].filter(Boolean).join(' ')}
                       </Text>
                       {r.player.country && (
                         <Text style={styles.participantMeta}>{r.player.country}</Text>
