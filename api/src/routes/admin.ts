@@ -385,4 +385,79 @@ router.patch('/commissars/:id/reject', async (req: AuthRequest, res: Response) =
   }
 });
 
+// ─── FINANCES ─────────────────────────────────────────
+
+// GET /api/admin/finances — revenue summary + paginated payment list
+router.get('/finances', async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+
+    // Date range filters
+    if (req.query.from || req.query.to) {
+      const createdAt: Record<string, Date> = {};
+      if (req.query.from) {
+        createdAt.gte = new Date(req.query.from as string);
+      }
+      if (req.query.to) {
+        // Include the entire end day
+        const toDate = new Date(req.query.to as string);
+        toDate.setHours(23, 59, 59, 999);
+        createdAt.lte = toDate;
+      }
+      where.createdAt = createdAt;
+    }
+
+    // Status filter
+    if (req.query.status) {
+      const status = (req.query.status as string).toUpperCase();
+      if (['PENDING', 'PAID', 'FAILED', 'REFUNDED'].includes(status)) {
+        where.status = status;
+      }
+    }
+
+    // Aggregations (always across the filtered set)
+    const [paidAgg, pendingAgg, refundedCount, items, total] = await Promise.all([
+      prisma.payment.aggregate({
+        _sum: { amount: true },
+        _count: true,
+        where: { ...where, status: 'PAID' },
+      }),
+      prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { ...where, status: 'PENDING' },
+      }),
+      prisma.payment.count({ where: { ...where, status: 'REFUNDED' } }),
+      prisma.payment.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          tournament: { select: { title: true, currency: true } },
+          user: { select: { name: true, email: true } },
+        },
+      }),
+      prisma.payment.count({ where }),
+    ]);
+
+    res.json({
+      summary: {
+        totalRevenue: paidAgg._sum.amount || 0,
+        paidCount: paidAgg._count || 0,
+        pendingAmount: pendingAgg._sum.amount || 0,
+        refundedCount,
+      },
+      items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (err) {
+    console.error('Admin finances error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
