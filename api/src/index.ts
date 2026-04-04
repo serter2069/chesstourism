@@ -17,6 +17,7 @@ import organizationsRouter from './routes/organizations';
 import adminRouter from './routes/admin';
 import notificationsRouter from './routes/notifications';
 import settingsRouter from './routes/settings';
+import verifyRouter from './routes/verify';
 
 dotenv.config();
 
@@ -77,6 +78,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', project: 'chesstourism', version: process.env.npm_package_version });
 });
 
+app.use('/api', verifyRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/commissars', commissarsRouter);
