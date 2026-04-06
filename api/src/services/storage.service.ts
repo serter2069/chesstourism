@@ -22,10 +22,10 @@ if (STORAGE_ENDPOINT && STORAGE_ACCESS_KEY && STORAGE_SECRET_KEY) {
   });
 }
 
-function generateKey(originalName: string): string {
+function generateKey(prefix: string, originalName: string): string {
   const ext = path.extname(originalName).toLowerCase();
   const id = crypto.randomUUID();
-  return `tournaments/photos/${id}${ext}`;
+  return `${prefix}/${id}${ext}`;
 }
 
 export async function uploadFile(
@@ -33,7 +33,7 @@ export async function uploadFile(
   originalName: string,
   mimeType: string,
 ): Promise<string> {
-  const key = generateKey(originalName);
+  const key = generateKey('tournaments/photos', originalName);
 
   if (!s3Client) {
     // Graceful degradation: return placeholder URL when storage not configured
@@ -57,5 +57,37 @@ export async function uploadFile(
   } catch (err) {
     console.error('S3 upload error:', err);
     throw new Error('Failed to upload file');
+  }
+}
+
+export async function uploadAvatar(
+  buffer: Buffer,
+  originalName: string,
+  mimeType: string,
+): Promise<string> {
+  const key = generateKey('avatars', originalName);
+
+  if (!s3Client) {
+    // Graceful degradation: return placeholder URL when storage not configured
+    console.warn('Storage not configured, returning placeholder URL');
+    return `https://placeholder.storage/${key}`;
+  }
+
+  try {
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: STORAGE_BUCKET,
+        Key: key,
+        Body: buffer,
+        ContentType: mimeType,
+      }),
+    );
+
+    // Return public URL (MinIO with public bucket or proxy)
+    const publicUrl = `${STORAGE_ENDPOINT}/${STORAGE_BUCKET}/${key}`;
+    return publicUrl;
+  } catch (err) {
+    console.error('S3 avatar upload error:', err);
+    throw new Error('Failed to upload avatar');
   }
 }
