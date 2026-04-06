@@ -70,6 +70,7 @@ export default function CommissionerCabinetScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   const isCommissioner = user?.role === 'COMMISSIONER';
 
@@ -114,14 +115,42 @@ export default function CommissionerCabinetScreen() {
     setError(null);
     try {
       await api.post('/commissars/register');
-      await loadUser();
-      await fetchData();
+      setRegistered(true);
     } catch (err: any) {
       const msg = err?.response?.data?.error || 'Failed to register as commissioner';
       setError(msg);
     } finally {
       setRegisterLoading(false);
     }
+  }
+
+  async function handleGoToCabinet() {
+    await loadUser();
+    await fetchData();
+    setRegistered(false);
+  }
+
+  // Success state — shown after registration, before cabinet loads
+  if (registered) {
+    return (
+      <SafeContainer>
+        <Header title="Commissioner" showBack />
+        <View style={styles.successContainer}>
+          <Card style={styles.successCard}>
+            <Text style={styles.successIcon}>✓</Text>
+            <Text style={styles.successTitle}>Registration Submitted!</Text>
+            <Text style={styles.successText}>
+              You are now registered as a commissioner. Set up your profile to start hosting tournaments.
+            </Text>
+            <Button
+              title="Go to Cabinet"
+              onPress={handleGoToCabinet}
+              style={styles.successBtn}
+            />
+          </Card>
+        </View>
+      </SafeContainer>
+    );
   }
 
   // Not a commissioner — show CTA
@@ -307,6 +336,43 @@ const styles = StyleSheet.create({
     maxWidth: 430,
     width: '100%',
     alignSelf: 'center',
+  },
+  // Success state (post-registration)
+  successContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.lg,
+    maxWidth: 430,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  successCard: {
+    alignItems: 'center',
+    paddingVertical: Spacing['3xl'],
+  },
+  successIcon: {
+    fontSize: Typography.sizes['3xl'],
+    color: Colors.primary,
+    fontWeight: Typography.weights.bold,
+    marginBottom: Spacing.lg,
+  },
+  successTitle: {
+    fontSize: Typography.sizes.xl,
+    fontWeight: Typography.weights.bold,
+    color: Colors.text,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
+  },
+  successText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.xl,
+  },
+  successBtn: {
+    alignSelf: 'stretch',
   },
   // CTA (non-commissioner)
   ctaContainer: {
