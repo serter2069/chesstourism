@@ -6,7 +6,10 @@ export type NotificationType =
   | 'REGISTRATION_REJECTED'
   | 'TOURNAMENT_OPEN'
   | 'PAYMENT_CONFIRMED'
-  | 'PAYMENT_DISPUTED';
+  | 'PAYMENT_DISPUTED'
+  | 'SCHEDULE_UPDATED'
+  | 'TOURNAMENT_ANNOUNCEMENT'
+  | 'WATCHLIST_TOURNAMENT_OPEN';
 
 export async function createNotification(
   userId: string,
