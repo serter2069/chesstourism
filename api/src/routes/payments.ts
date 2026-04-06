@@ -178,13 +178,124 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
           data: { status: 'PAID' },
         }),
         prisma.webhookEvent.create({
-          data: { stripeEventId: event.id },
+          data: { stripeEventId: event.id, eventType: event.type, status: 'processed' },
         }),
       ]);
       console.log(`Payment confirmed for user ${userId}, tournament ${tournamentId}`);
     } catch (err) {
       console.error('Webhook: DB update failed:', err);
+      // Dead letter: record failed event so it can be inspected/replayed
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: `${event.id}:${Date.now()}`,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: err instanceof Error ? err.message : String(err),
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook: dead letter write also failed:', dlErr);
+      }
       // Return 500 so Stripe retries
+      res.status(500).json({ error: 'DB update failed' });
+      return;
+    }
+  } else if (event.type === 'payment_intent.payment_failed') {
+    const pi = event.data.object as Stripe.PaymentIntent;
+
+    // Idempotency check
+    const alreadyProcessed = await prisma.webhookEvent.findUnique({
+      where: { stripeEventId: event.id },
+    });
+    if (alreadyProcessed) {
+      console.log(`Webhook: duplicate payment_failed event ${event.id}, skipping`);
+      res.json({ received: true });
+      return;
+    }
+
+    // Resolve payment_intent → checkout session → our Payment record
+    let sessionId: string | null = null;
+    try {
+      const sessions = await stripe.checkout.sessions.list({ payment_intent: pi.id, limit: 1 });
+      if (sessions.data.length > 0) {
+        sessionId = sessions.data[0].id;
+      }
+    } catch (err) {
+      console.error(`Webhook payment_failed: failed to resolve PI ${pi.id} to session:`, err);
+    }
+
+    if (!sessionId) {
+      console.warn(`Webhook payment_failed: no checkout session found for PI ${pi.id}`);
+      // Dead letter — no session found, can't update payment record
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: event.id,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: `No checkout session found for PaymentIntent ${pi.id}`,
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook payment_failed: dead letter write failed:', dlErr);
+      }
+      res.json({ received: true });
+      return;
+    }
+
+    const payment = await prisma.payment.findFirst({ where: { externalId: sessionId } });
+
+    if (!payment) {
+      console.warn(`Webhook payment_failed: no Payment record for session ${sessionId}`);
+      // Dead letter — session resolved but no matching payment row
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: event.id,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: `No Payment record for checkout session ${sessionId} (PI: ${pi.id})`,
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook payment_failed: dead letter write failed:', dlErr);
+      }
+      res.json({ received: true });
+      return;
+    }
+
+    // Update payment status and record event atomically
+    try {
+      await prisma.$transaction([
+        prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'FAILED' },
+        }),
+        prisma.webhookEvent.create({
+          data: { stripeEventId: event.id, eventType: event.type, status: 'processed' },
+        }),
+      ]);
+      console.log(`Payment ${payment.id} marked FAILED (PI: ${pi.id})`);
+    } catch (err) {
+      console.error('Webhook payment_failed: DB update failed:', err);
+      // Dead letter
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: `${event.id}:${Date.now()}`,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: err instanceof Error ? err.message : String(err),
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook payment_failed: dead letter write also failed:', dlErr);
+      }
       res.status(500).json({ error: 'DB update failed' });
       return;
     }
@@ -227,7 +338,9 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
     if (!payment) {
       console.warn(`Webhook dispute: no payment found for charge ${chargeId} (sessionId=${sessionId ?? 'unknown'})`);
       // Still record idempotency and return 200 so Stripe doesn't retry indefinitely
-      await prisma.webhookEvent.create({ data: { stripeEventId: event.id } });
+      await prisma.webhookEvent.create({
+        data: { stripeEventId: event.id, eventType: event.type, status: 'processed' },
+      });
       res.json({ received: true });
       return;
     }
@@ -240,12 +353,26 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
           data: { status: 'DISPUTED' },
         }),
         prisma.webhookEvent.create({
-          data: { stripeEventId: event.id },
+          data: { stripeEventId: event.id, eventType: event.type, status: 'processed' },
         }),
       ]);
       console.log(`Payment ${payment.id} marked DISPUTED (charge ${chargeId}, dispute ${dispute.id})`);
     } catch (err) {
       console.error('Webhook dispute: DB update failed:', err);
+      // Dead letter
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: `${event.id}:${Date.now()}`,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: err instanceof Error ? err.message : String(err),
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook dispute: dead letter write also failed:', dlErr);
+      }
       res.status(500).json({ error: 'DB update failed' });
       return;
     }
