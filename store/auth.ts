@@ -32,7 +32,7 @@ type AuthAction =
 
 interface AuthContextValue extends AuthState {
   requestOtp: (email: string) => Promise<void>;
-  verifyOtp: (email: string, code: string) => Promise<{ needsOnboarding: boolean }>;
+  verifyOtp: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
   loadUser: () => Promise<void>;
 }
@@ -63,7 +63,7 @@ const initialState: AuthState = {
 export const AuthContext = createContext<AuthContextValue>({
   ...initialState,
   requestOtp: async () => {},
-  verifyOtp: async () => ({ needsOnboarding: false }),
+  verifyOtp: async () => {},
   logout: async () => {},
   loadUser: async () => {},
 });
@@ -106,13 +106,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifyOtp = useCallback(async (email: string, code: string) => {
     const res = await api.post('/auth/verify-code', { email, code });
-    const { token, refreshToken, user, isNewUser, onboardingCompleted } = res.data;
+    const { token, refreshToken, user } = res.data;
     await saveTokens(token, refreshToken);
     dispatch({ type: 'SET_TOKEN', payload: token });
     dispatch({ type: 'SET_USER', payload: user });
-    // New user or user who hasn't completed onboarding → needs quiz
-    const needsOnboarding = isNewUser || onboardingCompleted === false;
-    return { needsOnboarding };
   }, []);
 
   const logout = useCallback(async () => {

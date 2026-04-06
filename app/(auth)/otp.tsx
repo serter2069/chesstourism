@@ -69,12 +69,8 @@ export default function OtpScreen() {
     setError('');
     setLoading(true);
     try {
-      const { needsOnboarding } = await verifyOtp(email, code);
-      if (needsOnboarding) {
-        router.replace('/(onboarding)/quiz');
-      } else {
-        router.replace('/');
-      }
+      await verifyOtp(email, code);
+      router.replace('/');
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Invalid code. Please try again.';
       setError(msg);
