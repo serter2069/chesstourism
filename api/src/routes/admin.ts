@@ -414,7 +414,7 @@ router.get('/finances', async (req: AuthRequest, res: Response) => {
     // Status filter
     if (req.query.status) {
       const status = (req.query.status as string).toUpperCase();
-      if (['PENDING', 'PAID', 'FAILED', 'REFUNDED'].includes(status)) {
+      if (['PENDING', 'PAID', 'FAILED', 'REFUNDED', 'DISPUTED'].includes(status)) {
         where.status = status;
       }
     }
