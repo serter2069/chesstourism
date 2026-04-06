@@ -32,6 +32,10 @@ export const Colors = {
   eloPositive: '#1A7A3A',
   eloNegative: '#C0392B',
 
+  // Medal colors
+  silver: '#9EA3A8',
+  bronze: '#CD7F32',
+
 } as const
 
 export type Color = keyof typeof Colors
