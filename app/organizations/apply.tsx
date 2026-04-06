@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
 import { Button, Card, Input } from '../../components/ui';
 import { Colors } from '../../constants/colors';
@@ -31,6 +32,7 @@ const initialForm: FormData = {
 };
 
 export default function OrganizationApplyScreen() {
+  const router = useRouter();
   const [form, setForm] = useState<FormData>(initialForm);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -94,11 +96,17 @@ export default function OrganizationApplyScreen() {
         <Header title="Organization Application" showBack />
         <View style={styles.successContainer}>
           <Card style={styles.successCard}>
-            <Text style={styles.successIcon}>{'[OK]'}</Text>
+            <Text style={styles.successIcon}>✓</Text>
             <Text style={styles.successTitle}>Application Submitted!</Text>
             <Text style={styles.successText}>
               Your application has been submitted. We will contact you within 3 business days.
             </Text>
+            <Button
+              title="Back to Home"
+              onPress={() => router.replace('/')}
+              variant="secondary"
+              style={styles.successBtn}
+            />
           </Card>
         </View>
       </SafeContainer>
@@ -249,5 +257,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
     paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.xl,
+  },
+  successBtn: {
+    alignSelf: 'stretch',
   },
 });
