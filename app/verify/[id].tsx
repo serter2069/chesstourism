@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     maxWidth: 430,
     width: '100%',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   badgeTextValid: {
-    color: '#1A7A3A',
+    color: Colors.eloPositive,
   },
   badgeTextRevoked: {
     color: Colors.error,

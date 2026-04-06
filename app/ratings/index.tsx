@@ -57,8 +57,8 @@ interface Pagination {
 // Medal colors for top-3
 const MEDAL_COLORS: Record<number, string> = {
   1: Colors.gold,   // gold
-  2: '#9EA3A8',             // silver
-  3: '#CD7F32',             // bronze
+  2: Colors.silver,         // silver
+  3: Colors.bronze,         // bronze
 };
 
 function TitleBadge({ title }: { title: string }) {
