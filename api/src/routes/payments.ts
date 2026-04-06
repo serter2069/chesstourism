@@ -2,6 +2,7 @@ import { Router, Response, Request } from 'express';
 import Stripe from 'stripe';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
+import { createNotification } from '../utils/notifications';
 
 const router = Router();
 
@@ -186,6 +187,95 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       // Return 500 so Stripe retries
       res.status(500).json({ error: 'DB update failed' });
       return;
+    }
+  } else if (event.type === 'charge.dispute.created') {
+    const dispute = event.data.object as Stripe.Dispute;
+    const chargeId = dispute.charge as string;
+
+    // Idempotency check
+    const alreadyProcessed = await prisma.webhookEvent.findUnique({
+      where: { stripeEventId: event.id },
+    });
+    if (alreadyProcessed) {
+      console.log(`Webhook: duplicate dispute event ${event.id}, skipping`);
+      res.json({ received: true });
+      return;
+    }
+
+    // Resolve charge → payment_intent → checkout session → our Payment record
+    // Done OUTSIDE any DB transaction as these are Stripe API calls
+    let sessionId: string | null = null;
+    try {
+      const charge = await stripe.charges.retrieve(chargeId);
+      const paymentIntentId = charge.payment_intent as string | null;
+      if (paymentIntentId) {
+        const sessions = await stripe.checkout.sessions.list({ payment_intent: paymentIntentId, limit: 1 });
+        if (sessions.data.length > 0) {
+          sessionId = sessions.data[0].id;
+        }
+      }
+    } catch (err) {
+      console.error(`Webhook dispute: failed to resolve charge ${chargeId} to session:`, err);
+      // Don't fail — mark event processed and continue
+    }
+
+    // Find payment by session ID (externalId)
+    const payment = sessionId
+      ? await prisma.payment.findFirst({ where: { externalId: sessionId } })
+      : null;
+
+    if (!payment) {
+      console.warn(`Webhook dispute: no payment found for charge ${chargeId} (sessionId=${sessionId ?? 'unknown'})`);
+      // Still record idempotency and return 200 so Stripe doesn't retry indefinitely
+      await prisma.webhookEvent.create({ data: { stripeEventId: event.id } });
+      res.json({ received: true });
+      return;
+    }
+
+    // Update payment status and record event atomically
+    try {
+      await prisma.$transaction([
+        prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'DISPUTED' },
+        }),
+        prisma.webhookEvent.create({
+          data: { stripeEventId: event.id },
+        }),
+      ]);
+      console.log(`Payment ${payment.id} marked DISPUTED (charge ${chargeId}, dispute ${dispute.id})`);
+    } catch (err) {
+      console.error('Webhook dispute: DB update failed:', err);
+      res.status(500).json({ error: 'DB update failed' });
+      return;
+    }
+
+    // Notify all admins (fire-and-forget — must not fail the webhook response)
+    try {
+      const admins = await prisma.user.findMany({
+        where: { role: 'ADMIN' },
+        select: { id: true },
+      });
+      await Promise.all(
+        admins.map((admin) =>
+          createNotification(
+            admin.id,
+            'PAYMENT_DISPUTED',
+            'Payment Disputed',
+            `A chargeback dispute was opened for payment #${payment.id} (amount: ${payment.amount} ${payment.currency}). Dispute ID: ${dispute.id}.`,
+            {
+              paymentId: payment.id,
+              disputeId: dispute.id,
+              chargeId,
+              amount: payment.amount,
+              currency: payment.currency,
+              reason: dispute.reason,
+            },
+          ),
+        ),
+      );
+    } catch (err) {
+      console.error('Webhook dispute: failed to create admin notifications:', err);
     }
   }
 
