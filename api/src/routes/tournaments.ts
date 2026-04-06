@@ -572,38 +572,6 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
   }
 });
 
-// DELETE /api/tournaments/:id/register — cancel own registration
-router.delete('/tournaments/:id/register', authenticate, async (req: AuthRequest, res: Response) => {
-  try {
-    const tournamentId = req.params.id;
-    const userId = req.user!.userId;
-
-    const registration = await prisma.tournamentRegistration.findUnique({
-      where: { tournamentId_userId: { tournamentId, userId } },
-    });
-
-    if (!registration) {
-      res.status(404).json({ error: 'Registration not found' });
-      return;
-    }
-
-    // Only allow cancelling PENDING registrations
-    if (registration.status !== 'PENDING') {
-      res.status(400).json({ error: 'Can only cancel pending registrations' });
-      return;
-    }
-
-    await prisma.tournamentRegistration.delete({
-      where: { id: registration.id },
-    });
-
-    res.json({ message: 'Registration cancelled' });
-  } catch (err) {
-    console.error('Cancel registration error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 // GET /api/my-registrations — participant's own registrations
 router.get('/my-registrations', authenticate, async (req: AuthRequest, res: Response) => {
   try {
