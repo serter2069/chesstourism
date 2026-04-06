@@ -266,4 +266,8 @@ model WebhookEvent {
   id            String   @id @default(cuid())
   stripeEventId String   @unique
   processedAt   DateTime @default(now())
+  eventType     String?
+  status        String   @default("processed")
+  errorMessage  String?
+  rawRef        String?  // stores "eventId:eventType" for dead letter tracing
 }
