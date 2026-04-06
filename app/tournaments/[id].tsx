@@ -393,7 +393,7 @@ export default function TournamentDetailScreen() {
           {!user && ['PUBLISHED', 'REGISTRATION_OPEN'].includes(tournament.status) && (
             <Button
               title="Sign In to Register"
-              onPress={() => router.push('/(auth)/login')}
+              onPress={() => router.push({ pathname: '/(auth)/login', params: { returnUrl: `/tournaments/${tournament.id}` } } as any)}
             />
           )}
           {canRegister && (

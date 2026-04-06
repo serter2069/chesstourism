@@ -22,7 +22,7 @@ const RESEND_COOLDOWN_SEC = 60;
 
 export default function OtpScreen() {
   const router = useRouter();
-  const { email } = useLocalSearchParams<{ email: string }>();
+  const { email, returnUrl } = useLocalSearchParams<{ email: string; returnUrl?: string }>();
   const { verifyOtp, requestOtp } = useAuth();
 
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
@@ -70,7 +70,7 @@ export default function OtpScreen() {
     setLoading(true);
     try {
       await verifyOtp(email, code);
-      router.replace('/');
+      router.replace((returnUrl || '/') as any);
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Invalid code. Please try again.';
       setError(msg);
