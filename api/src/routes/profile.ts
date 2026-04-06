@@ -1,9 +1,72 @@
 import { Router, Response } from 'express';
+import multer from 'multer';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { generateMembershipCertificate } from '../services/pdf.service';
 import { signDownloadToken } from '../utils/jwt';
+import { uploadAvatar } from '../services/storage.service';
+
 const router = Router();
+
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+const avatarUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPEG, PNG, and WebP images are allowed'));
+    }
+  },
+});
+
+// POST /api/profile/avatar — upload user avatar image
+router.post('/avatar', authenticate, (req: AuthRequest, res: Response) => {
+  avatarUpload.single('avatar')(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        res.status(400).json({ error: 'File too large. Maximum size is 5MB' });
+        return;
+      }
+      res.status(400).json({ error: err.message });
+      return;
+    } else if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: 'No file uploaded. Use field name "avatar"' });
+        return;
+      }
+
+      const userId = req.user!.userId;
+      const photoUrl = await uploadAvatar(req.file.buffer, req.file.originalname, req.file.mimetype);
+
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { photoUrl },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          surname: true,
+          role: true,
+          photoUrl: true,
+        },
+      });
+
+      res.json({ ok: true, user });
+    } catch (uploadErr: any) {
+      console.error('Avatar upload error:', uploadErr);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+});
 
 // POST /api/profile/preferences — save onboarding quiz answers
 router.post('/preferences', authenticate, async (req: AuthRequest, res: Response) => {
