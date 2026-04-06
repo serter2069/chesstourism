@@ -178,6 +178,60 @@ export async function sendOrganizationRequestDecision(
   });
 }
 
+export async function sendScheduleChangeEmail(
+  to: string,
+  userName: string,
+  tournament: {
+    id: string;
+    title: string;
+    city: string;
+    country: string;
+    startDate: Date;
+    endDate: Date;
+  },
+): Promise<void> {
+  const startFormatted = tournament.startDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const endFormatted = tournament.endDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const tournamentUrl = `${BASE_URL}/tournaments/${tournament.id}`;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `Schedule update: ${tournament.title}`,
+    htmlContent: `
+      <h2>Tournament Schedule Updated</h2>
+      <p>Dear ${userName},</p>
+      <p>The schedule for <strong>${tournament.title}</strong> has been updated.</p>
+      <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Location:</td>
+          <td>${tournament.city}, ${tournament.country}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Starts:</td>
+          <td>${startFormatted}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Ends:</td>
+          <td>${endFormatted}</td>
+        </tr>
+      </table>
+      <p><a href="${tournamentUrl}">View tournament details</a></p>
+      <p>Best regards,<br/>ChesTourism Team</p>
+    `,
+  });
+}
+
 export async function sendResultsWithCertificate(
   to: string,
   userName: string,
