@@ -174,7 +174,7 @@ export async function verifyOtp(email: string, code: string) {
   let isNewUser = false;
   if (!user) {
     user = await prisma.user.create({
-      data: { email, role: Role.PARTICIPANT },
+      data: { email, role: Role.PARTICIPANT, onboardingCompleted: true },
       include: { commissioner: true },
     });
     isNewUser = true;
