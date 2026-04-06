@@ -1,24 +1,44 @@
-import nodemailer from 'nodemailer';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'localhost',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || '',
-  },
-});
-
-const FROM_EMAIL = process.env.SMTP_FROM || 'noreply@chesstourism.com';
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
+const FROM_EMAIL = 'noreply@diagrams.love';
+const FROM_NAME = 'ChesTourism';
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8081';
 
+interface BrevoAttachment {
+  name: string;
+  content: string; // base64
+}
+
+interface BrevoPayload {
+  sender: { name: string; email: string };
+  to: Array<{ email: string }>;
+  subject: string;
+  htmlContent: string;
+  attachment?: BrevoAttachment[];
+}
+
+async function brevoSend(payload: BrevoPayload): Promise<void> {
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': BREVO_API_KEY,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Brevo API error ${response.status}: ${body}`);
+  }
+}
+
 export async function sendOtpEmail(email: string, code: string): Promise<void> {
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to: email,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email }],
     subject: 'Your ChesTourism login code',
-    html: `
+    htmlContent: `
       <h2>Your Login Code</h2>
       <p>Use the code below to sign in to ChesTourism:</p>
       <p style="font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center;">${code}</p>
@@ -35,11 +55,11 @@ export async function sendTournamentInvite(
   tournamentDate: string,
   registrationUrl: string,
 ): Promise<void> {
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
     subject: `You're invited to ${tournamentName}!`,
-    html: `
+    htmlContent: `
       <h2>Tournament Invitation</h2>
       <p>Dear ${userName},</p>
       <p>You are invited to participate in <strong>${tournamentName}</strong>!</p>
@@ -62,11 +82,11 @@ export async function sendCommissarApproval(
     ? 'Your commissar application has been approved!'
     : 'Update on your commissar application';
 
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
     subject,
-    html: `
+    htmlContent: `
       <h2>Commissar Application ${status}</h2>
       <p>Dear ${userName},</p>
       <p>Your commissar application has been <strong>${status.toLowerCase()}</strong>.</p>
@@ -91,11 +111,11 @@ export async function sendTournamentResults(
   const placeText = placeLabels[place] || `${place}th`;
   const eloText = eloChange >= 0 ? `+${eloChange}` : `${eloChange}`;
 
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
     subject: `Tournament Results: ${tournamentName}`,
-    html: `
+    htmlContent: `
       <h2>Tournament Results</h2>
       <p>Dear ${userName},</p>
       <p>The results for <strong>${tournamentName}</strong> are in!</p>
@@ -112,11 +132,11 @@ export async function sendThankYouEmail(
   userName: string,
   tournamentName: string,
 ): Promise<void> {
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
     subject: `Thank you for participating in ${tournamentName}!`,
-    html: `
+    htmlContent: `
       <h2>Thank You!</h2>
       <p>Dear ${userName},</p>
       <p>Thank you for participating in <strong>${tournamentName}</strong>!</p>
@@ -140,11 +160,11 @@ export async function sendOrganizationRequestDecision(
     ? `Your organization "${organizationName}" has been approved!`
     : `Update on your organization request for "${organizationName}"`;
 
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
     subject,
-    html: `
+    htmlContent: `
       <h2>Organization Request ${status}</h2>
       <p>Dear ${contactName},</p>
       <p>Your request to register <strong>${organizationName}</strong> on ChesTourism has been <strong>${status.toLowerCase()}</strong>.</p>
@@ -170,22 +190,21 @@ export async function sendResultsWithCertificate(
   const placeText = placeLabels[place] || `${place}th`;
   const eloText = eloChange >= 0 ? `+${eloChange}` : `${eloChange}`;
 
-  await transporter.sendMail({
-    from: FROM_EMAIL,
-    to,
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
     subject: `Congratulations! ${placeText} Place in ${tournamentName}`,
-    html: `
+    htmlContent: `
       <h2>Congratulations, ${userName}!</h2>
       <p>You achieved <strong>${placeText} place</strong> in <strong>${tournamentName}</strong>!</p>
       <p>ELO change: <strong>${eloText}</strong></p>
       <p>Your certificate of achievement is attached to this email.</p>
       <p>Best regards,<br/>ChesTourism Team</p>
     `,
-    attachments: [
+    attachment: [
       {
-        filename: `certificate-${tournamentName.replace(/\s+/g, '-')}-${placeText}.pdf`,
-        content: certificatePdf,
-        contentType: 'application/pdf',
+        name: `certificate-${tournamentName.replace(/\s+/g, '-')}-${placeText}.pdf`,
+        content: certificatePdf.toString('base64'),
       },
     ],
   });
