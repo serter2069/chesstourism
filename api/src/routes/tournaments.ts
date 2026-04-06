@@ -189,8 +189,10 @@ router.get('/tournaments/:id', async (req: Request, res: Response) => {
       ratingChange: r.eloChange,
     }));
 
+    // Exclude raw registrations and results from spread to prevent PII leak
+    const { registrations: _reg, results: _res, ...tournamentData } = tournament;
     res.json({
-      ...tournament,
+      ...tournamentData,
       registrationCount: tournament._count.registrations,
       participants,
       results,
