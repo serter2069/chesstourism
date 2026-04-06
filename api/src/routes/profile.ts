@@ -4,23 +4,15 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { generateMembershipCertificate } from '../services/pdf.service';
 import { signDownloadToken } from '../utils/jwt';
-import { uploadAvatar } from '../services/storage.service';
+import { validateAndUpload, UploadValidationError } from '../services/storage.service';
 
 const router = Router();
 
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
+// Accept up to 20MB at the multer layer (largest allowed category is document/PDF).
+// Fine-grained type + size validation is handled inside validateAndUpload().
 const avatarUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: MAX_FILE_SIZE },
-  fileFilter: (_req, file, cb) => {
-    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only JPEG, PNG, and WebP images are allowed'));
-    }
-  },
+  limits: { fileSize: 20 * 1024 * 1024 },
 });
 
 // POST /api/profile/avatar — upload user avatar image
@@ -28,7 +20,7 @@ router.post('/avatar', authenticate, (req: AuthRequest, res: Response) => {
   avatarUpload.single('avatar')(req, res, async (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
-        res.status(400).json({ error: 'File too large. Maximum size is 5MB' });
+        res.status(400).json({ error: 'File too large. Maximum size is 20MB' });
         return;
       }
       res.status(400).json({ error: err.message });
@@ -45,7 +37,12 @@ router.post('/avatar', authenticate, (req: AuthRequest, res: Response) => {
       }
 
       const userId = req.user!.userId;
-      const photoUrl = await uploadAvatar(req.file.buffer, req.file.originalname, req.file.mimetype);
+      const photoUrl = await validateAndUpload(
+        req.file.buffer,
+        req.file.mimetype,
+        req.file.originalname,
+        'avatar',
+      );
 
       const user = await prisma.user.update({
         where: { id: userId },
@@ -62,6 +59,10 @@ router.post('/avatar', authenticate, (req: AuthRequest, res: Response) => {
 
       res.json({ ok: true, user });
     } catch (uploadErr: any) {
+      if (uploadErr instanceof UploadValidationError) {
+        res.status(400).json({ error: uploadErr.message });
+        return;
+      }
       console.error('Avatar upload error:', uploadErr);
       res.status(500).json({ error: 'Internal server error' });
     }
