@@ -156,6 +156,16 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       return;
     }
 
+    // Idempotency check — Stripe retries webhooks; skip if already processed
+    const alreadyProcessed = await prisma.webhookEvent.findUnique({
+      where: { stripeEventId: event.id },
+    });
+    if (alreadyProcessed) {
+      console.log(`Webhook: duplicate event ${event.id}, skipping`);
+      res.json({ received: true });
+      return;
+    }
+
     try {
       await prisma.$transaction([
         prisma.payment.updateMany({
@@ -165,6 +175,9 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
         prisma.tournamentRegistration.update({
           where: { tournamentId_userId: { tournamentId, userId } },
           data: { status: 'PAID' },
+        }),
+        prisma.webhookEvent.create({
+          data: { stripeEventId: event.id },
         }),
       ]);
       console.log(`Payment confirmed for user ${userId}, tournament ${tournamentId}`);
