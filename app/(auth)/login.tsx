@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeContainer } from '../../components/layout';
 import { Button, Input } from '../../components/ui';
 import { Colors } from '../../constants/colors';
@@ -10,6 +10,7 @@ import { useAuth } from '../../store/auth';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { returnUrl } = useLocalSearchParams<{ returnUrl?: string }>();
   const { requestOtp } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await requestOtp(email.trim().toLowerCase());
-      router.push({ pathname: '/(auth)/otp', params: { email: email.trim().toLowerCase() } });
+      router.push({ pathname: '/(auth)/otp', params: { email: email.trim().toLowerCase(), returnUrl: returnUrl || '' } });
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Failed to send code. Please try again.';
       setError(msg);
