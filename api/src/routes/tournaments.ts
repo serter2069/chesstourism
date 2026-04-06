@@ -4,6 +4,7 @@ import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
 import { generateParticipationCertificate } from '../services/pdf.service';
+import { sendThankYouEmail } from '../services/email.service';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -562,10 +563,56 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
       return;
     }
 
-    const registration = await prisma.tournamentRegistration.create({
-      data: { tournamentId, userId, status: 'PENDING' },
-      select: { id: true, status: true, createdAt: true },
-    });
+    const isFree = (tournament.fee ?? 0) === 0;
+
+    let registration: { id: string; status: string; createdAt: Date };
+
+    if (isFree) {
+      // Free tournament: create registration + payment in one transaction, set both to PAID
+      const result = await prisma.$transaction(async (tx) => {
+        const reg = await tx.tournamentRegistration.create({
+          data: { tournamentId, userId, status: 'PAID' },
+          select: { id: true, status: true, createdAt: true },
+        });
+
+        const payment = await tx.payment.create({
+          data: {
+            userId,
+            tournamentId,
+            amount: 0,
+            currency: tournament.currency,
+            status: 'PAID',
+          },
+        });
+
+        await tx.tournamentRegistration.update({
+          where: { id: reg.id },
+          data: { paymentId: payment.id },
+        });
+
+        return reg;
+      });
+
+      registration = result;
+
+      // Fire-and-forget thank-you email after transaction commit
+      (async () => {
+        try {
+          const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
+          if (user) {
+            await sendThankYouEmail(user.email, user.name ?? user.email, tournament.title);
+          }
+        } catch (e) {
+          console.error('sendThankYouEmail error (free registration):', e);
+        }
+      })();
+    } else {
+      // Paid tournament: registration starts as PENDING, awaiting payment
+      registration = await prisma.tournamentRegistration.create({
+        data: { tournamentId, userId, status: 'PENDING' },
+        select: { id: true, status: true, createdAt: true },
+      });
+    }
 
     res.status(201).json(registration);
   } catch (err) {
@@ -669,6 +716,7 @@ router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('C
 
     const registration = await prisma.tournamentRegistration.findFirst({
       where: { id: req.params.regId, tournamentId: req.params.id },
+      include: { payment: true },
     });
 
     if (!registration) {
@@ -676,15 +724,60 @@ router.put('/tournaments/:id/registrations/:regId', authenticate, requireRole('C
       return;
     }
 
-    const updated = await prisma.tournamentRegistration.update({
-      where: { id: req.params.regId },
-      data: { status },
-      include: {
-        user: { select: { id: true, name: true, email: true, rating: true, city: true } },
-      },
-    });
+    const isFree = (tournament.fee ?? 0) === 0;
 
-    // Send in-app notification when registration is approved or rejected
+    // For free tournaments: APPROVED → auto-upgrade to PAID (skip Stripe)
+    const effectiveStatus = (status === 'APPROVED' && isFree) ? 'PAID' : status;
+
+    let updated;
+
+    if (effectiveStatus === 'PAID' && isFree) {
+      // Free tournament approve: set status PAID and ensure Payment record exists
+      updated = await prisma.$transaction(async (tx) => {
+        if (!registration.payment) {
+          // No payment yet — create one
+          const payment = await tx.payment.create({
+            data: {
+              userId: registration.userId,
+              tournamentId: tournament.id,
+              amount: 0,
+              currency: tournament.currency,
+              status: 'PAID',
+            },
+          });
+          return tx.tournamentRegistration.update({
+            where: { id: req.params.regId },
+            data: { status: 'PAID', paymentId: payment.id },
+            include: {
+              user: { select: { id: true, name: true, email: true, rating: true, city: true } },
+            },
+          });
+        } else if (registration.payment.status !== 'PAID') {
+          // Payment exists but not yet PAID — update it
+          await tx.payment.update({
+            where: { id: registration.payment.id },
+            data: { status: 'PAID' },
+          });
+        }
+        return tx.tournamentRegistration.update({
+          where: { id: req.params.regId },
+          data: { status: 'PAID' },
+          include: {
+            user: { select: { id: true, name: true, email: true, rating: true, city: true } },
+          },
+        });
+      });
+    } else {
+      updated = await prisma.tournamentRegistration.update({
+        where: { id: req.params.regId },
+        data: { status: effectiveStatus },
+        include: {
+          user: { select: { id: true, name: true, email: true, rating: true, city: true } },
+        },
+      });
+    }
+
+    // Send in-app notification when registration is approved/paid or rejected
     if (status === 'APPROVED') {
       await createNotification(
         registration.userId,
