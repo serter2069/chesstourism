@@ -6,19 +6,12 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeContainer, Header } from '../../../components/layout';
-import { Button, Input, Badge } from '../../../components/ui';
+import { Button, Input } from '../../../components/ui';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 import { useAuth } from '../../../store/auth';
 import api from '../../../lib/api';
-
-interface FideLookupResult {
-  name: string | null;
-  rating: number | null;
-  country: string | null;
-  title: string | null;
-}
 
 const TITLE_LABELS: Record<string, string> = {
   GM: 'Grandmaster',
@@ -35,12 +28,15 @@ export default function ProfileScreen() {
   const { user, loadUser } = useAuth();
 
   const [fideId, setFideId] = useState(user?.fideId || '');
-  const [lookupResult, setLookupResult] = useState<FideLookupResult | null>(null);
-  const [lookupLoading, setLookupLoading] = useState(false);
+  const [fideRating, setFideRating] = useState(
+    user?.fideRating ? String(user.fideRating) : ''
+  );
+  const [fideTitle, setFideTitle] = useState(user?.fideTitle || '');
   const [saveLoading, setSaveLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  async function handleLookup() {
+
+  async function handleSave() {
     const cleanId = fideId.trim();
     if (!cleanId) {
       setError('Please enter a FIDE ID');
@@ -53,36 +49,19 @@ export default function ProfileScreen() {
 
     setError(null);
     setSuccess(null);
-    setLookupResult(null);
-    setLookupLoading(true);
-
-    try {
-      const res = await api.post('/profile/fide-lookup', { fideId: cleanId });
-      setLookupResult(res.data);
-    } catch (err: any) {
-      const msg = err?.response?.data?.error || 'FIDE ID not found';
-      setError(msg);
-    } finally {
-      setLookupLoading(false);
-    }
-  }
-
-  async function handleSave() {
-    if (!lookupResult) return;
-
-    setError(null);
-    setSuccess(null);
     setSaveLoading(true);
+
+    const parsedRating = parseInt(fideRating.trim(), 10);
+    const cleanTitle = fideTitle.trim().toUpperCase();
 
     try {
       await api.put('/profile/fide', {
-        fideId: fideId.trim(),
-        fideRating: lookupResult.rating,
-        fideTitle: lookupResult.title,
+        fideId: cleanId,
+        fideRating: isNaN(parsedRating) ? undefined : parsedRating,
+        fideTitle: cleanTitle || undefined,
       });
       await loadUser();
       setSuccess('FIDE profile saved successfully');
-      setLookupResult(null);
     } catch (err: any) {
       const msg = err?.response?.data?.error || 'Failed to save FIDE data';
       setError(msg);
@@ -124,13 +103,13 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* FIDE ID Lookup */}
+        {/* FIDE fields — text entry */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            {hasFide ? 'Update FIDE ID' : 'Link FIDE ID'}
+            {hasFide ? 'Update FIDE Profile' : 'Link FIDE Profile'}
           </Text>
           <Text style={styles.description}>
-            Enter your FIDE ID to verify your rating and title.
+            Enter your FIDE ID and rating manually.
             Find your ID at ratings.fide.com
           </Text>
 
@@ -141,71 +120,44 @@ export default function ProfileScreen() {
               setFideId(text.replace(/\D/g, ''));
               setError(null);
               setSuccess(null);
-              setLookupResult(null);
             }}
             placeholder="e.g. 4100018"
             keyboardType="numeric"
             maxLength={12}
           />
 
-          <Button
-            title="Verify"
-            onPress={handleLookup}
-            loading={lookupLoading}
-            disabled={!fideId.trim()}
-            variant="secondary"
+          <Input
+            label="FIDE Rating (optional)"
+            value={fideRating}
+            onChangeText={(text) => {
+              setFideRating(text.replace(/\D/g, ''));
+              setError(null);
+              setSuccess(null);
+            }}
+            placeholder="e.g. 2100"
+            keyboardType="numeric"
+            maxLength={4}
           />
 
-          {/* Lookup result */}
-          {lookupResult && (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultTitle}>Profile Found</Text>
+          <Input
+            label="FIDE Title (optional)"
+            value={fideTitle}
+            onChangeText={(text) => {
+              setFideTitle(text);
+              setError(null);
+              setSuccess(null);
+            }}
+            placeholder="e.g. GM, IM, FM, CM"
+            autoCapitalize="characters"
+            maxLength={3}
+          />
 
-              {lookupResult.name && (
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>Name</Text>
-                  <Text style={styles.resultValue}>{lookupResult.name}</Text>
-                </View>
-              )}
-
-              {lookupResult.rating && (
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>Rating</Text>
-                  <Text style={styles.resultValue}>{lookupResult.rating}</Text>
-                </View>
-              )}
-
-              {lookupResult.title && (
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>Title</Text>
-                  <View style={styles.titleBadgeWrap}>
-                    <Badge
-                      label={lookupResult.title}
-                      status="info"
-                    />
-                    <Text style={styles.titleFullName}>
-                      {TITLE_LABELS[lookupResult.title] || lookupResult.title}
-                    </Text>
-                  </View>
-                </View>
-              )}
-
-              {lookupResult.country && (
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>Country</Text>
-                  <Text style={styles.resultValue}>{lookupResult.country}</Text>
-                </View>
-              )}
-
-              <View style={styles.saveButtonWrap}>
-                <Button
-                  title="Save to Profile"
-                  onPress={handleSave}
-                  loading={saveLoading}
-                />
-              </View>
-            </View>
-          )}
+          <Button
+            title="Save FIDE Profile"
+            onPress={handleSave}
+            loading={saveLoading}
+            disabled={!fideId.trim()}
+          />
 
           {/* Error */}
           {error && (
@@ -292,50 +244,6 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.medium,
     color: Colors.text,
     marginTop: Spacing.xs,
-  },
-  // Lookup result
-  resultCard: {
-    marginTop: Spacing.lg,
-    backgroundColor: Colors.background,
-    borderRadius: 8,
-    padding: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  resultTitle: {
-    fontSize: Typography.sizes.base,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.primary,
-    marginBottom: Spacing.md,
-  },
-  resultRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  resultLabel: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textMuted,
-  },
-  resultValue: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.text,
-  },
-  titleBadgeWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  titleFullName: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textMuted,
-  },
-  saveButtonWrap: {
-    marginTop: Spacing.lg,
   },
   // Messages
   messageBox: {
