@@ -18,6 +18,7 @@ import adminRouter from './routes/admin';
 import notificationsRouter from './routes/notifications';
 import settingsRouter from './routes/settings';
 import verifyRouter from './routes/verify';
+import './lib/scheduleQueue'; // initialize BullMQ Worker for schedule-change email debounce
 
 dotenv.config();
 

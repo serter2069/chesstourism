@@ -5,6 +5,7 @@ import { createNotification } from '../utils/notifications';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
 import { generateParticipationCertificate } from '../services/pdf.service';
 import { sendThankYouEmail } from '../services/email.service';
+import { debounceScheduleEmail } from '../lib/scheduleQueue';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -336,6 +337,19 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
       data.endDate = end;
     }
 
+    // Detect if any schedule-relevant field actually changed (compare old vs new values)
+    const scheduleFields = ['startDate', 'endDate', 'title', 'city', 'country', 'fee'] as const;
+    const scheduleChanged = scheduleFields.some((field) => {
+      if (!(field in data)) return false;
+      const newVal = field === 'startDate' || field === 'endDate'
+        ? (data[field] as Date).getTime()
+        : data[field];
+      const oldVal = field === 'startDate' || field === 'endDate'
+        ? (tournament[field] as Date).getTime()
+        : tournament[field];
+      return newVal !== oldVal;
+    });
+
     const updated = await prisma.tournament.update({
       where: { id: req.params.id },
       data,
@@ -343,6 +357,13 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
         commissioner: { select: { id: true, userId: true } },
       },
     });
+
+    // Debounce schedule-change email notification (fire-and-forget, non-fatal)
+    if (scheduleChanged) {
+      debounceScheduleEmail(req.params.id).catch((err) =>
+        console.error('[tournaments] debounceScheduleEmail failed:', (err as Error).message),
+      );
+    }
 
     res.json(updated);
   } catch (err) {
