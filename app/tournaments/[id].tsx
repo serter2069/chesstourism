@@ -123,7 +123,6 @@ export default function TournamentDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [registering, setRegistering] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
   const [downloadingCertificate, setDownloadingCertificate] = useState(false);
 
   // Photos state
@@ -249,33 +248,6 @@ export default function TournamentDetailScreen() {
       setRegistering(false);
     }
   }, [id, user, tournament, fetchTournament, router]);
-
-  const handleCancelRegistration = useCallback(async () => {
-    if (!id) return;
-    Alert.alert(
-      'Cancel Registration',
-      'Are you sure you want to cancel your registration?',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes, Cancel',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setCancelling(true);
-              await api.delete(`/tournaments/${id}/register`);
-              await fetchTournament();
-            } catch (err: unknown) {
-              const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to cancel registration';
-              Alert.alert('Error', message);
-            } finally {
-              setCancelling(false);
-            }
-          },
-        },
-      ],
-    );
-  }, [id, fetchTournament]);
 
   const handleDownloadCertificate = useCallback(async () => {
     if (!id) return;
@@ -436,15 +408,7 @@ export default function TournamentDetailScreen() {
             <Badge label="Tournament Full" status="warning" style={styles.regStatusBadge} />
           )}
           {isRegistered && regStatus === 'PENDING' && (
-            <View style={styles.regStatusRow}>
-              <Badge label="Pending Approval" status="warning" style={styles.regStatusBadge} />
-              <Button
-                title="Cancel Registration"
-                onPress={handleCancelRegistration}
-                loading={cancelling}
-                variant="secondary"
-              />
-            </View>
+            <Badge label="Pending Approval" status="warning" style={styles.regStatusBadge} />
           )}
           {isRegistered && regStatus === 'APPROVED' && (
             <View style={styles.regStatusRow}>
