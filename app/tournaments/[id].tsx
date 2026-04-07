@@ -327,7 +327,7 @@ export default function TournamentDetailScreen() {
         await fetchTournament();
       }
     } catch (err: unknown) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Registration failed';
+      const message = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error || (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.message || 'Registration failed';
       Alert.alert('Error', message);
     } finally {
       setRegistering(false);

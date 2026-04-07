@@ -34,6 +34,7 @@ const allowedOrigins = [
   'https://chesstourism.smartlaunchhub.com',
   'http://localhost:8081',
   'http://localhost:3000',
+  'http://localhost:8203',
   'http://localhost:19006',
 ];
 

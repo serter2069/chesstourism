@@ -99,7 +99,8 @@ export default function CreateTournamentScreen() {
       }
     } catch (err: unknown) {
       const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.message ||
         'Failed to create tournament';
       Alert.alert('Error', message);
     } finally {
