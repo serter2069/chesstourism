@@ -2,6 +2,7 @@ import { calculateEloChanges, TournamentResultEntry } from './elo.service';
 import { generateCertificate } from './pdf.service';
 import { sendResultsWithCertificate } from './email.service';
 import prisma from '../lib/prisma';
+import { assertValidTransition } from '../utils/tournamentFsm';
 
 export interface ResultInput {
   userId: string;
@@ -101,6 +102,15 @@ export async function submitResults(
         where: { id: change.userId },
         data: { rating: change.eloAfter },
       });
+    }
+
+    // FSM guard: ensure IN_PROGRESS → COMPLETED is valid before writing
+    const { valid } = assertValidTransition(tournament.status, 'COMPLETED');
+    if (!valid) {
+      throw new AppError(
+        `Cannot transition tournament from ${tournament.status} to COMPLETED`,
+        400,
+      );
     }
 
     // Transition tournament to COMPLETED

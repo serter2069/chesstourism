@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
+import { assertValidTransition } from '../utils/tournamentFsm';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
 import { generateParticipationCertificate } from '../services/pdf.service';
 import { sendThankYouEmail, sendTournamentCancelledEmail } from '../services/email.service';
@@ -407,20 +408,10 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
       return;
     }
 
-    // FSM: valid tournament status transitions
-    const VALID_TRANSITIONS: Record<string, string[]> = {
-      DRAFT: ['PUBLISHED', 'CANCELLED'],
-      PUBLISHED: ['REGISTRATION_OPEN', 'CANCELLED'],
-      REGISTRATION_OPEN: ['REGISTRATION_CLOSED', 'CANCELLED'],
-      REGISTRATION_CLOSED: ['IN_PROGRESS', 'CANCELLED'],
-      IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
-      COMPLETED: [],
-      CANCELLED: [],
-    };
-
-    const allowed = VALID_TRANSITIONS[tournament.status] || [];
-    if (!allowed.includes(newStatus)) {
-      res.status(422).json({
+    // FSM: validate tournament status transition
+    const { valid, allowed } = assertValidTransition(tournament.status, newStatus);
+    if (!valid) {
+      res.status(400).json({
         error: `Invalid status transition: ${tournament.status} → ${newStatus}`,
         allowed,
       });
