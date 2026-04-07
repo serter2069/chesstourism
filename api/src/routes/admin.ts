@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import prisma from '../lib/prisma';
-import { sendOrganizationRequestDecision } from '../services/email.service';
+import { enqueueEmail } from '../lib/emailQueue';
 
 const router = Router();
 
@@ -231,13 +231,12 @@ router.patch('/organization-requests/:id/approve', async (req: AuthRequest, res:
       data: { status: 'APPROVED' },
     });
 
-    // Send email notification (fire and forget)
-    sendOrganizationRequestDecision(
-      existing.email,
-      existing.contactName,
-      existing.organizationName,
-      true,
-    ).catch((err) => console.error('Failed to send org request approval email:', err));
+    // Enqueue email notification (fire and forget, with retry)
+    enqueueEmail('organization_request_decision', existing.email, {
+      contactName: existing.contactName,
+      organizationName: existing.organizationName,
+      approved: true,
+    }).catch((err) => console.error('Failed to enqueue org request approval email:', err));
 
     res.json(updated);
   } catch (err) {
@@ -268,14 +267,13 @@ router.patch('/organization-requests/:id/reject', async (req: AuthRequest, res: 
       data: { status: 'REJECTED' },
     });
 
-    // Send email notification (fire and forget)
-    sendOrganizationRequestDecision(
-      existing.email,
-      existing.contactName,
-      existing.organizationName,
-      false,
+    // Enqueue email notification (fire and forget, with retry)
+    enqueueEmail('organization_request_decision', existing.email, {
+      contactName: existing.contactName,
+      organizationName: existing.organizationName,
+      approved: false,
       reason,
-    ).catch((err) => console.error('Failed to send org request rejection email:', err));
+    }).catch((err) => console.error('Failed to enqueue org request rejection email:', err));
 
     res.json({ ...updated, rejectionReason: reason || null });
   } catch (err) {

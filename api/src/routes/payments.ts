@@ -3,7 +3,8 @@ import Stripe from 'stripe';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { createNotification } from '../utils/notifications';
-import { sendDisputeAlertEmail, sendPaymentConfirmedEmail } from '../services/email.service';
+import { sendDisputeAlertEmail } from '../services/email.service';
+import { enqueueEmail } from '../lib/emailQueue';
 
 const router = Router();
 
@@ -204,12 +205,16 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
             prisma.tournament.findUnique({ where: { id: tournamentId }, select: { title: true } }),
           ]);
           if (user?.email && tournament?.title) {
-            await sendPaymentConfirmedEmail(user.email, user.name ?? 'Player', tournament.title, tournamentId);
+            await enqueueEmail('payment_confirmed', user.email, {
+              userName: user.name ?? 'Player',
+              tournamentTitle: tournament.title,
+              tournamentId,
+            });
           } else {
             console.warn(`Webhook: skipping payment confirmed email — missing user email or tournament title (userId=${userId}, tournamentId=${tournamentId})`);
           }
         } catch (emailErr) {
-          console.error('Webhook: failed to send payment confirmed email:', emailErr);
+          console.error('Webhook: failed to enqueue payment confirmed email:', emailErr);
         }
       })();
     } catch (err) {
