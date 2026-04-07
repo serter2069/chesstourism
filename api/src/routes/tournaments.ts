@@ -72,6 +72,20 @@ router.get('/tournaments', async (req: Request, res: Response) => {
       where.timeControl = (req.query.timeControl as string).toLowerCase();
     }
 
+    // Price filter: ?feeMax=0 → free only; ?feeMin=X and/or ?feeMax=Y → range
+    if (req.query.feeMax !== undefined || req.query.feeMin !== undefined) {
+      const feeFilter: Record<string, number> = {};
+      if (req.query.feeMax !== undefined) {
+        const feeMax = parseFloat(req.query.feeMax as string);
+        if (!isNaN(feeMax)) feeFilter.lte = feeMax;
+      }
+      if (req.query.feeMin !== undefined) {
+        const feeMin = parseFloat(req.query.feeMin as string);
+        if (!isNaN(feeMin)) feeFilter.gte = feeMin;
+      }
+      if (Object.keys(feeFilter).length > 0) where.fee = feeFilter;
+    }
+
     const [tournaments, total] = await Promise.all([
       prisma.tournament.findMany({
         where,
