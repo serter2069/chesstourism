@@ -50,6 +50,19 @@ interface Participant {
   surname?: string;
 }
 
+interface TournamentCommissioner {
+  id: string;
+  userId: string;
+  role: 'LEAD' | 'ASSISTANT';
+  assignedAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    surname: string | null;
+    email: string;
+  };
+}
+
 const FORMAT_OPTIONS = ['CLASSICAL', 'RAPID', 'BLITZ'] as const;
 
 const STATUS_TRANSITIONS: Record<string, { label: string; nextStatus: string } | null> = {
@@ -103,9 +116,10 @@ export default function EditTournamentScreen() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [tRes, pRes] = await Promise.all([
+      const [tRes, pRes, commRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
         api.get(`/tournaments/${id}/registrations`).catch(() => ({ data: [] })),
+        api.get(`/tournaments/${id}/commissioners`).catch(() => ({ data: [] })),
       ]);
 
       const t: Tournament = tRes.data;
@@ -131,6 +145,7 @@ export default function EditTournamentScreen() {
 
       const pData = pRes.data;
       setParticipants(Array.isArray(pData) ? pData : pData.items || pData.participants || []);
+      setCommissioners(Array.isArray(commRes.data) ? commRes.data : []);
     } catch {
       Alert.alert('Error', 'Failed to load tournament');
     } finally {
@@ -203,6 +218,57 @@ export default function EditTournamentScreen() {
     }
   }
 
+  async function handleAddCommissioner() {
+    if (!newCommUserId.trim()) {
+      Alert.alert('Error', 'Please enter a User ID');
+      return;
+    }
+    try {
+      setAddingComm(true);
+      await api.post(`/tournaments/${id}/commissioners`, {
+        userId: newCommUserId.trim(),
+        role: newCommRole,
+      });
+      setNewCommUserId('');
+      fetchData();
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
+        'Failed to add commissioner';
+      Alert.alert('Error', message);
+    } finally {
+      setAddingComm(false);
+    }
+  }
+
+  async function handleRemoveCommissioner(targetUserId: string) {
+    Alert.alert(
+      'Remove Commissioner',
+      'Are you sure you want to remove this commissioner?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setRemovingComm(targetUserId);
+              await api.delete(`/tournaments/${id}/commissioners/${targetUserId}`);
+              fetchData();
+            } catch (err: unknown) {
+              const message =
+                (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
+                'Failed to remove commissioner';
+              Alert.alert('Error', message);
+            } finally {
+              setRemovingComm(null);
+            }
+          },
+        },
+      ],
+    );
+  }
+
   function handleCancelTournament() {
     const isInProgress = tournament?.status === 'IN_PROGRESS';
     const title = isInProgress
@@ -240,6 +306,12 @@ export default function EditTournamentScreen() {
       ],
     );
   }
+
+  const [commissioners, setCommissioners] = useState<TournamentCommissioner[]>([]);
+  const [newCommUserId, setNewCommUserId] = useState('');
+  const [newCommRole, setNewCommRole] = useState<'LEAD' | 'ASSISTANT'>('ASSISTANT');
+  const [addingComm, setAddingComm] = useState(false);
+  const [removingComm, setRemovingComm] = useState<string | null>(null);
 
   const [confirmingCash, setConfirmingCash] = useState<string | null>(null);
 
@@ -476,6 +548,74 @@ export default function EditTournamentScreen() {
           />
         </View>
 
+        {/* Commissioners section */}
+        <View style={styles.participantsSection}>
+          <Text style={styles.sectionTitle}>
+            Commissioners ({commissioners.length})
+          </Text>
+          {commissioners.length === 0 && (
+            <Text style={styles.noParticipants}>No commissioners assigned yet.</Text>
+          )}
+          {commissioners.map((c) => {
+            const cName = [c.user.name, c.user.surname].filter(Boolean).join(' ') || c.user.email;
+            return (
+              <Card key={c.id} style={styles.participantCard}>
+                <View style={styles.participantRow}>
+                  <View style={styles.participantInfo}>
+                    <Text style={styles.participantName}>{cName}</Text>
+                    <Text style={styles.participantEmail}>{c.user.email}</Text>
+                  </View>
+                  <View style={styles.participantActions}>
+                    <Badge
+                      label={c.role}
+                      status={c.role === 'LEAD' ? 'success' : 'info'}
+                    />
+                    {c.role === 'ASSISTANT' && (
+                      <TouchableOpacity
+                        onPress={() => handleRemoveCommissioner(c.userId)}
+                        disabled={removingComm === c.userId}
+                        style={styles.removeBtn}
+                      >
+                        <Text style={styles.removeBtnText}>
+                          {removingComm === c.userId ? '...' : 'Remove'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              </Card>
+            );
+          })}
+          {/* Add commissioner */}
+          <View style={styles.addCommRow}>
+            <Input
+              label="User ID"
+              value={newCommUserId}
+              onChangeText={setNewCommUserId}
+              placeholder="Enter user ID"
+              style={styles.addCommInput}
+            />
+            <View style={styles.chipRow}>
+              {(['LEAD', 'ASSISTANT'] as const).map((r) => (
+                <Button
+                  key={r}
+                  title={r}
+                  variant={newCommRole === r ? 'primary' : 'secondary'}
+                  onPress={() => setNewCommRole(r)}
+                  style={styles.chip}
+                />
+              ))}
+            </View>
+            <Button
+              title="Add Commissioner"
+              onPress={handleAddCommissioner}
+              loading={addingComm}
+              disabled={addingComm}
+              style={styles.saveBtn}
+            />
+          </View>
+        </View>
+
         {/* Participants section */}
         <View style={styles.participantsSection}>
           <Text style={styles.sectionTitle}>
@@ -624,7 +764,26 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     marginTop: 2,
   },
-  participantActions: {},
+  participantActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  removeBtn: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  removeBtnText: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.error || '#cc0000',
+    fontWeight: Typography.weights.medium,
+  },
+  addCommRow: {
+    marginTop: Spacing.md,
+  },
+  addCommInput: {
+    marginBottom: Spacing.sm,
+  },
   empty: {
     flex: 1,
     alignItems: 'center',

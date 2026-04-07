@@ -52,6 +52,11 @@ enum MembershipStatus {
   EXPIRED
 }
 
+enum TournamentCommissionerRole {
+  LEAD
+  ASSISTANT
+}
+
 // ─── Models ──────────────────────────────────────────────
 
 model User {
@@ -82,6 +87,7 @@ model User {
   watchlist               TournamentWatchlist[]
   notifications           Notification[]
   tournamentResults       TournamentResult[]
+  tournamentCommissioners TournamentCommissioner[]
 }
 
 model OtpCode {
@@ -124,17 +130,32 @@ model Tournament {
   timeControl     String?
   createdAt       DateTime         @default(now())
 
-  registrations TournamentRegistration[]
-  payments      Payment[]
-  photos        TournamentPhoto[]
-  watchlistedBy TournamentWatchlist[]
-  results       TournamentResult[]
-  announcements Announcement[]
-  schedule      ScheduleEntry[]
-  rounds        Round[]
+  registrations           TournamentRegistration[]
+  payments                Payment[]
+  photos                  TournamentPhoto[]
+  watchlistedBy           TournamentWatchlist[]
+  results                 TournamentResult[]
+  announcements           Announcement[]
+  schedule                ScheduleEntry[]
+  rounds                  Round[]
+  tournamentCommissioners TournamentCommissioner[]
 
   @@index([commissionerId])
   @@index([status])
+}
+
+model TournamentCommissioner {
+  id           String                     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament                 @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         TournamentCommissionerRole @default(ASSISTANT)
+  assignedAt   DateTime                   @default(now())
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
 }
 
 model TournamentRegistration {
