@@ -283,6 +283,17 @@ const TOURNAMENTS: TournamentDef[] = [
     description: 'Fast blitz tournament in the Nordic capital. Prize for top U1800.',
     ratingLimit: 2400,
   },
+  // FREE tournament in REGISTRATION_OPEN (Bug #231)
+  {
+    title: 'Dublin Open Beginner Cup',
+    city: 'Dublin', country: 'Ireland',
+    status: TournamentStatus.REGISTRATION_OPEN,
+    format: 'RAPID 15+10',
+    fee: 0, currency: 'EUR', maxParticipants: 32,
+    daysOffset: [-10, -14],
+    description: 'Free entry beginner-friendly rapid tournament. Open to all players rated under 1600.',
+    ratingLimit: 1600,
+  },
   // UPCOMING (2) — use PUBLISHED status since no UPCOMING enum
   {
     title: 'Dubai Grand Prix 2026',
@@ -352,7 +363,25 @@ async function seedUsers(): Promise<Map<string, string>> {
     emailToId.set(email, user.id);
   }
 
-  console.log(`  Created/updated ${PLAYERS.length} users`);
+  // Admin user (Bug #230)
+  const adminEmail = 'admin@chesstourism.test';
+  const adminUser = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      name: 'Admin',
+      role: Role.ADMIN,
+      onboardingCompleted: true,
+    },
+    create: {
+      email: adminEmail,
+      name: 'Admin',
+      role: Role.ADMIN,
+      onboardingCompleted: true,
+    },
+  });
+  emailToId.set(adminEmail, adminUser.id);
+
+  console.log(`  Created/updated ${PLAYERS.length + 1} users (incl. admin)`);
   return emailToId;
 }
 
