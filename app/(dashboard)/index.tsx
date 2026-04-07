@@ -183,6 +183,13 @@ export default function DashboardScreen() {
                 </View>
               </View>
             )}
+            <TouchableOpacity
+              onPress={() => router.push('/ratings/history')}
+              style={styles.historyLink}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.historyLinkText}>View Rating History</Text>
+            </TouchableOpacity>
           </Card>
         </View>
 
@@ -390,6 +397,14 @@ const styles = StyleSheet.create({
   fideIdText: {
     fontSize: Typography.sizes.sm,
     color: Colors.textMuted,
+  },
+  historyLink: {
+    marginTop: Spacing.sm,
+    alignItems: 'center',
+  },
+  historyLinkText: {
+    color: Colors.primary,
+    fontSize: Typography.sizes.sm,
   },
   footer: {
     height: Spacing['2xl'],
