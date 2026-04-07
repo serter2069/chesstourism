@@ -1,7 +1,17 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import prisma from '../lib/prisma';
 
 const router = Router();
+
+// Rate limit: max 3 submissions per IP per hour (UC-15 AC6)
+const orgFormLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3,
+  message: { error: 'Too many organization requests. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // POST /api/organization-requests — canonical UC-15 endpoint (public, no auth required)
 // POST /api/organizations/request — legacy alias (kept for backward compatibility)
@@ -45,7 +55,7 @@ async function handleOrganizationRequest(req: Request, res: Response): Promise<v
   }
 }
 
-router.post('/organization-requests', handleOrganizationRequest);
-router.post('/organizations/request', handleOrganizationRequest);
+router.post('/organization-requests', orgFormLimiter, handleOrganizationRequest);
+router.post('/organizations/request', orgFormLimiter, handleOrganizationRequest);
 
 export default router;
