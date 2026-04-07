@@ -69,7 +69,7 @@ router.post('/avatar', authenticate, (req: AuthRequest, res: Response) => {
   });
 });
 
-// POST /api/profile/preferences — save onboarding quiz answers
+// POST /api/profile/preferences — save user preferences (skillLevel, countries, experience)
 router.post('/preferences', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
