@@ -824,7 +824,13 @@ export default function TournamentDetailScreen() {
               <View style={styles.photoGrid}>
                 {photos.map((photo) => (
                   <View key={photo.id} style={styles.photoItem}>
-                    <Image source={{ uri: photo.url }} style={styles.photoImage} resizeMode="cover" />
+                    <Image
+                      source={{ uri: photo.url }}
+                      style={styles.photoImage}
+                      resizeMode="cover"
+                      accessibilityLabel={photo.caption || 'Tournament photo'}
+                      accessibilityRole="image"
+                    />
                     {photo.caption && (
                       <Text style={styles.photoCaption} numberOfLines={1}>{photo.caption}</Text>
                     )}

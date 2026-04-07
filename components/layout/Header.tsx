@@ -43,7 +43,12 @@ export default function Header({ title, showBack = false }: HeaderProps) {
       {/* Top row: logo + hamburger/auth */}
       <View style={styles.topRow}>
         {showBack ? (
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backBtn}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+          >
             <Text style={styles.backText}>{'<'}</Text>
           </TouchableOpacity>
         ) : (
@@ -90,6 +95,8 @@ export default function Header({ title, showBack = false }: HeaderProps) {
             <TouchableOpacity
               onPress={() => setMenuOpen(!menuOpen)}
               style={styles.hamburger}
+              accessibilityLabel={menuOpen ? 'Close menu' : 'Open menu'}
+              accessibilityRole="button"
             >
               <Text style={styles.hamburgerText}>{menuOpen ? 'X' : '='}</Text>
             </TouchableOpacity>
@@ -244,8 +251,8 @@ const styles = StyleSheet.create({
   },
   bellBtn: {
     position: 'relative',
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -294,8 +301,8 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
   },
   hamburger: {
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
