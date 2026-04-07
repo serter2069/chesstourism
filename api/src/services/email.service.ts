@@ -355,6 +355,25 @@ export async function sendScheduleChangeEmail(
   });
 }
 
+export async function sendAnnouncementEmail(
+  to: string,
+  tournamentTitle: string,
+  announcementTitle: string,
+  body: string,
+): Promise<void> {
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `[${tournamentTitle}] ${announcementTitle}`,
+    htmlContent: `
+      <h2>${announcementTitle}</h2>
+      <p>${body.replace(/\n/g, '<br>')}</p>
+      <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;" />
+      <small>Tournament: ${tournamentTitle}</small>
+    `,
+  });
+}
+
 export async function sendTournamentCancelledEmail(
   to: string,
   userName: string,

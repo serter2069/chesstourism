@@ -1202,4 +1202,116 @@ router.get('/tournaments/:id/my-certificate', authenticate, async (req: AuthRequ
   }
 });
 
+// ─── Announcements ──────────────────────────────────────────
+
+// POST /api/tournaments/:id/announcements — create announcement (commissioner only)
+router.post('/tournaments/:id/announcements', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (tournament.commissioner.userId !== userId && req.user!.role !== 'ADMIN') {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const { title, body } = req.body;
+    if (!title || !body) {
+      res.status(400).json({ error: 'title and body are required' });
+      return;
+    }
+    const ann = await prisma.announcement.create({
+      data: { tournamentId: req.params.id, title: title.trim(), body: body.trim() },
+    });
+    res.status(201).json(ann);
+  } catch (err) {
+    console.error('Create announcement error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/tournaments/:id/announcements — public sees published only, commissioner sees all
+router.get('/tournaments/:id/announcements', async (req: Request, res: Response) => {
+  try {
+    let isCommissioner = false;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const { verifyToken } = await import('../utils/jwt');
+        const payload = verifyToken(authHeader.split(' ')[1]);
+        if (payload.type === 'access') {
+          const tournament = await prisma.tournament.findUnique({
+            where: { id: req.params.id },
+            include: { commissioner: { select: { userId: true } } },
+          });
+          isCommissioner = tournament?.commissioner?.userId === payload.userId || payload.role === 'ADMIN';
+        }
+      } catch { /* not authenticated — show published only */ }
+    }
+    const anns = await prisma.announcement.findMany({
+      where: {
+        tournamentId: req.params.id,
+        ...(isCommissioner ? {} : { published: true }),
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(anns);
+  } catch (err) {
+    console.error('List announcements error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/tournaments/:id/announcements/:annId/publish — publish + email participants
+router.patch('/tournaments/:id/announcements/:annId/publish', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: {
+        commissioner: { select: { userId: true } },
+        registrations: {
+          where: { status: { in: ['APPROVED', 'PAID'] } },
+          include: { user: { select: { email: true } } },
+        },
+      },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (tournament.commissioner.userId !== userId && req.user!.role !== 'ADMIN') {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const ann = await prisma.announcement.update({
+      where: { id: req.params.annId },
+      data: { published: true },
+    });
+    res.json(ann);
+
+    // Fire-and-forget: email participants
+    const { sendAnnouncementEmail } = await import('../services/email.service');
+    (async () => {
+      for (const reg of tournament.registrations) {
+        if (reg.user?.email) {
+          try {
+            await sendAnnouncementEmail(reg.user.email, tournament.title, ann.title, ann.body);
+          } catch (e) {
+            console.error(`[announcement] sendAnnouncementEmail failed for ${reg.user.email}:`, (e as Error).message);
+          }
+        }
+      }
+    })().catch((err) => console.error('Announcement email loop error:', (err as Error).message));
+  } catch (err) {
+    console.error('Publish announcement error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
