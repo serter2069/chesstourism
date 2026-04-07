@@ -1,3 +1,1101 @@
+<!-- SCENARIOS_META
+{
+  "version": "1.0",
+  "project": "ChessTourism",
+  "generated": "2026-04-07",
+  "total": 57,
+  "groups": {
+    "structural": 20,
+    "interactive": 17,
+    "cross_portal": 5,
+    "admin": 5,
+    "security": 10,
+    "visual": 5
+  },
+  "dependency_groups": {
+    "tier1_auth": ["inter-001"],
+    "tier2_participant": ["inter-002", "inter-003", "inter-004", "inter-005", "cross-001", "cross-002", "cross-003"],
+    "tier2_commissioner": ["inter-006", "inter-007", "inter-008", "inter-009", "inter-010", "inter-014"],
+    "tier2_admin": ["admin-001", "admin-002", "admin-003", "admin-004"],
+    "independent": ["path-*", "sec-*", "vis-*"]
+  },
+  "scenarios": [
+    {
+      "id": "path-001",
+      "title": "Главная страница открывается",
+      "uc_ref": "UC-25",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/",
+      "steps": [
+        "Открыть /",
+        "Проверить наличие Hero секции с CTA 'Upcoming Tournaments'",
+        "Проверить секцию ближайших турниров (до 4 карточек)",
+        "Проверить секцию Топ рейтинга (10 позиций)",
+        "Проверить секцию 'How It Works' (4 шага)",
+        "Проверить CTA карточки 'Become a Commissar' и 'Host a Tournament'"
+      ],
+      "expected": "Все секции отображаются, данные загружены, CTA кнопки ведут на публичные страницы",
+      "priority": "p1"
+    },
+    {
+      "id": "path-002",
+      "title": "Каталог турниров открывается",
+      "uc_ref": "UC-27",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/tournaments",
+      "steps": [
+        "Открыть /tournaments",
+        "Проверить наличие списка турниров (карточки)",
+        "Проверить фильтры: страна, тип контроля, статус",
+        "Проверить пагинацию",
+        "Проверить что DRAFT турниры не отображаются"
+      ],
+      "expected": "Список опубликованных турниров с фильтрами и пагинацией отображается",
+      "priority": "p1"
+    },
+    {
+      "id": "path-003",
+      "title": "Страница турнира открывается",
+      "uc_ref": "UC-24",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/tournaments/:id",
+      "steps": [
+        "Открыть /tournaments/:id существующего турнира",
+        "Проверить заголовок, даты, город, страна, формат, взнос",
+        "Проверить статус badge",
+        "Проверить табы: info / participants / results / photos",
+        "Проверить OG meta теги (og:title, og:description)"
+      ],
+      "expected": "Полная карточка турнира с табами, данные загружены, OG теги присутствуют",
+      "priority": "p1"
+    },
+    {
+      "id": "path-004",
+      "title": "Каталог комиссаров открывается",
+      "uc_ref": "UC-29",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/commissars",
+      "steps": [
+        "Открыть /commissars",
+        "Проверить карточки верифицированных комиссаров",
+        "Проверить фильтр по стране",
+        "Проверить данные: фото, имя, страна, город, кол-во турниров"
+      ],
+      "expected": "Карточки комиссаров отображаются с фильтрацией по стране",
+      "priority": "p2"
+    },
+    {
+      "id": "path-005",
+      "title": "Страница комиссара открывается",
+      "uc_ref": "UC-14",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/commissars/:id",
+      "steps": [
+        "Открыть /commissars/:id верифицированного комиссара",
+        "Проверить фото, ФИО, биографию",
+        "Проверить статистику: проведённых турниров, участников",
+        "Проверить список последних турниров"
+      ],
+      "expected": "Публичный профиль комиссара с данными и статистикой",
+      "priority": "p2"
+    },
+    {
+      "id": "path-006",
+      "title": "Публичный профиль пользователя открывается",
+      "uc_ref": "UC-33",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/users/:id",
+      "steps": [
+        "Открыть /users/:id существующего пользователя",
+        "Проверить имя, страну, рейтинг",
+        "Проверить историю турниров (завершённые)",
+        "Проверить что email и phone НЕ показываются"
+      ],
+      "expected": "Публичный профиль без приватных данных, история турниров отображается",
+      "priority": "p2"
+    },
+    {
+      "id": "path-007",
+      "title": "Рейтинг-лист открывается",
+      "uc_ref": "UC-17",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/ratings",
+      "steps": [
+        "Открыть /ratings",
+        "Проверить таблицу: #, ФИО, Страна, Рейтинг, Турниров, Динамика",
+        "Проверить сортировку по рейтингу (высший первый)",
+        "Проверить фильтр по стране и поиск по имени",
+        "Проверить пагинацию (50 на страницу)"
+      ],
+      "expected": "Таблица рейтинга с фильтрами и пагинацией отображается",
+      "priority": "p1"
+    },
+    {
+      "id": "path-008",
+      "title": "История рейтинга открывается",
+      "uc_ref": "UC-26",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/ratings/history",
+      "steps": [
+        "Открыть /ratings/history",
+        "Проверить таблицу: турнир, место, очки, изменение ELO, дата",
+        "Проверить пагинацию"
+      ],
+      "expected": "Таблица истории рейтинга с пагинацией",
+      "priority": "p3"
+    },
+    {
+      "id": "path-009",
+      "title": "Заявка организации открывается",
+      "uc_ref": "UC-15",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/organizations/apply",
+      "steps": [
+        "Открыть /organizations/apply",
+        "Проверить форму: название организации, тип, контактное лицо, email, описание",
+        "Проверить кнопку 'Отправить заявку'"
+      ],
+      "expected": "Форма заявки организации доступна без авторизации",
+      "priority": "p2"
+    },
+    {
+      "id": "path-010",
+      "title": "Проверка сертификата открывается",
+      "uc_ref": "UC-05",
+      "type": "structural",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/verify/:id",
+      "steps": [
+        "Открыть /verify/:id с валидным certificate ID",
+        "Проверить данные сертификата: номер, имя участника, дата"
+      ],
+      "expected": "Публичная страница верификации сертификата отображает данные",
+      "priority": "p3"
+    },
+    {
+      "id": "path-011",
+      "title": "Страница успешной оплаты открывается",
+      "uc_ref": "UC-10",
+      "type": "structural",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/payment-success",
+      "steps": [
+        "Открыть /payment-success?tournamentId=:id",
+        "Проверить сообщение об успешной оплате"
+      ],
+      "expected": "Страница показывает подтверждение оплаты",
+      "priority": "p2"
+    },
+    {
+      "id": "path-012",
+      "title": "Dashboard участника открывается",
+      "uc_ref": "UC-04",
+      "type": "structural",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /(dashboard)",
+        "Проверить блок Профиль: ФИО, страна, FIDE ID",
+        "Проверить блок Рейтинг: число + позиция",
+        "Проверить блок Турниры: количество, последний",
+        "Проверить что блок Членство скрыт (deferred v2)"
+      ],
+      "expected": "Dashboard загружается с актуальными данными, блок членства скрыт",
+      "priority": "p1"
+    },
+    {
+      "id": "path-013",
+      "title": "Мой профиль открывается",
+      "uc_ref": "UC-01",
+      "type": "structural",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)/profile",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /(dashboard)/profile",
+        "Проверить поля: Имя, Фамилия, Страна, Дата рождения, FIDE ID",
+        "Проверить что Email read-only"
+      ],
+      "expected": "Форма профиля с предзаполненными данными, email disabled",
+      "priority": "p1"
+    },
+    {
+      "id": "path-014",
+      "title": "Мои регистрации открывается",
+      "uc_ref": "UC-32",
+      "type": "structural",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)/my-registrations",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /(dashboard)/my-registrations",
+        "Проверить список регистраций с данными турнира и статусами",
+        "Проверить что кнопка отмены отсутствует (no-cancel policy)"
+      ],
+      "expected": "Список регистраций без кнопки отмены",
+      "priority": "p2"
+    },
+    {
+      "id": "path-015",
+      "title": "Watchlist открывается",
+      "uc_ref": "UC-20",
+      "type": "structural",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)/watchlist",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /(dashboard)/watchlist",
+        "Проверить список отслеживаемых турниров или пустое состояние"
+      ],
+      "expected": "Список watchlist турниров или сообщение 'Нет отслеживаемых турниров'",
+      "priority": "p2"
+    },
+    {
+      "id": "path-016",
+      "title": "Уведомления открываются",
+      "uc_ref": "UC-21",
+      "type": "structural",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/notifications",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /notifications",
+        "Проверить список уведомлений или пустое состояние",
+        "Проверить badge непрочитанных"
+      ],
+      "expected": "Список уведомлений с badge количества непрочитанных",
+      "priority": "p2"
+    },
+    {
+      "id": "path-017",
+      "title": "Создание турнира открывается",
+      "uc_ref": "UC-06",
+      "type": "structural",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/create",
+      "steps": [
+        "Авторизоваться как верифицированный комиссар",
+        "Открыть /(dashboard)/tournaments/create",
+        "Проверить форму: название, место, даты, формат, описание, взнос, макс. участников"
+      ],
+      "expected": "Форма создания турнира со всеми полями",
+      "priority": "p1"
+    },
+    {
+      "id": "path-018",
+      "title": "Управление турнирами комиссара открывается",
+      "uc_ref": "UC-31",
+      "type": "structural",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/manage",
+      "steps": [
+        "Авторизоваться как комиссар",
+        "Открыть /(dashboard)/tournaments/manage",
+        "Проверить список турниров с фильтром по статусу",
+        "Проверить быстрые действия: Publish / Start / Complete / Cancel"
+      ],
+      "expected": "Список турниров комиссара с действиями по управлению статусом",
+      "priority": "p1"
+    },
+    {
+      "id": "path-019",
+      "title": "Admin Dashboard открывается",
+      "uc_ref": "UC-30",
+      "type": "structural",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)",
+      "steps": [
+        "Авторизоваться как admin",
+        "Открыть /(admin)",
+        "Проверить счётчики: заявки участников, комиссаров, организаций",
+        "Проверить навигацию: users, tournaments, finances, organizations, moderation"
+      ],
+      "expected": "Admin dashboard с актуальными счётчиками и навигацией",
+      "priority": "p1"
+    },
+    {
+      "id": "path-020",
+      "title": "Admin Finances открывается",
+      "uc_ref": "UC-35",
+      "type": "structural",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)/finances",
+      "steps": [
+        "Авторизоваться как admin",
+        "Открыть /(admin)/finances",
+        "Проверить 4 summary-карточки: Total Revenue, Paid Count, Pending, Refunds+Disputes",
+        "Проверить фильтр по периоду",
+        "Проверить paginated список транзакций"
+      ],
+      "expected": "Финансовая панель с карточками и списком транзакций",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-001",
+      "title": "OTP auth flow: email -> код -> вход",
+      "uc_ref": "UC-00",
+      "type": "interactive",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/(auth)/login",
+      "steps": [
+        "Открыть /(auth)/login",
+        "Ввести email в поле",
+        "Нажать 'Get Code'",
+        "Проверить переход на экран OTP",
+        "Ввести код 000000 (dev mode)",
+        "Нажать 'Войти'",
+        "Проверить редирект в dashboard или на /profile (если onboarding не пройден)"
+      ],
+      "expected": "Успешный вход, JWT токены установлены, редирект в кабинет",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-002",
+      "title": "Заполнение профиля участника",
+      "uc_ref": "UC-01",
+      "type": "interactive",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)/profile",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /(dashboard)/profile",
+        "Заполнить Имя, Фамилию, Страну",
+        "Нажать 'Сохранить'",
+        "Проверить тост 'Профиль сохранён'",
+        "Перезагрузить страницу — данные сохранены"
+      ],
+      "expected": "Профиль сохранён через PUT /api/users/me, данные персистентны",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-003",
+      "title": "Регистрация на бесплатный турнир",
+      "uc_ref": "UC-28",
+      "type": "interactive",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/tournaments/:id",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть страницу бесплатного турнира (fee=0) со статусом REGISTRATION_OPEN",
+        "Нажать 'Зарегистрироваться'",
+        "Проверить что статус регистрации = PAID (auto-confirm для бесплатных)",
+        "Проверить появление в /(dashboard)/my-registrations"
+      ],
+      "expected": "Регистрация создана со статусом PAID, видна в 'Мои регистрации'",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-004",
+      "title": "Регистрация на платный турнир + оплата",
+      "uc_ref": "UC-28, UC-10",
+      "type": "interactive",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/tournaments/:id",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть страницу платного турнира со статусом REGISTRATION_OPEN",
+        "Нажать 'Зарегистрироваться'",
+        "Проверить статус PENDING",
+        "Проверить редирект на страницу оплаты",
+        "Пройти Stripe Checkout (тестовые данные)",
+        "Проверить статус = PAID после оплаты"
+      ],
+      "expected": "Регистрация PENDING -> оплата через Stripe -> статус PAID",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-005",
+      "title": "Добавление и удаление из watchlist",
+      "uc_ref": "UC-20",
+      "type": "interactive",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/tournaments/:id",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть страницу турнира",
+        "Нажать heart icon (добавить в watchlist)",
+        "Проверить что иконка стала заполненной",
+        "Открыть /(dashboard)/watchlist — турнир в списке",
+        "Нажать heart icon повторно (удалить)",
+        "Проверить что турнир удалён из watchlist"
+      ],
+      "expected": "Toggle watchlist работает, данные синхронизированы с /api/watchlist",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-006",
+      "title": "Подача заявки комиссара",
+      "uc_ref": "UC-02",
+      "type": "interactive",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)/commissioner",
+      "steps": [
+        "Авторизоваться как участник",
+        "Перейти на страницу 'Стать комиссаром'",
+        "Заполнить: опыт (min 50 символов), регион, локации (до 3)",
+        "Нажать 'Подать заявку'",
+        "Проверить сообщение 'Заявка отправлена. Ожидайте рассмотрения'"
+      ],
+      "expected": "Заявка создана со статусом commissioner_pending, admin получает уведомление",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-007",
+      "title": "Создание турнира комиссаром",
+      "uc_ref": "UC-06",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/create",
+      "steps": [
+        "Авторизоваться как верифицированный комиссар",
+        "Открыть форму создания турнира",
+        "Заполнить: название, место, даты, формат",
+        "Нажать 'Создать турнир'",
+        "Проверить статус DRAFT",
+        "Проверить что турнир НЕ виден публично"
+      ],
+      "expected": "Турнир создан со статусом DRAFT, виден только комиссару",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-008",
+      "title": "Редактирование турнира",
+      "uc_ref": "UC-06, UC-NEW-05",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/:id/edit",
+      "steps": [
+        "Авторизоваться как комиссар-владелец",
+        "Открыть /(dashboard)/tournaments/:id/edit",
+        "Изменить название и описание",
+        "Нажать 'Сохранить'",
+        "Проверить что данные обновились"
+      ],
+      "expected": "Турнир обновлён, изменения отражены на публичной странице",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-009",
+      "title": "Публикация турнира (state machine)",
+      "uc_ref": "UC-NEW-05",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/manage",
+      "steps": [
+        "Авторизоваться как комиссар",
+        "Найти турнир в статусе DRAFT",
+        "Нажать 'Опубликовать' -> PUBLISHED",
+        "Нажать 'Открыть регистрацию' -> REGISTRATION_OPEN",
+        "Проверить что турнир виден на /tournaments"
+      ],
+      "expected": "Переходы DRAFT->PUBLISHED->REGISTRATION_OPEN выполнены, турнир публичный",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-010",
+      "title": "Одобрение регистрации комиссаром",
+      "uc_ref": "UC-07",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/:id/registrations",
+      "steps": [
+        "Авторизоваться как комиссар-владелец",
+        "Открыть вкладку 'Участники'",
+        "Найти регистрацию со статусом PENDING",
+        "Нажать 'Одобрить'",
+        "Проверить статус APPROVED (платный) или PAID (бесплатный)"
+      ],
+      "expected": "Регистрация одобрена, участник получает уведомление",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-011",
+      "title": "Загрузка фото турнира",
+      "uc_ref": "UC-09",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/:id/photos",
+      "steps": [
+        "Авторизоваться как комиссар-владелец завершённого турнира",
+        "Открыть вкладку 'Фото'",
+        "Загрузить JPG фото (< 10MB)",
+        "Проверить что фото появилось в галерее",
+        "Проверить что фото видно на публичной странице"
+      ],
+      "expected": "Фото загружено в S3/MinIO, отображается публично",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-012",
+      "title": "Ввод результатов турнира",
+      "uc_ref": "UC-23",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/:id/results",
+      "steps": [
+        "Авторизоваться как комиссар-владелец",
+        "Открыть турнир со статусом IN_PROGRESS",
+        "Ввести результаты: место и очки для каждого участника",
+        "Нажать 'Утвердить результаты'",
+        "Проверить ELO изменения рассчитаны",
+        "Проверить статус -> COMPLETED"
+      ],
+      "expected": "Результаты сохранены, ELO обновлён, турнир COMPLETED",
+      "priority": "p1"
+    },
+    {
+      "id": "inter-013",
+      "title": "Подача заявки от организации",
+      "uc_ref": "UC-15",
+      "type": "interactive",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/organizations/apply",
+      "steps": [
+        "Открыть /organizations/apply без авторизации",
+        "Заполнить: название организации, контактное лицо, email, описание (min 30 символов)",
+        "Нажать 'Отправить заявку'",
+        "Проверить сообщение 'Спасибо! Ваша заявка принята'"
+      ],
+      "expected": "Заявка создана, admin получает email уведомление",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-014",
+      "title": "Редактирование профиля комиссара",
+      "uc_ref": "UC-NEW-07",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/commissioner/edit",
+      "steps": [
+        "Авторизоваться как комиссар",
+        "Открыть /(dashboard)/commissioner/edit",
+        "Обновить bio, города работы, достижения",
+        "Загрузить аватар (JPG/PNG, < 5MB)",
+        "Нажать 'Сохранить'",
+        "Проверить изменения на публичной странице /commissars/:id"
+      ],
+      "expected": "Профиль комиссара обновлён, изменения видны публично",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-015",
+      "title": "Создание расписания турнира",
+      "uc_ref": "UC-NEW-10",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[x]",
+      "path": "/(dashboard)/tournaments/:id/schedule",
+      "steps": [
+        "Авторизоваться как комиссар-владелец",
+        "Открыть dashboard турнира -> 'Расписание'",
+        "Добавить событие: название, дата/время, тип",
+        "Проверить хронологический список",
+        "Проверить на публичной странице таб 'Расписание'"
+      ],
+      "expected": "Расписание создано, видно публично",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-016",
+      "title": "Публикация объявления турнира",
+      "uc_ref": "UC-NEW-11",
+      "type": "interactive",
+      "actor": "commissioner",
+      "status": "[x]",
+      "path": "/tournaments/:id/announcements",
+      "steps": [
+        "Авторизоваться как комиссар",
+        "Открыть dashboard турнира -> 'Объявления'",
+        "Написать текст объявления (до 1000 симв.)",
+        "Нажать 'Опубликовать'",
+        "Проверить что объявление видно публично",
+        "Проверить что участники получили уведомление"
+      ],
+      "expected": "Объявление опубликовано, email + in-app уведомления отправлены",
+      "priority": "p2"
+    },
+    {
+      "id": "inter-017",
+      "title": "Просмотр истории рейтинга",
+      "uc_ref": "UC-26",
+      "type": "interactive",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/ratings/history",
+      "steps": [
+        "Открыть /ratings",
+        "Нажать 'View History' у участника",
+        "Проверить таблицу: турнир, место, очки, ELO дельта, дата",
+        "Проверить пагинацию"
+      ],
+      "expected": "История рейтинга с дельтами и пагинацией",
+      "priority": "p3"
+    },
+    {
+      "id": "cross-001",
+      "title": "Участник регистрируется -> Комиссар видит",
+      "uc_ref": "UC-07, UC-28",
+      "type": "cross-portal",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/tournaments/:id",
+      "steps": [
+        "Участник регистрируется на турнир (UC-28)",
+        "Комиссар открывает вкладку 'Участники' того же турнира",
+        "Проверить что новая регистрация видна в списке"
+      ],
+      "expected": "Регистрация участника мгновенно видна комиссару",
+      "priority": "p1"
+    },
+    {
+      "id": "cross-002",
+      "title": "Комиссар одобряет -> Участник получает уведомление",
+      "uc_ref": "UC-07, UC-21",
+      "type": "cross-portal",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/:id/registrations",
+      "steps": [
+        "Комиссар одобряет регистрацию участника",
+        "Участник открывает /notifications",
+        "Проверить уведомление 'Заявка одобрена'"
+      ],
+      "expected": "In-app уведомление REGISTRATION_APPROVED создано и видно участнику",
+      "priority": "p1"
+    },
+    {
+      "id": "cross-003",
+      "title": "Участник платит онлайн -> Регистрация PAID",
+      "uc_ref": "UC-10, SYS-04",
+      "type": "cross-portal",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)/payment/:tournamentId",
+      "steps": [
+        "Участник оплачивает через Stripe Checkout",
+        "Stripe webhook (checkout.session.completed) приходит",
+        "Проверить registration.status = PAID",
+        "Комиссар видит обновлённый статус оплаты"
+      ],
+      "expected": "Webhook обрабатывает оплату, статус PAID, виден обоим актёрам",
+      "priority": "p1"
+    },
+    {
+      "id": "cross-004",
+      "title": "Комиссар вводит результаты -> ELO обновляется",
+      "uc_ref": "UC-23, SYS-02",
+      "type": "cross-portal",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/:id/results",
+      "steps": [
+        "Комиссар вводит результаты и утверждает",
+        "Проверить ELO изменения в /ratings",
+        "Участник видит обновлённый рейтинг в dashboard",
+        "Проверить историю рейтинга /ratings/history"
+      ],
+      "expected": "ELO пересчитан, виден в рейтинг-листе и профиле участника",
+      "priority": "p1"
+    },
+    {
+      "id": "cross-005",
+      "title": "Комиссар отменяет турнир -> Участники уведомлены",
+      "uc_ref": "UC-NEW-01, UC-21",
+      "type": "cross-portal",
+      "actor": "commissioner",
+      "status": "[ ]",
+      "path": "/(dashboard)/tournaments/manage",
+      "steps": [
+        "Комиссар нажимает 'Отменить турнир'",
+        "Подтверждает в confirmation dialog",
+        "Проверить статус -> CANCELLED",
+        "Проверить что все регистрации -> CANCELLED",
+        "Участники получают email и in-app уведомление"
+      ],
+      "expected": "Турнир и регистрации отменены, участники уведомлены по email и in-app",
+      "priority": "p2"
+    },
+    {
+      "id": "admin-001",
+      "title": "Модерация заявки комиссара",
+      "uc_ref": "UC-16",
+      "type": "admin",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)/moderation",
+      "steps": [
+        "Авторизоваться как admin",
+        "Открыть /(admin)/moderation",
+        "Найти заявку комиссара со статусом pending",
+        "Нажать 'Одобрить'",
+        "Проверить роль пользователя = commissioner",
+        "Проверить email отправлен: 'Вы аккредитованы как комиссар'"
+      ],
+      "expected": "Заявка одобрена, роль обновлена, email отправлен",
+      "priority": "p1"
+    },
+    {
+      "id": "admin-002",
+      "title": "Управление пользователями — смена роли",
+      "uc_ref": "UC-30",
+      "type": "admin",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)/users",
+      "steps": [
+        "Авторизоваться как admin",
+        "Открыть /(admin)/users",
+        "Найти пользователя по email",
+        "Изменить роль через PATCH /api/admin/users/:id",
+        "Проверить что роль обновилась"
+      ],
+      "expected": "Роль пользователя изменена через admin панель",
+      "priority": "p2"
+    },
+    {
+      "id": "admin-003",
+      "title": "Модерация organization requests",
+      "uc_ref": "UC-16",
+      "type": "admin",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)/organizations",
+      "steps": [
+        "Авторизоваться как admin",
+        "Открыть /(admin)/organizations",
+        "Найти заявку организации",
+        "Одобрить или отклонить",
+        "Проверить email организации с решением"
+      ],
+      "expected": "Заявка обработана, email отправлен организации",
+      "priority": "p2"
+    },
+    {
+      "id": "admin-004",
+      "title": "Просмотр финансов",
+      "uc_ref": "UC-35",
+      "type": "admin",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)/finances",
+      "steps": [
+        "Авторизоваться как admin",
+        "Открыть /(admin)/finances",
+        "Проверить summary: Total Revenue, Paid Count, Pending, Refunds+Disputes",
+        "Сменить период фильтрации",
+        "Проверить обновление карточек и списка транзакций"
+      ],
+      "expected": "Финансовые данные корректны, фильтр по периоду работает",
+      "priority": "p2"
+    },
+    {
+      "id": "admin-005",
+      "title": "Разрешение dispute/chargeback",
+      "uc_ref": "SYS-06",
+      "type": "admin",
+      "actor": "admin",
+      "status": "[ ]",
+      "path": "/(admin)/finances",
+      "steps": [
+        "Симулировать charge.dispute.created webhook",
+        "Проверить payment.status = DISPUTED",
+        "Проверить in-app уведомление admin 'PAYMENT_DISPUTED'",
+        "Проверить DISPUTED badge в таблице финансов"
+      ],
+      "expected": "Dispute зафиксирован, admin уведомлён, виден в /admin/finances",
+      "priority": "p3"
+    },
+    {
+      "id": "sec-001",
+      "title": "Защищённые роуты без токена -> 401",
+      "uc_ref": "UC-00",
+      "type": "security",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/api/profile/registrations",
+      "steps": [
+        "Отправить GET /api/profile/registrations без Authorization header",
+        "Проверить HTTP 401"
+      ],
+      "expected": "401 Unauthorized без валидного токена",
+      "priority": "p1"
+    },
+    {
+      "id": "sec-002",
+      "title": "Admin endpoint с user токеном -> 403",
+      "uc_ref": "UC-30",
+      "type": "security",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/api/admin/users",
+      "steps": [
+        "Авторизоваться как participant",
+        "Отправить GET /api/admin/users",
+        "Проверить HTTP 403"
+      ],
+      "expected": "403 Forbidden для non-admin ролей",
+      "priority": "p1"
+    },
+    {
+      "id": "sec-003",
+      "title": "OTP brute force (6+ попыток) -> 429",
+      "uc_ref": "UC-00",
+      "type": "security",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/api/auth/request-code",
+      "steps": [
+        "Отправить 6 запросов POST /api/auth/request-code с одним email за 15 минут",
+        "Проверить HTTP 429 на 6-м запросе"
+      ],
+      "expected": "429 Too Many Requests после превышения лимита (5 req / 15 мин)",
+      "priority": "p1"
+    },
+    {
+      "id": "sec-004",
+      "title": "IDOR — участник читает чужую регистрацию",
+      "uc_ref": "UC-32",
+      "type": "security",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/api/tournaments/:id/registrations",
+      "steps": [
+        "Авторизоваться как participant (не комиссар)",
+        "Отправить GET /api/tournaments/:id/registrations чужого турнира",
+        "Проверить что доступ ограничен (403 или отсутствие данных)"
+      ],
+      "expected": "Участник не может читать регистрации чужого турнира напрямую",
+      "priority": "p2"
+    },
+    {
+      "id": "sec-005",
+      "title": "Rate limit org form (4 submissions) -> 429",
+      "uc_ref": "UC-15",
+      "type": "security",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/api/organizations",
+      "steps": [
+        "Отправить 4 POST /api/organizations с одного IP за час",
+        "Проверить HTTP 429 на 4-м запросе"
+      ],
+      "expected": "429 Too Many Requests после 3 заявок в час (rate limit)",
+      "priority": "p2"
+    },
+    {
+      "id": "sec-006",
+      "title": "Загрузка .exe как аватар -> 422",
+      "uc_ref": "SYS-05",
+      "type": "security",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/api/profile/avatar",
+      "steps": [
+        "Авторизоваться как participant",
+        "POST /api/profile/avatar с файлом .exe",
+        "Проверить ошибку валидации (400/422)"
+      ],
+      "expected": "Файл отклонён — допустимы только JPG/PNG/WebP",
+      "priority": "p2"
+    },
+    {
+      "id": "sec-007",
+      "title": "Оплата с чужим tournamentId -> 403",
+      "uc_ref": "UC-10",
+      "type": "security",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/api/payments/tournament/:tournamentId",
+      "steps": [
+        "Авторизоваться как participant без регистрации на турнир",
+        "POST /api/payments/tournament/:tournamentId",
+        "Проверить HTTP 400 'You are not registered for this tournament'"
+      ],
+      "expected": "Оплата отклонена для незарегистрированного участника",
+      "priority": "p1"
+    },
+    {
+      "id": "sec-008",
+      "title": "returnUrl с внешним доменом -> редирект на /",
+      "uc_ref": "UC-NEW-06",
+      "type": "security",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/(auth)/login?returnUrl=https://evil.com",
+      "steps": [
+        "Открыть /(auth)/login?returnUrl=https://evil.com",
+        "Пройти OTP аутентификацию",
+        "Проверить что редирект идёт на / (не на evil.com)"
+      ],
+      "expected": "Внешний returnUrl игнорируется, редирект на главную. NOTE: в коде НЕ РЕАЛИЗОВАНА валидация returnUrl — может быть уязвимость",
+      "priority": "p2"
+    },
+    {
+      "id": "sec-009",
+      "title": "Mass assignment (role: ADMIN в PATCH profile) -> игнорируется",
+      "uc_ref": "UC-01",
+      "type": "security",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/api/users/me",
+      "steps": [
+        "Авторизоваться как participant",
+        "PUT /api/users/me с телом {name: 'Test', role: 'ADMIN'}",
+        "Проверить что роль НЕ изменилась"
+      ],
+      "expected": "Поле role игнорируется в PUT /api/users/me",
+      "priority": "p1"
+    },
+    {
+      "id": "sec-010",
+      "title": "SQL injection в search param -> 200",
+      "uc_ref": "UC-27",
+      "type": "security",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/api/tournaments?q='; DROP TABLE tournaments;--",
+      "steps": [
+        "GET /api/tournaments?q='; DROP TABLE tournaments;--",
+        "Проверить HTTP 200 (не 500)",
+        "Проверить что таблица не повреждена"
+      ],
+      "expected": "Prisma ORM параметризует запросы, injection невозможна, 200 OK",
+      "priority": "p1"
+    },
+    {
+      "id": "vis-001",
+      "title": "Главная на mobile 430px",
+      "uc_ref": "UC-25",
+      "type": "visual",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/",
+      "steps": [
+        "Открыть / в viewport 430px",
+        "Проверить отсутствие горизонтального overflow",
+        "Проверить layout секций: hero, турниры, рейтинг, how it works",
+        "Проверить читаемость текста и кнопок"
+      ],
+      "expected": "Все секции помещаются в 430px, нет overflow, кнопки кликабельны",
+      "priority": "p2"
+    },
+    {
+      "id": "vis-002",
+      "title": "Каталог турниров на mobile",
+      "uc_ref": "UC-27",
+      "type": "visual",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/tournaments",
+      "steps": [
+        "Открыть /tournaments в viewport 430px",
+        "Проверить карточки турниров — вмещаются в ширину",
+        "Проверить фильтры — доступны и кликабельны",
+        "Проверить пагинацию"
+      ],
+      "expected": "Карточки и фильтры корректно отображаются на mobile",
+      "priority": "p2"
+    },
+    {
+      "id": "vis-003",
+      "title": "Dashboard на mobile",
+      "uc_ref": "UC-04",
+      "type": "visual",
+      "actor": "participant",
+      "status": "[ ]",
+      "path": "/(dashboard)",
+      "steps": [
+        "Авторизоваться как участник",
+        "Открыть /(dashboard) в viewport 430px",
+        "Проверить все блоки: профиль, рейтинг, турниры — видны",
+        "Проверить что блоки в колонку (не обрезаются)"
+      ],
+      "expected": "Dashboard блоки в колонку, все видны, нет обрезания",
+      "priority": "p2"
+    },
+    {
+      "id": "vis-004",
+      "title": "Brand compliance: Navy/Gold, Playfair+Inter",
+      "uc_ref": "UC-25",
+      "type": "visual",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/",
+      "steps": [
+        "Открыть /",
+        "Проверить цветовую схему: Navy основной, Gold акценты",
+        "Проверить шрифты: Playfair Display для заголовков, Inter для текста",
+        "Проверить логотип и иконки"
+      ],
+      "expected": "Цвета и шрифты соответствуют brand guide",
+      "priority": "p3"
+    },
+    {
+      "id": "vis-005",
+      "title": "Auth flow на mobile 430px",
+      "uc_ref": "UC-00",
+      "type": "visual",
+      "actor": "guest",
+      "status": "[ ]",
+      "path": "/(auth)/login",
+      "steps": [
+        "Открыть /(auth)/login в viewport 430px",
+        "Проверить layout: иконка, заголовок, поле email, кнопка",
+        "Перейти на OTP экран",
+        "Проверить 6 ячеек кода: 48x56px, gap 8px",
+        "Проверить KeyboardAvoidingView"
+      ],
+      "expected": "Auth экраны корректно отображаются на mobile, ячейки кода доступны",
+      "priority": "p2"
+    }
+  ]
+}
+-->
+
 <!-- COLLEGIUM_DECISIONS
 {
   "UC-03": {"decision": "deleted", "reason": "replaced by UC-00 (OTP auth)", "date": "2026-04-03", "by": "user"},
