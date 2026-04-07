@@ -374,6 +374,31 @@ export async function sendAnnouncementEmail(
   });
 }
 
+export async function sendPaymentConfirmedEmail(
+  to: string,
+  userName: string,
+  tournamentTitle: string,
+  tournamentId: string,
+): Promise<void> {
+  if (await isEmailOptedOut(to)) return;
+
+  const tournamentUrl = `${BASE_URL}/tournaments/${tournamentId}`;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `Payment confirmed for ${tournamentTitle}`,
+    htmlContent: `
+      <h2>Payment Confirmed</h2>
+      <p>Dear ${userName},</p>
+      <p>Your payment for <strong>${tournamentTitle}</strong> has been successfully processed. Your registration is now confirmed.</p>
+      <p><a href="${tournamentUrl}">View tournament details</a></p>
+      <p>Best regards,<br/>ChesTourism Team</p>
+      ${buildUnsubscribeFooter(to)}
+    `,
+  });
+}
+
 export async function sendTournamentCancelledEmail(
   to: string,
   userName: string,
