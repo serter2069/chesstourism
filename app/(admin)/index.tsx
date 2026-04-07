@@ -84,6 +84,11 @@ export default function AdminDashboardScreen() {
       href: '/(admin)/organizations',
       badgeCount: stats?.pendingOrgRequests || 0,
     },
+    {
+      title: 'Webhook Events',
+      description: 'Stripe webhook event log and retry',
+      href: '/(admin)/webhooks',
+    },
   ];
 
   return (
