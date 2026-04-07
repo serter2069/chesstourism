@@ -612,6 +612,7 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
       where: { id: tournamentId },
       include: {
         _count: { select: { registrations: true } },
+        commissioner: { select: { userId: true } },
       },
     });
 
@@ -701,6 +702,26 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
     }
 
     res.status(201).json(registration);
+
+    // Fire-and-forget: notify commissioner about new registration
+    (async () => {
+      try {
+        const commissionerUserId = tournament.commissioner?.userId;
+        if (commissionerUserId) {
+          const participant = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
+          const participantName = participant?.name ?? participant?.email ?? 'Unknown';
+          await createNotification(
+            commissionerUserId,
+            'NEW_REGISTRATION',
+            'New registration',
+            `New registration: ${participantName} has registered for "${tournament.title}".`,
+            { tournamentId, registrationId: registration.id },
+          );
+        }
+      } catch (e) {
+        console.error('createNotification (new registration) error:', e);
+      }
+    })();
   } catch (err) {
     console.error('Tournament register error:', err);
     res.status(500).json({ error: 'Internal server error' });
