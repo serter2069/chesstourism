@@ -4,9 +4,10 @@
   "scripts": {
     "dev": "doppler run -- ts-node-dev --respawn src/index.ts",
     "dev:nodoppler": "ts-node-dev --respawn src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/index.js",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate",
+    "generate": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1022.0",
