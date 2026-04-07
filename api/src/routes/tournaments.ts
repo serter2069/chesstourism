@@ -5,8 +5,8 @@ import { createNotification } from '../utils/notifications';
 import { assertValidTransition } from '../utils/tournamentFsm';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
 import { generateParticipationCertificate } from '../services/pdf.service';
-import { sendThankYouEmail, sendTournamentCancelledEmail } from '../services/email.service';
 import { debounceScheduleEmail } from '../lib/scheduleQueue';
+import { enqueueEmail } from '../lib/emailQueue';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -451,14 +451,13 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
         (async () => {
           for (const reg of affectedRegistrations) {
             try {
-              await sendTournamentCancelledEmail(
-                reg.user.email,
-                reg.user.name ?? reg.user.email,
-                tournament.title,
+              await enqueueEmail('tournament_cancelled', reg.user.email, {
+                userName: reg.user.name ?? reg.user.email,
+                tournamentTitle: tournament.title,
                 commissionerEmail,
-              );
+              });
             } catch (e) {
-              console.error(`[cancel] sendTournamentCancelledEmail failed for ${reg.user.email}:`, (e as Error).message);
+              console.error(`[cancel] enqueueEmail tournament_cancelled failed for ${reg.user.email}:`, (e as Error).message);
             }
 
             try {
@@ -826,15 +825,18 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
 
       registration = result;
 
-      // Fire-and-forget thank-you email after transaction commit
+      // Fire-and-forget thank-you email after transaction commit (via queue with retry)
       (async () => {
         try {
           const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
           if (user) {
-            await sendThankYouEmail(user.email, user.name ?? user.email, tournament.title);
+            await enqueueEmail('thank_you', user.email, {
+              userName: user.name ?? user.email,
+              tournamentName: tournament.title,
+            });
           }
         } catch (e) {
-          console.error('sendThankYouEmail error (free registration):', e);
+          console.error('enqueueEmail thank_you error (free registration):', e);
         }
       })();
     } else {
@@ -1457,15 +1459,18 @@ router.patch('/tournaments/:id/announcements/:annId/publish', authenticate, asyn
     });
     res.json(ann);
 
-    // Fire-and-forget: email participants
-    const { sendAnnouncementEmail } = await import('../services/email.service');
+    // Fire-and-forget: enqueue announcement emails for each participant (with retry)
     (async () => {
       for (const reg of tournament.registrations) {
         if (reg.user?.email) {
           try {
-            await sendAnnouncementEmail(reg.user.email, tournament.title, ann.title, ann.body);
+            await enqueueEmail('announcement', reg.user.email, {
+              tournamentTitle: tournament.title,
+              announcementTitle: ann.title,
+              body: ann.body,
+            });
           } catch (e) {
-            console.error(`[announcement] sendAnnouncementEmail failed for ${reg.user.email}:`, (e as Error).message);
+            console.error(`[announcement] enqueueEmail failed for ${reg.user.email}:`, (e as Error).message);
           }
         }
       }
