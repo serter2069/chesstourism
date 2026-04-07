@@ -538,4 +538,89 @@ router.get('/finances/export.csv', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// ── Webhook Events ──────────────────────────────────────────────────────────
+
+// GET /api/admin/webhooks — list webhook events with pagination + filters
+router.get('/webhooks', async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+
+    if (req.query.status) {
+      const allowed = ['processed', 'failed', 'pending'];
+      const s = (req.query.status as string).toLowerCase();
+      if (allowed.includes(s)) where.status = s;
+    }
+
+    if (req.query.eventType) {
+      where.eventType = req.query.eventType as string;
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.webhookEvent.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { processedAt: 'desc' },
+        select: {
+          id: true,
+          stripeEventId: true,
+          eventType: true,
+          status: true,
+          processedAt: true,
+          errorMessage: true,
+          rawRef: true,
+        },
+      }),
+      prisma.webhookEvent.count({ where }),
+    ]);
+
+    res.json({
+      items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (err) {
+    console.error('Admin webhooks list error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/admin/webhooks/:id — get full webhook event detail
+router.get('/webhooks/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const event = await prisma.webhookEvent.findUnique({
+      where: { id: req.params.id },
+    });
+    if (!event) return res.status(404).json({ error: 'Not found' });
+    res.json(event);
+  } catch (err) {
+    console.error('Admin webhook detail error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/admin/webhooks/:id/retry — mark failed event as pending for retry
+router.patch('/webhooks/:id/retry', async (req: AuthRequest, res: Response) => {
+  try {
+    const event = await prisma.webhookEvent.findUnique({
+      where: { id: req.params.id },
+    });
+    if (!event) return res.status(404).json({ error: 'Not found' });
+    if (event.status !== 'failed') {
+      return res.status(400).json({ error: 'Only failed events can be retried' });
+    }
+    const updated = await prisma.webhookEvent.update({
+      where: { id: req.params.id },
+      data: { status: 'pending', errorMessage: null },
+    });
+    res.json(updated);
+  } catch (err) {
+    console.error('Admin webhook retry error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
