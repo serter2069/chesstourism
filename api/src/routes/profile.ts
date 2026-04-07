@@ -69,6 +69,60 @@ router.post('/avatar', authenticate, (req: AuthRequest, res: Response) => {
   });
 });
 
+// POST /api/profile/commissioner-avatar — upload commissioner avatar (updates Commissioner.photoUrl)
+router.post('/commissioner-avatar', authenticate, (req: AuthRequest, res: Response) => {
+  avatarUpload.single('avatar')(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        res.status(400).json({ error: 'File too large. Maximum size is 20MB' });
+        return;
+      }
+      res.status(400).json({ error: err.message });
+      return;
+    } else if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: 'No file uploaded. Use field name "avatar"' });
+        return;
+      }
+
+      const userId = req.user!.userId;
+
+      const commissioner = await prisma.commissioner.findUnique({ where: { userId } });
+      if (!commissioner) {
+        res.status(404).json({ error: 'Commissioner profile not found' });
+        return;
+      }
+
+      const photoUrl = await validateAndUpload(
+        req.file.buffer,
+        req.file.mimetype,
+        req.file.originalname,
+        'avatar',
+      );
+
+      const updated = await prisma.commissioner.update({
+        where: { userId },
+        data: { photoUrl },
+        select: { id: true, userId: true, photoUrl: true },
+      });
+
+      res.json({ ok: true, commissioner: updated });
+    } catch (uploadErr: any) {
+      if (uploadErr instanceof UploadValidationError) {
+        res.status(400).json({ error: uploadErr.message });
+        return;
+      }
+      console.error('Commissioner avatar upload error:', uploadErr);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+});
+
 // POST /api/profile/preferences — save user preferences (skillLevel, countries, experience)
 router.post('/preferences', authenticate, async (req: AuthRequest, res: Response) => {
   try {

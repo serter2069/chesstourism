@@ -87,11 +87,16 @@ router.get('/profile', authenticate, async (req: AuthRequest, res: Response) => 
   }
 });
 
+// Strip HTML tags to prevent XSS in text fields stored and displayed as plain text
+function stripHtml(input: string): string {
+  return input.replace(/<[^>]*>/g, '').trim();
+}
+
 // PUT /api/commissars/profile — update own commissioner profile
 router.put('/profile', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { bio, specialization, country, city, photoUrl } = req.body;
+    const { bio, specialization, country, city, cities, photoUrl, achievements, website, telegram } = req.body;
 
     // Ensure commissioner record exists for this user
     const existing = await prisma.commissioner.findUnique({ where: { userId } });
@@ -100,13 +105,44 @@ router.put('/profile', authenticate, async (req: AuthRequest, res: Response) => 
       return;
     }
 
-    // Validate string fields
     const updates: Record<string, any> = {};
-    if (bio !== undefined) updates.bio = typeof bio === 'string' ? bio.slice(0, 2000) : null;
-    if (specialization !== undefined) updates.specialization = typeof specialization === 'string' ? specialization.slice(0, 200) : null;
-    if (country !== undefined) updates.country = typeof country === 'string' ? country.slice(0, 100) : null;
-    if (city !== undefined) updates.city = typeof city === 'string' ? city.slice(0, 100) : null;
-    if (photoUrl !== undefined) updates.photoUrl = typeof photoUrl === 'string' ? photoUrl.slice(0, 500) : null;
+
+    if (bio !== undefined) {
+      updates.bio = typeof bio === 'string' ? stripHtml(bio).slice(0, 2000) : null;
+    }
+    if (specialization !== undefined) {
+      updates.specialization = typeof specialization === 'string' ? specialization.slice(0, 200) : null;
+    }
+    if (country !== undefined) {
+      updates.country = typeof country === 'string' ? country.slice(0, 100) : null;
+    }
+    if (city !== undefined) {
+      updates.city = typeof city === 'string' ? city.slice(0, 100) : null;
+    }
+    if (photoUrl !== undefined) {
+      updates.photoUrl = typeof photoUrl === 'string' ? photoUrl.slice(0, 500) : null;
+    }
+    if (achievements !== undefined) {
+      updates.achievements = typeof achievements === 'string' ? stripHtml(achievements).slice(0, 1000) : null;
+    }
+    if (website !== undefined) {
+      updates.website = typeof website === 'string' ? website.slice(0, 200) : null;
+    }
+    if (telegram !== undefined) {
+      updates.telegram = typeof telegram === 'string' ? telegram.slice(0, 100) : null;
+    }
+    // cities: array of up to 3 non-empty strings
+    if (cities !== undefined) {
+      if (!Array.isArray(cities)) {
+        res.status(400).json({ error: 'cities must be an array' });
+        return;
+      }
+      const filtered = (cities as any[])
+        .filter((c) => typeof c === 'string' && c.trim().length > 0)
+        .map((c: string) => c.trim().slice(0, 100))
+        .slice(0, 3);
+      updates.cities = filtered;
+    }
 
     const updated = await prisma.commissioner.update({
       where: { userId },
