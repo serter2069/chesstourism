@@ -18,6 +18,7 @@ import adminRouter from './routes/admin';
 import notificationsRouter from './routes/notifications';
 import settingsRouter from './routes/settings';
 import verifyRouter from './routes/verify';
+import unsubscribeRouter from './routes/unsubscribe';
 import './lib/scheduleQueue'; // initialize BullMQ Worker for schedule-change email debounce
 
 dotenv.config();
@@ -108,6 +109,7 @@ app.use('/api', organizationsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', notificationsRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api', unsubscribeRouter);
 
 app.listen(PORT, () => {
   console.log(`ChesTourism API running on port ${PORT}`);
