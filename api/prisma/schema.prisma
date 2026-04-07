@@ -68,6 +68,7 @@ model User {
   fideTitle           String?
   preferences         Json?
   onboardingCompleted Boolean  @default(false)
+  emailOptOut         Boolean  @default(false)
   photoUrl            String?
   createdAt           DateTime @default(now())
 

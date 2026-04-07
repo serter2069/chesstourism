@@ -1,3 +1,6 @@
+import prisma from '../lib/prisma';
+import { signUnsubscribeToken } from '../utils/unsubscribeToken';
+
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 const FROM_EMAIL = 'noreply@diagrams.love';
 const FROM_NAME = 'ChesTourism';
@@ -33,6 +36,35 @@ async function brevoSend(payload: BrevoPayload): Promise<void> {
   }
 }
 
+/**
+ * Check whether the user with the given email has opted out of marketing emails.
+ * Returns true if opted out (email should NOT be sent).
+ */
+async function isEmailOptedOut(email: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { emailOptOut: true },
+  });
+  return user?.emailOptOut === true;
+}
+
+/**
+ * Build the unsubscribe footer HTML to append to marketing emails.
+ */
+function buildUnsubscribeFooter(email: string): string {
+  const token = signUnsubscribeToken(email);
+  const unsubscribeUrl = `${BASE_URL}/api/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+  return `
+    <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;" />
+    <p style="color: #888; font-size: 12px; text-align: center;">
+      You are receiving this email because you are registered on ChesTourism.<br/>
+      <a href="${unsubscribeUrl}" style="color: #888;">Unsubscribe from marketing emails</a>
+    </p>
+  `;
+}
+
+// ─── Transactional emails (no opt-out check) ──────────────────────────────────
+
 export async function sendOtpEmail(email: string, code: string): Promise<void> {
   await brevoSend({
     sender: { name: FROM_NAME, email: FROM_EMAIL },
@@ -44,29 +76,6 @@ export async function sendOtpEmail(email: string, code: string): Promise<void> {
       <p style="font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center;">${code}</p>
       <p>This code expires in 10 minutes.</p>
       <p>If you didn't request this, please ignore this email.</p>
-    `,
-  });
-}
-
-export async function sendTournamentInvite(
-  to: string,
-  userName: string,
-  tournamentName: string,
-  tournamentDate: string,
-  registrationUrl: string,
-): Promise<void> {
-  await brevoSend({
-    sender: { name: FROM_NAME, email: FROM_EMAIL },
-    to: [{ email: to }],
-    subject: `You're invited to ${tournamentName}!`,
-    htmlContent: `
-      <h2>Tournament Invitation</h2>
-      <p>Dear ${userName},</p>
-      <p>You are invited to participate in <strong>${tournamentName}</strong>!</p>
-      <p>Date: ${tournamentDate}</p>
-      <p><a href="${registrationUrl}">Register Now</a></p>
-      <p>We look forward to seeing you at the board!</p>
-      <p>Best regards,<br/>ChesTourism Team</p>
     `,
   });
 }
@@ -100,54 +109,6 @@ export async function sendCommissarApproval(
   });
 }
 
-export async function sendTournamentResults(
-  to: string,
-  userName: string,
-  tournamentName: string,
-  place: number,
-  eloChange: number,
-): Promise<void> {
-  const placeLabels: Record<number, string> = { 1: '1st', 2: '2nd', 3: '3rd' };
-  const placeText = placeLabels[place] || `${place}th`;
-  const eloText = eloChange >= 0 ? `+${eloChange}` : `${eloChange}`;
-
-  await brevoSend({
-    sender: { name: FROM_NAME, email: FROM_EMAIL },
-    to: [{ email: to }],
-    subject: `Tournament Results: ${tournamentName}`,
-    htmlContent: `
-      <h2>Tournament Results</h2>
-      <p>Dear ${userName},</p>
-      <p>The results for <strong>${tournamentName}</strong> are in!</p>
-      <p>Your placement: <strong>${placeText} place</strong></p>
-      <p>ELO change: <strong>${eloText}</strong></p>
-      ${place <= 3 ? '<p>Congratulations on your podium finish! Your certificate will be available for download in your profile.</p>' : ''}
-      <p>Best regards,<br/>ChesTourism Team</p>
-    `,
-  });
-}
-
-export async function sendThankYouEmail(
-  to: string,
-  userName: string,
-  tournamentName: string,
-): Promise<void> {
-  await brevoSend({
-    sender: { name: FROM_NAME, email: FROM_EMAIL },
-    to: [{ email: to }],
-    subject: `Thank you for participating in ${tournamentName}!`,
-    htmlContent: `
-      <h2>Thank You!</h2>
-      <p>Dear ${userName},</p>
-      <p>Thank you for participating in <strong>${tournamentName}</strong>!</p>
-      <p>We hope you enjoyed the tournament and the experience.</p>
-      <p>Check out upcoming tournaments on our platform and keep playing!</p>
-      <p><a href="${BASE_URL}/tournaments">Browse Tournaments</a></p>
-      <p>Best regards,<br/>ChesTourism Team</p>
-    `,
-  });
-}
-
 export async function sendOrganizationRequestDecision(
   to: string,
   contactName: string,
@@ -173,60 +134,6 @@ export async function sendOrganizationRequestDecision(
         ? `<p>Welcome aboard! You can now explore partnership opportunities on <a href="${BASE_URL}">ChesTourism</a>.</p>`
         : '<p>If you have questions, feel free to contact us or submit a new request.</p>'
       }
-      <p>Best regards,<br/>ChesTourism Team</p>
-    `,
-  });
-}
-
-export async function sendScheduleChangeEmail(
-  to: string,
-  userName: string,
-  tournament: {
-    id: string;
-    title: string;
-    city: string;
-    country: string;
-    startDate: Date;
-    endDate: Date;
-  },
-): Promise<void> {
-  const startFormatted = tournament.startDate.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const endFormatted = tournament.endDate.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const tournamentUrl = `${BASE_URL}/tournaments/${tournament.id}`;
-
-  await brevoSend({
-    sender: { name: FROM_NAME, email: FROM_EMAIL },
-    to: [{ email: to }],
-    subject: `Schedule update: ${tournament.title}`,
-    htmlContent: `
-      <h2>Tournament Schedule Updated</h2>
-      <p>Dear ${userName},</p>
-      <p>The schedule for <strong>${tournament.title}</strong> has been updated.</p>
-      <table style="border-collapse: collapse; margin: 16px 0;">
-        <tr>
-          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Location:</td>
-          <td>${tournament.city}, ${tournament.country}</td>
-        </tr>
-        <tr>
-          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Starts:</td>
-          <td>${startFormatted}</td>
-        </tr>
-        <tr>
-          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Ends:</td>
-          <td>${endFormatted}</td>
-        </tr>
-      </table>
-      <p><a href="${tournamentUrl}">View tournament details</a></p>
       <p>Best regards,<br/>ChesTourism Team</p>
     `,
   });
@@ -306,5 +213,144 @@ export async function sendResultsWithCertificate(
         content: certificatePdf.toString('base64'),
       },
     ],
+  });
+}
+
+// ─── Marketing emails (opt-out guarded + unsubscribe footer) ──────────────────
+
+export async function sendTournamentInvite(
+  to: string,
+  userName: string,
+  tournamentName: string,
+  tournamentDate: string,
+  registrationUrl: string,
+): Promise<void> {
+  if (await isEmailOptedOut(to)) return;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `You're invited to ${tournamentName}!`,
+    htmlContent: `
+      <h2>Tournament Invitation</h2>
+      <p>Dear ${userName},</p>
+      <p>You are invited to participate in <strong>${tournamentName}</strong>!</p>
+      <p>Date: ${tournamentDate}</p>
+      <p><a href="${registrationUrl}">Register Now</a></p>
+      <p>We look forward to seeing you at the board!</p>
+      <p>Best regards,<br/>ChesTourism Team</p>
+      ${buildUnsubscribeFooter(to)}
+    `,
+  });
+}
+
+export async function sendTournamentResults(
+  to: string,
+  userName: string,
+  tournamentName: string,
+  place: number,
+  eloChange: number,
+): Promise<void> {
+  if (await isEmailOptedOut(to)) return;
+
+  const placeLabels: Record<number, string> = { 1: '1st', 2: '2nd', 3: '3rd' };
+  const placeText = placeLabels[place] || `${place}th`;
+  const eloText = eloChange >= 0 ? `+${eloChange}` : `${eloChange}`;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `Tournament Results: ${tournamentName}`,
+    htmlContent: `
+      <h2>Tournament Results</h2>
+      <p>Dear ${userName},</p>
+      <p>The results for <strong>${tournamentName}</strong> are in!</p>
+      <p>Your placement: <strong>${placeText} place</strong></p>
+      <p>ELO change: <strong>${eloText}</strong></p>
+      ${place <= 3 ? '<p>Congratulations on your podium finish! Your certificate will be available for download in your profile.</p>' : ''}
+      <p>Best regards,<br/>ChesTourism Team</p>
+      ${buildUnsubscribeFooter(to)}
+    `,
+  });
+}
+
+export async function sendThankYouEmail(
+  to: string,
+  userName: string,
+  tournamentName: string,
+): Promise<void> {
+  if (await isEmailOptedOut(to)) return;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `Thank you for participating in ${tournamentName}!`,
+    htmlContent: `
+      <h2>Thank You!</h2>
+      <p>Dear ${userName},</p>
+      <p>Thank you for participating in <strong>${tournamentName}</strong>!</p>
+      <p>We hope you enjoyed the tournament and the experience.</p>
+      <p>Check out upcoming tournaments on our platform and keep playing!</p>
+      <p><a href="${BASE_URL}/tournaments">Browse Tournaments</a></p>
+      <p>Best regards,<br/>ChesTourism Team</p>
+      ${buildUnsubscribeFooter(to)}
+    `,
+  });
+}
+
+export async function sendScheduleChangeEmail(
+  to: string,
+  userName: string,
+  tournament: {
+    id: string;
+    title: string;
+    city: string;
+    country: string;
+    startDate: Date;
+    endDate: Date;
+  },
+): Promise<void> {
+  if (await isEmailOptedOut(to)) return;
+
+  const startFormatted = tournament.startDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const endFormatted = tournament.endDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const tournamentUrl = `${BASE_URL}/tournaments/${tournament.id}`;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `Schedule update: ${tournament.title}`,
+    htmlContent: `
+      <h2>Tournament Schedule Updated</h2>
+      <p>Dear ${userName},</p>
+      <p>The schedule for <strong>${tournament.title}</strong> has been updated.</p>
+      <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Location:</td>
+          <td>${tournament.city}, ${tournament.country}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Starts:</td>
+          <td>${startFormatted}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Ends:</td>
+          <td>${endFormatted}</td>
+        </tr>
+      </table>
+      <p><a href="${tournamentUrl}">View tournament details</a></p>
+      <p>Best regards,<br/>ChesTourism Team</p>
+      ${buildUnsubscribeFooter(to)}
+    `,
   });
 }
