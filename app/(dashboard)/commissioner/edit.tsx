@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarPlaceholderText: {
-    color: '#ffffff',
+    color: Colors.white,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
   },
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarOverlayText: {
-    color: '#ffffff',
+    color: Colors.white,
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.medium,
   },

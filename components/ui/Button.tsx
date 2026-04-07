@@ -28,7 +28,7 @@ const variantStyles: Record<ButtonVariant, { bg: string; text: string; border: s
   primary: { bg: Colors.gold, text: Colors.white, border: 'transparent' },
   secondary: { bg: Colors.backgroundAlt, text: Colors.text, border: Colors.border },
   ghost: { bg: 'transparent', text: Colors.primary, border: Colors.primary },
-  danger: { bg: Colors.error, text: '#ffffff', border: 'transparent' },
+  danger: { bg: Colors.error, text: Colors.white, border: 'transparent' },
 };
 
 export default function Button({
