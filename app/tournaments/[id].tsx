@@ -133,7 +133,7 @@ type TabKey = 'info' | 'participants' | 'rounds' | 'results' | 'photos' | 'annou
 
 const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
   DRAFT: { label: 'Draft', status: 'default' },
-  PUBLISHED: { label: 'Coming Soon', status: 'default' },
+  PUBLISHED: { label: 'Open for Registration', status: 'success' },
   REGISTRATION_OPEN: { label: 'Registration Open', status: 'success' },
   REGISTRATION_CLOSED: { label: 'Registration Closed', status: 'warning' },
   IN_PROGRESS: { label: 'In Progress', status: 'info' },
