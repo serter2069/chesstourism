@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { createNotification } from '../utils/notifications';
-import { sendDisputeAlertEmail } from '../services/email.service';
+import { sendDisputeAlertEmail, sendPaymentConfirmedEmail } from '../services/email.service';
 
 const router = Router();
 
@@ -183,6 +183,35 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
         }),
       ]);
       console.log(`Payment confirmed for user ${userId}, tournament ${tournamentId}`);
+
+      // In-app notification + email — fire-and-forget (non-blocking, must not delay Stripe response)
+      (async () => {
+        try {
+          await createNotification(
+            userId,
+            'PAYMENT_CONFIRMED',
+            'Payment Confirmed',
+            `Your payment for the tournament has been successfully processed. Your registration is now confirmed.`,
+            { tournamentId },
+          );
+        } catch (notifErr) {
+          console.error('Webhook: failed to create PAYMENT_CONFIRMED notification:', notifErr);
+        }
+
+        try {
+          const [user, tournament] = await Promise.all([
+            prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } }),
+            prisma.tournament.findUnique({ where: { id: tournamentId }, select: { title: true } }),
+          ]);
+          if (user?.email && tournament?.title) {
+            await sendPaymentConfirmedEmail(user.email, user.name ?? 'Player', tournament.title, tournamentId);
+          } else {
+            console.warn(`Webhook: skipping payment confirmed email — missing user email or tournament title (userId=${userId}, tournamentId=${tournamentId})`);
+          }
+        } catch (emailErr) {
+          console.error('Webhook: failed to send payment confirmed email:', emailErr);
+        }
+      })();
     } catch (err) {
       console.error('Webhook: DB update failed:', err);
       // Dead letter: record failed event so it can be inspected/replayed
