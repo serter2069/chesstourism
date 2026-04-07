@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../../components/layout';
-import { Button, Card, Badge, LoadingSpinner } from '../../../components/ui';
+import { Button, Card, Badge, LoadingSpinner, EmptyState } from '../../../components/ui';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -111,12 +111,11 @@ export default function CommissarTournamentsScreen() {
         )}
 
         {!loading && !error && tournaments.length === 0 && (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No Tournaments Yet</Text>
-            <Text style={styles.emptyText}>
-              Create your first tournament to get started.
-            </Text>
-          </View>
+          <EmptyState
+            icon="♜"
+            title="No Tournaments Yet"
+            subtitle="Create your first tournament to get started."
+          />
         )}
 
         {!loading &&
@@ -186,22 +185,6 @@ const styles = StyleSheet.create({
     color: Colors.error,
     fontSize: Typography.sizes.sm,
     marginBottom: Spacing.md,
-  },
-  empty: {
-    alignItems: 'center',
-    paddingTop: Spacing['4xl'],
-    paddingHorizontal: Spacing.xl,
-  },
-  emptyTitle: {
-    fontSize: Typography.sizes.lg,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.text,
-    marginBottom: Spacing.sm,
-  },
-  emptyText: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textMuted,
-    textAlign: 'center',
   },
   cardWrapper: {
     paddingHorizontal: Spacing.lg,
