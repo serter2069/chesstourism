@@ -69,8 +69,23 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Stricter limiter for public endpoints to prevent scraping/abuse.
+// 60 req/15min < generalLimiter (100), so this fires first for these routes.
+const publicLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: { error: 'Too many requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use('/api/', generalLimiter);
 app.use('/api/auth/', authLimiter);
+app.use('/api/tournaments', publicLimiter);
+app.use('/api/ratings', publicLimiter);
+app.use('/api/commissars', publicLimiter);
+app.use('/api/users', publicLimiter);
+app.use('/api/organization-requests', publicLimiter);
 
 app.use(express.json());
 app.use(cookieParser());
