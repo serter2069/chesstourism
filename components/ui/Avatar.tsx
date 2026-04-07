@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   initials: {
-    color: '#ffffff',
+    color: Colors.white,
     fontWeight: Typography.weights.semibold,
   },
 });
