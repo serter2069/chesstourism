@@ -157,15 +157,17 @@ export default function HomeScreen() {
         )}
 
         {/* Upcoming Tournaments */}
-        {tournaments.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Upcoming Tournaments</Text>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Upcoming Tournaments</Text>
+            {tournaments.length > 0 && (
               <TouchableOpacity onPress={() => router.push('/tournaments')}>
                 <Text style={styles.seeAll}>See All</Text>
               </TouchableOpacity>
-            </View>
-            {tournaments.map((t) => {
+            )}
+          </View>
+          {tournaments.length > 0 ? (
+            tournaments.map((t) => {
               const badge = STATUS_BADGE[t.status] || STATUS_BADGE.REGISTRATION_OPEN;
               return (
                 <TouchableOpacity
@@ -189,9 +191,23 @@ export default function HomeScreen() {
                   </Card>
                 </TouchableOpacity>
               );
-            })}
-          </View>
-        )}
+            })
+          ) : (
+            <Card style={styles.emptyStateCard}>
+              <Text style={styles.emptyStateIcon}>{'♜'}</Text>
+              <Text style={styles.emptyStateTitle}>No Tournaments Yet</Text>
+              <Text style={styles.emptyStateDesc}>
+                Check back soon for upcoming chess tournaments
+              </Text>
+              <Button
+                title="Explore"
+                onPress={() => router.push('/tournaments')}
+                variant="secondary"
+                style={styles.emptyStateButton}
+              />
+            </Card>
+          )}
+        </View>
 
         {/* Top Ratings */}
         {ratings.length > 0 && (
@@ -505,5 +521,34 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: Spacing['2xl'],
+  },
+  // Empty state
+  emptyStateCard: {
+    alignItems: 'center',
+    paddingVertical: Spacing['2xl'],
+    paddingHorizontal: Spacing.xl,
+  },
+  emptyStateIcon: {
+    fontSize: Typography.sizes.iconLg,
+    color: Colors.gold,
+    marginBottom: Spacing.md,
+  },
+  emptyStateTitle: {
+    fontSize: Typography.sizes.lg,
+    fontFamily: Typography.fontFamilyHeading,
+    fontWeight: Typography.weights.bold,
+    color: Colors.text,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
+  },
+  emptyStateDesc: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
+    marginBottom: Spacing.xl,
+  },
+  emptyStateButton: {
+    minWidth: 160,
   },
 });
