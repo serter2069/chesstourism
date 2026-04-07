@@ -30,6 +30,7 @@ enum RegistrationStatus {
   APPROVED
   REJECTED
   PAID
+  CANCELLED
 }
 
 enum PaymentStatus {
