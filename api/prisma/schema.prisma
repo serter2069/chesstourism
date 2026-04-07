@@ -131,6 +131,7 @@ model Tournament {
   results       TournamentResult[]
   announcements Announcement[]
   schedule      ScheduleEntry[]
+  rounds        Round[]
 
   @@index([commissionerId])
   @@index([status])
@@ -307,4 +308,29 @@ model WebhookEvent {
   status        String   @default("processed")
   errorMessage  String?
   rawRef        String?  // stores "eventId:eventType" for dead letter tracing
+}
+
+model Round {
+  id           String    @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  roundNumber  Int
+  status       String    @default("PENDING")
+  pairings     Pairing[]
+  createdAt    DateTime  @default(now())
+
+  @@unique([tournamentId, roundNumber])
+  @@index([tournamentId])
+}
+
+model Pairing {
+  id        String   @id @default(cuid())
+  roundId   String
+  round     Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  player1Id String
+  player2Id String?
+  result    String?
+  board     Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

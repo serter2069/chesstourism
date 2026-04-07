@@ -74,6 +74,21 @@ interface ScheduleEntry {
   roundNumber?: number | null;
 }
 
+interface RoundPairing {
+  id: string;
+  player1Id: string;
+  player2Id: string | null;
+  result: string | null;
+  board: number | null;
+}
+
+interface TournamentRound {
+  id: string;
+  roundNumber: number;
+  status: string;
+  pairings: RoundPairing[];
+}
+
 interface Announcement {
   id: string;
   title: string;
@@ -114,7 +129,7 @@ interface TournamentDetail {
   _count?: { registrations: number };
 }
 
-type TabKey = 'info' | 'participants' | 'results' | 'photos' | 'announcements' | 'schedule';
+type TabKey = 'info' | 'participants' | 'rounds' | 'results' | 'photos' | 'announcements' | 'schedule';
 
 const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
   DRAFT: { label: 'Draft', status: 'default' },
@@ -145,6 +160,10 @@ export default function TournamentDetailScreen() {
 
   // Schedule state
   const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
+
+  // Rounds state
+  const [rounds, setRounds] = useState<TournamentRound[]>([]);
+  const [expandedRound, setExpandedRound] = useState<string | null>(null);
 
   // Announcements state
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -214,6 +233,16 @@ export default function TournamentDetailScreen() {
     }
   }, [id]);
 
+  const fetchRounds = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await api.get(`/tournaments/${id}/rounds`);
+      setRounds(res.data);
+    } catch {
+      // Silent — rounds are optional
+    }
+  }, [id]);
+
   useEffect(() => {
     if (id) fetchPhotos();
   }, [id, fetchPhotos]);
@@ -225,6 +254,10 @@ export default function TournamentDetailScreen() {
   useEffect(() => {
     if (id) fetchAnnouncements();
   }, [id, fetchAnnouncements]);
+
+  useEffect(() => {
+    if (id) fetchRounds();
+  }, [id, fetchRounds]);
 
   const handleAddPhoto = useCallback(async () => {
     const trimmedUrl = photoUrl.trim();
@@ -369,9 +402,21 @@ export default function TournamentDetailScreen() {
   const canRegister = ['PUBLISHED', 'REGISTRATION_OPEN'].includes(tournament.status) && user && !isRegistered && !isFull;
   const hasResults = tournament.status === 'COMPLETED' || tournament.status === 'IN_PROGRESS';
   const canDownloadCertificate = tournament.status === 'COMPLETED' && !!user && !!myReg && ['APPROVED', 'PAID'].includes(myReg.status);
+  // Build a player name map from participants for display in rounds
+  const playerNameMap = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    if (tournament.participants) {
+      for (const p of tournament.participants) {
+        map[p.user.id] = [p.user.name, p.user.surname].filter(Boolean).join(' ');
+      }
+    }
+    return map;
+  }, [tournament.participants]);
+
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'info', label: 'Info' },
     { key: 'participants', label: `Players (${tournament.participants?.length || 0})` },
+    ...(rounds.length > 0 ? [{ key: 'rounds' as TabKey, label: `Rounds (${rounds.length})` }] : []),
     ...(hasResults ? [{ key: 'results' as TabKey, label: 'Results' }] : []),
     ...(schedule.length > 0 ? [{ key: 'schedule' as TabKey, label: `Schedule (${schedule.length})` }] : []),
     { key: 'photos', label: photos.length ? `Photos (${photos.length})` : 'Photos' },
@@ -595,6 +640,63 @@ export default function TournamentDetailScreen() {
                   </TouchableOpacity>
                 ))}
               </Card>
+            )}
+          </View>
+        )}
+
+        {activeTab === 'rounds' && (
+          <View style={styles.section}>
+            {rounds.length === 0 ? (
+              <Text style={styles.emptyTab}>No rounds yet.</Text>
+            ) : (
+              rounds.map((round) => {
+                const isExpanded = expandedRound === round.id;
+                return (
+                  <Card key={round.id} style={styles.roundCard}>
+                    <TouchableOpacity
+                      style={styles.roundHeader}
+                      onPress={() => setExpandedRound(isExpanded ? null : round.id)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.roundTitle}>Round {round.roundNumber}</Text>
+                      <Badge
+                        label={round.status}
+                        status={round.status === 'COMPLETED' ? 'success' : round.status === 'IN_PROGRESS' ? 'info' : 'default'}
+                      />
+                    </TouchableOpacity>
+                    {isExpanded && (
+                      <View style={styles.pairingsContainer}>
+                        {round.pairings.length === 0 ? (
+                          <Text style={styles.emptyTab}>No pairings set.</Text>
+                        ) : (
+                          <>
+                            <View style={styles.pairingsHeaderRow}>
+                              <Text style={[styles.pairingsHeaderText, styles.pairingBoard]}>#</Text>
+                              <Text style={[styles.pairingsHeaderText, styles.pairingPlayer]}>White</Text>
+                              <Text style={[styles.pairingsHeaderText, styles.pairingResult]}>Result</Text>
+                              <Text style={[styles.pairingsHeaderText, styles.pairingPlayer]}>Black</Text>
+                            </View>
+                            {round.pairings.map((p, idx) => (
+                              <View key={p.id} style={[styles.pairingRow, idx % 2 === 0 && styles.rowEven]}>
+                                <Text style={[styles.pairingText, styles.pairingBoard]}>{p.board ?? idx + 1}</Text>
+                                <Text style={[styles.pairingText, styles.pairingPlayer]} numberOfLines={1}>
+                                  {playerNameMap[p.player1Id] || p.player1Id.slice(0, 8)}
+                                </Text>
+                                <Text style={[styles.pairingText, styles.pairingResult, styles.pairingResultValue]}>
+                                  {p.result || '-'}
+                                </Text>
+                                <Text style={[styles.pairingText, styles.pairingPlayer]} numberOfLines={1}>
+                                  {p.player2Id ? (playerNameMap[p.player2Id] || p.player2Id.slice(0, 8)) : 'BYE'}
+                                </Text>
+                              </View>
+                            ))}
+                          </>
+                        )}
+                      </View>
+                    )}
+                  </Card>
+                );
+              })
             )}
           </View>
         )}
@@ -1083,6 +1185,64 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     color: Colors.textMuted,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
+  },
+  // Rounds
+  roundCard: {
+    marginBottom: Spacing.md,
+    padding: 0,
+    overflow: 'hidden',
+  },
+  roundHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: Spacing.md,
+  },
+  roundTitle: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.text,
+  },
+  pairingsContainer: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  pairingsHeaderRow: {
+    flexDirection: 'row',
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    backgroundColor: Colors.backgroundAlt,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  pairingsHeaderText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textMuted,
+    textTransform: 'uppercase',
+  },
+  pairingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+  },
+  pairingText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.text,
+  },
+  pairingBoard: {
+    width: 28,
+  },
+  pairingPlayer: {
+    flex: 1,
+  },
+  pairingResult: {
+    width: 60,
+    textAlign: 'center',
+  },
+  pairingResultValue: {
+    fontWeight: Typography.weights.semibold,
   },
   // Announcements
   announcementCard: {
