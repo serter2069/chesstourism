@@ -521,6 +521,159 @@ router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADM
   }
 });
 
+// ─── Multi-Commissioner Endpoints ───────────────────────
+
+// Helper: get LEAD userId from TournamentCommissioner table
+async function getTournamentLeadUserId(tournamentId: string): Promise<string | null> {
+  const lead = await prisma.tournamentCommissioner.findFirst({
+    where: { tournamentId, role: 'LEAD' },
+    select: { userId: true },
+  });
+  return lead?.userId ?? null;
+}
+
+// Helper: check if user is LEAD commissioner or ADMIN
+async function isLeadOrAdmin(tournamentId: string, userId: string, role: string): Promise<boolean> {
+  if (role === 'ADMIN') return true;
+  const leadUserId = await getTournamentLeadUserId(tournamentId);
+  return leadUserId === userId;
+}
+
+// GET /api/tournaments/:id/commissioners — list all commissioners (public)
+router.get('/tournaments/:id/commissioners', async (req: AuthRequest, res: Response) => {
+  try {
+    const tournamentId = req.params.id;
+    const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId } });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    const commissioners = await prisma.tournamentCommissioner.findMany({
+      where: { tournamentId },
+      include: {
+        user: { select: { id: true, name: true, surname: true, email: true } },
+      },
+      orderBy: [{ role: 'asc' }, { assignedAt: 'asc' }],
+    });
+
+    res.json(commissioners);
+  } catch (err) {
+    console.error('List commissioners error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/tournaments/:id/commissioners — add commissioner (LEAD or ADMIN only)
+router.post('/tournaments/:id/commissioners', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournamentId = req.params.id;
+
+    const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId } });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (!(await isLeadOrAdmin(tournamentId, userId, role))) {
+      res.status(403).json({ error: 'Only the lead commissioner or admin can manage commissioners' });
+      return;
+    }
+
+    const { userId: targetUserId, role: commRole } = req.body as { userId?: string; role?: string };
+    if (!targetUserId) {
+      res.status(400).json({ error: 'userId is required' });
+      return;
+    }
+    if (!commRole || !['LEAD', 'ASSISTANT'].includes(commRole)) {
+      res.status(400).json({ error: 'role must be LEAD or ASSISTANT' });
+      return;
+    }
+
+    // Ensure target user exists
+    const targetUser = await prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    // Only one LEAD allowed per tournament
+    if (commRole === 'LEAD') {
+      const existingLead = await prisma.tournamentCommissioner.findFirst({
+        where: { tournamentId, role: 'LEAD' },
+      });
+      if (existingLead && existingLead.userId !== targetUserId) {
+        res.status(409).json({ error: 'A lead commissioner already exists for this tournament' });
+        return;
+      }
+    }
+
+    try {
+      const entry = await prisma.tournamentCommissioner.create({
+        data: {
+          tournamentId,
+          userId: targetUserId,
+          role: commRole as 'LEAD' | 'ASSISTANT',
+        },
+        include: {
+          user: { select: { id: true, name: true, surname: true, email: true } },
+        },
+      });
+      res.status(201).json(entry);
+    } catch (createErr: unknown) {
+      const prismaErr = createErr as { code?: string };
+      if (prismaErr?.code === 'P2002') {
+        res.status(409).json({ error: 'This user is already assigned as a commissioner for this tournament' });
+        return;
+      }
+      throw createErr;
+    }
+  } catch (err) {
+    console.error('Add commissioner error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/tournaments/:id/commissioners/:targetUserId — remove commissioner (LEAD or ADMIN only)
+router.delete('/tournaments/:id/commissioners/:targetUserId', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const { id: tournamentId, targetUserId } = req.params;
+
+    const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId } });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (!(await isLeadOrAdmin(tournamentId, userId, role))) {
+      res.status(403).json({ error: 'Only the lead commissioner or admin can manage commissioners' });
+      return;
+    }
+
+    const entry = await prisma.tournamentCommissioner.findFirst({
+      where: { tournamentId, userId: targetUserId },
+    });
+    if (!entry) {
+      res.status(404).json({ error: 'Commissioner assignment not found' });
+      return;
+    }
+
+    // LEAD cannot remove themselves via this endpoint
+    if (entry.role === 'LEAD' && role !== 'ADMIN') {
+      res.status(403).json({ error: 'Lead commissioner cannot be removed by another commissioner; contact admin' });
+      return;
+    }
+
+    await prisma.tournamentCommissioner.delete({ where: { id: entry.id } });
+    res.status(204).send();
+  } catch (err) {
+    console.error('Remove commissioner error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ─── Results Endpoints ──────────────────────────────────
 
 // POST /api/tournaments/:id/results — submit results (Commissioner/Admin only)
