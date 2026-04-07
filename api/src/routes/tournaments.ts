@@ -536,20 +536,34 @@ router.delete('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADM
 
 // ─── Multi-Commissioner Endpoints ───────────────────────
 
-// Helper: get LEAD userId from TournamentCommissioner table
+// Helper: get LEAD userId from TournamentCommissioner table (with legacy commissionerId fallback)
 async function getTournamentLeadUserId(tournamentId: string): Promise<string | null> {
   const lead = await prisma.tournamentCommissioner.findFirst({
     where: { tournamentId, role: 'LEAD' },
     select: { userId: true },
   });
-  return lead?.userId ?? null;
+  if (lead?.userId) return lead.userId;
+
+  // Fallback: legacy commissionerId field for older tournaments
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { commissionerId: true },
+  });
+  return tournament?.commissionerId ?? null;
 }
 
-// Helper: check if user is LEAD commissioner or ADMIN
+// Helper: check if user is LEAD commissioner or ADMIN (with legacy commissionerId fallback)
 async function isLeadOrAdmin(tournamentId: string, userId: string, role: string): Promise<boolean> {
   if (role === 'ADMIN') return true;
   const leadUserId = await getTournamentLeadUserId(tournamentId);
-  return leadUserId === userId;
+  if (leadUserId === userId) return true;
+
+  // Additional fallback: check legacy commissionerId directly
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { commissionerId: true },
+  });
+  return tournament?.commissionerId === userId;
 }
 
 // GET /api/tournaments/:id/commissioners — list all commissioners (public)
