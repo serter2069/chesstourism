@@ -213,6 +213,7 @@ model Payment {
 
   @@index([userId])
   @@index([tournamentId])
+  @@index([externalId])
 }
 
 model TournamentPhoto {
