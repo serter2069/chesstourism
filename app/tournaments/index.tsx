@@ -98,6 +98,7 @@ export default function TournamentsListScreen() {
   const [cityFilter, setCityFilter] = useState('');
   const [debouncedCityFilter, setDebouncedCityFilter] = useState('');
   const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [freeFilter, setFreeFilter] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(1);
@@ -148,6 +149,7 @@ export default function TournamentsListScreen() {
       if (timeControlFilter) params.timeControl = timeControlFilter;
       if (debouncedCountryFilter) params.country = debouncedCountryFilter;
       if (debouncedCityFilter) params.city = debouncedCityFilter;
+      if (freeFilter) params.feeMax = 0;
       if (dateFrom) params.startFrom = dateFrom;
       if (dateTo) params.startTo = dateTo;
 
@@ -169,7 +171,7 @@ export default function TournamentsListScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [debouncedSearchQuery, statusFilter, ratingFilter, timeControlFilter, debouncedCountryFilter, debouncedCityFilter, dateFrom, dateTo]);
+  }, [debouncedSearchQuery, statusFilter, ratingFilter, timeControlFilter, freeFilter, debouncedCountryFilter, debouncedCityFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchTournaments(1);
@@ -286,6 +288,27 @@ export default function TournamentsListScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Price filter */}
+          <View style={styles.filterRow}>
+            <Text style={styles.filterLabel}>Price</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.chipRow}>
+                <TouchableOpacity
+                  onPress={() => setFreeFilter(false)}
+                  style={[styles.chip, !freeFilter && styles.chipActive]}
+                >
+                  <Text style={[styles.chipText, !freeFilter && styles.chipTextActive]}>All</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setFreeFilter(true)}
+                  style={[styles.chip, freeFilter && styles.chipActive]}
+                >
+                  <Text style={[styles.chipText, freeFilter && styles.chipTextActive]}>Free</Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
