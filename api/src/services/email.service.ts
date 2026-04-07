@@ -232,6 +232,51 @@ export async function sendScheduleChangeEmail(
   });
 }
 
+export async function sendDisputeAlertEmail(
+  to: string,
+  paymentId: string,
+  disputeId: string,
+  chargeId: string,
+  amount: number,
+  currency: string,
+  reason: string,
+): Promise<void> {
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `[ACTION REQUIRED] Chargeback dispute opened — Payment #${paymentId}`,
+    htmlContent: `
+      <h2 style="color: #cc0000;">Chargeback Dispute Opened</h2>
+      <p>A Stripe chargeback dispute has been filed. Immediate attention is required.</p>
+      <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Payment ID:</td>
+          <td>${paymentId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Dispute ID:</td>
+          <td>${disputeId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Charge ID:</td>
+          <td>${chargeId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Amount:</td>
+          <td>${amount} ${currency.toUpperCase()}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; font-weight: bold;">Reason:</td>
+          <td>${reason}</td>
+        </tr>
+      </table>
+      <p>The payment status has been updated to <strong>DISPUTED</strong> in the system.</p>
+      <p>Please log in to the Stripe Dashboard to review and respond to this dispute before the deadline.</p>
+      <p style="color: #888; font-size: 12px;">This is an automated alert from ChesTourism.</p>
+    `,
+  });
+}
+
 export async function sendResultsWithCertificate(
   to: string,
   userName: string,

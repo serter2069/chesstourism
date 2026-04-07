@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { createNotification } from '../utils/notifications';
+import { sendDisputeAlertEmail } from '../services/email.service';
 
 const router = Router();
 
@@ -377,29 +378,58 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       return;
     }
 
-    // Notify all admins (fire-and-forget — must not fail the webhook response)
+    // Notify all admins via in-app notification + email (fire-and-forget — must not fail the webhook response)
     try {
       const admins = await prisma.user.findMany({
         where: { role: 'ADMIN' },
-        select: { id: true },
+        select: { id: true, email: true },
       });
+
+      if (admins.length === 0) {
+        console.warn('Webhook dispute: no admin users found — skipping admin notifications');
+      }
+
       await Promise.all(
-        admins.map((admin) =>
-          createNotification(
-            admin.id,
-            'PAYMENT_DISPUTED',
-            'Payment Disputed',
-            `A chargeback dispute was opened for payment #${payment.id} (amount: ${payment.amount} ${payment.currency}). Dispute ID: ${dispute.id}.`,
-            {
-              paymentId: payment.id,
-              disputeId: dispute.id,
-              chargeId,
-              amount: payment.amount,
-              currency: payment.currency,
-              reason: dispute.reason,
-            },
-          ),
-        ),
+        admins.flatMap((admin) => {
+          const notificationBody = `A chargeback dispute was opened for payment #${payment.id} (amount: ${payment.amount} ${payment.currency}). Dispute ID: ${dispute.id}.`;
+          const notificationMeta = {
+            paymentId: payment.id,
+            disputeId: dispute.id,
+            chargeId,
+            amount: payment.amount,
+            currency: payment.currency,
+            reason: dispute.reason,
+          };
+
+          const tasks: Promise<void>[] = [
+            createNotification(
+              admin.id,
+              'PAYMENT_DISPUTED',
+              'Payment Disputed',
+              notificationBody,
+              notificationMeta,
+            ),
+          ];
+
+          // Send email alert only if the admin has an email address
+          if (admin.email) {
+            tasks.push(
+              sendDisputeAlertEmail(
+                admin.email,
+                payment.id,
+                dispute.id,
+                chargeId,
+                payment.amount,
+                payment.currency,
+                dispute.reason ?? 'unknown',
+              ),
+            );
+          } else {
+            console.warn(`Webhook dispute: admin user ${admin.id} has no email — skipping email alert`);
+          }
+
+          return tasks;
+        }),
       );
     } catch (err) {
       console.error('Webhook dispute: failed to create admin notifications:', err);
