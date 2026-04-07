@@ -2497,13 +2497,12 @@ chesstourism.com / chesstourism.ru
 **Цель:** Убрать мёртвый код из кодовой базы
 
 **Действия:**
-1. Удалить `/(onboarding)/quiz.tsx` — UC-19 cut, экран не используется
-2. Добавить redirect `/ratings/history → /ratings` — UC-26 cut
-3. Обновить навигационные ссылки если есть ссылки на эти маршруты
+1. Удалить `/(onboarding)/_layout.tsx` и папку `(onboarding)/` — UC-19 cut, quiz экран никогда не создавался, группа пуста
+2. ~~Добавить redirect `/ratings/history → /ratings`~~ — ОТМЕНЕНО: UC-26 reverted to KEEP (2026-04-06), экран реализован и доступен через кнопку на /ratings
 
 **Acceptance criteria:**
-- AC1: `/ratings/history` возвращает redirect 301 на `/ratings`
-- AC2: `/(onboarding)/quiz` не достижим через навигацию
+- AC1: ~~`/ratings/history` возвращает redirect 301 на `/ratings`~~ — НЕ применяется (UC-26 keep)
+- AC2: `/(onboarding)/` группа удалена из кодовой базы
 - AC3: Нет broken links в приложении
 
 ---
