@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../../components/layout';
-import { Card, Badge, LoadingSpinner } from '../../../components/ui';
+import { Card, Badge, LoadingSpinner, EmptyState } from '../../../components/ui';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -92,12 +92,11 @@ export default function MyRegistrationsScreen() {
         )}
 
         {!loading && !error && items.length === 0 && (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No Registrations</Text>
-            <Text style={styles.emptyText}>
-              You haven't registered for any tournaments yet. Browse tournaments and apply!
-            </Text>
-          </View>
+          <EmptyState
+            icon="♟"
+            title="No Registrations"
+            subtitle="You haven't registered for any tournaments yet. Browse tournaments and apply!"
+          />
         )}
 
         {!loading && items.map((reg) => {
@@ -154,22 +153,6 @@ const styles = StyleSheet.create({
   errorText: {
     color: Colors.error,
     fontSize: Typography.sizes.sm,
-    textAlign: 'center',
-  },
-  empty: {
-    alignItems: 'center',
-    paddingTop: Spacing['4xl'],
-    paddingHorizontal: Spacing.xl,
-  },
-  emptyTitle: {
-    fontSize: Typography.sizes.lg,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.text,
-    marginBottom: Spacing.sm,
-  },
-  emptyText: {
-    fontSize: Typography.sizes.sm,
-    color: Colors.textMuted,
     textAlign: 'center',
   },
   cardWrapper: {

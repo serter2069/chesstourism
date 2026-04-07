@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { Avatar, Badge, Card } from '../../components/ui';
+import { Avatar, Badge, Card, EmptyState } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { getCountryFlag } from '../../constants/countryFlags';
 import { Spacing } from '../../constants/spacing';
@@ -216,10 +216,7 @@ export default function CommissarsScreen() {
           <Text style={styles.emptyText}>{error}</Text>
         </View>
       ) : commissars.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>{'♞'}</Text>
-          <Text style={styles.emptyText}>No commissars found</Text>
-        </View>
+        <EmptyState icon="♞" title="No Commissars Found" subtitle="Try a different country filter." style={styles.empty} />
       ) : (
         <FlatList
           data={flatData}
@@ -352,12 +349,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: Spacing.lg,
-  },
   emptyText: {
-    fontSize: Typography.sizes.base,
-    color: Colors.textMuted,
+    fontSize: 16,
+    color: '#6B7A99',
   },
 });

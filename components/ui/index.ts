@@ -5,3 +5,4 @@ export { default as Badge } from './Badge';
 export { default as Avatar } from './Avatar';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { WatchlistButton } from './WatchlistButton';
+export { default as EmptyState } from './EmptyState';

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { LoadingSpinner } from '../../components/ui';
+import { LoadingSpinner, EmptyState } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
@@ -101,10 +101,7 @@ export default function NotificationsScreen() {
         {isLoading && notifications.length === 0 ? (
           <LoadingSpinner />
         ) : notifications.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{'?'}</Text>
-            <Text style={styles.emptyText}>Нет уведомлений</Text>
-          </View>
+          <EmptyState icon="?" title="Нет уведомлений" />
         ) : (
           <ScrollView
             contentContainerStyle={styles.list}
@@ -228,21 +225,5 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.sm,
     marginTop: 4,
     flexShrink: 0,
-  },
-  empty: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: Spacing['4xl'],
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: Spacing.md,
-    color: Colors.textMuted,
-  },
-  emptyText: {
-    fontSize: Typography.sizes.base,
-    color: Colors.textMuted,
-    fontWeight: Typography.weights.medium,
   },
 });
