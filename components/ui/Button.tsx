@@ -21,6 +21,7 @@ interface ButtonProps {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  accessibilityLabel?: string;
 }
 
 const variantStyles: Record<ButtonVariant, { bg: string; text: string; border: string }> = {
@@ -38,6 +39,7 @@ export default function Button({
   disabled = false,
   style,
   textStyle,
+  accessibilityLabel,
 }: ButtonProps) {
   const v = variantStyles[variant];
   const isDisabled = disabled || loading;
@@ -47,6 +49,9 @@ export default function Button({
       onPress={onPress}
       disabled={isDisabled}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? (loading ? `${title}, loading` : title)}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
       style={[
         styles.base,
         { backgroundColor: v.bg, borderColor: v.border },

@@ -24,6 +24,8 @@ export default function Avatar({ uri, name = '', size = 40 }: AvatarProps) {
     return (
       <Image
         source={{ uri }}
+        accessibilityLabel={name ? `${name} avatar` : 'User avatar'}
+        accessibilityRole="image"
         style={[
           styles.image,
           { width: size, height: size, borderRadius: size / 2 },
@@ -34,6 +36,8 @@ export default function Avatar({ uri, name = '', size = 40 }: AvatarProps) {
 
   return (
     <View
+      accessibilityLabel={name ? `${name} avatar` : 'User avatar'}
+      accessibilityRole="image"
       style={[
         styles.fallback,
         { width: size, height: size, borderRadius: size / 2 },
