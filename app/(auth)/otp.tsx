@@ -20,6 +20,14 @@ import { useAuth } from '../../store/auth';
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN_SEC = 60;
 
+// Validates that returnUrl is a safe relative path to prevent open redirect attacks.
+// Accepts paths starting with '/' but rejects protocol-relative URLs like '//evil.com'.
+function safeReturnUrl(url?: string): string {
+  if (!url) return '/';
+  if (/^\/(?!\/)/.test(url)) return url;
+  return '/';
+}
+
 export default function OtpScreen() {
   const router = useRouter();
   const { email, returnUrl } = useLocalSearchParams<{ email: string; returnUrl?: string }>();
@@ -70,7 +78,7 @@ export default function OtpScreen() {
     setLoading(true);
     try {
       await verifyOtp(email, code);
-      router.replace((returnUrl || '/') as any);
+      router.replace(safeReturnUrl(returnUrl) as any);
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Invalid code. Please try again.';
       setError(msg);
