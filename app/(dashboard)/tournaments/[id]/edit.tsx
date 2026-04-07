@@ -80,6 +80,7 @@ export default function EditTournamentScreen() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [statusChanging, setStatusChanging] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Form state
@@ -202,6 +203,44 @@ export default function EditTournamentScreen() {
     }
   }
 
+  function handleCancelTournament() {
+    const isInProgress = tournament?.status === 'IN_PROGRESS';
+    const title = isInProgress
+      ? 'Warning: Tournament In Progress'
+      : 'Cancel Tournament';
+    const message = isInProgress
+      ? 'This tournament is currently in progress. Are you sure you want to cancel it? All approved/paid participants will be notified by email.'
+      : 'Are you sure you want to cancel this tournament? All approved/paid participants will be notified by email.';
+
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: 'Go Back', style: 'cancel' },
+        {
+          text: 'Yes, Cancel Tournament',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setCancelling(true);
+              await api.patch(`/tournaments/${id}/status`, { status: 'CANCELLED' });
+              Alert.alert('Tournament Cancelled', 'The tournament has been cancelled and participants will be notified.');
+              fetchData();
+            } catch (err: unknown) {
+              const message =
+                (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
+                (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.message ||
+                'Failed to cancel tournament';
+              Alert.alert('Error', message);
+            } finally {
+              setCancelling(false);
+            }
+          },
+        },
+      ],
+    );
+  }
+
   const [confirmingCash, setConfirmingCash] = useState<string | null>(null);
 
   async function handleMarkPaidCash(participant: Participant) {
@@ -288,6 +327,16 @@ export default function EditTournamentScreen() {
               title="Enter Results"
               onPress={() => router.push(`/(dashboard)/tournaments/${id}/results` as never)}
               style={styles.statusBtn}
+            />
+          )}
+          {!['COMPLETED', 'CANCELLED'].includes(tournament.status) && (
+            <Button
+              title="Cancel Tournament"
+              variant="secondary"
+              onPress={handleCancelTournament}
+              loading={cancelling}
+              disabled={cancelling || statusChanging}
+              style={[styles.statusBtn, styles.cancelBtn]}
             />
           )}
         </Card>
@@ -481,6 +530,10 @@ const styles = StyleSheet.create({
   },
   statusBtn: {
     marginTop: Spacing.sm,
+  },
+  cancelBtn: {
+    borderColor: Colors.error || '#cc0000',
+    marginTop: Spacing.md,
   },
   quickLinks: {
     flexDirection: 'row',

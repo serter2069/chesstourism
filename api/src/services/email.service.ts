@@ -354,3 +354,29 @@ export async function sendScheduleChangeEmail(
     `,
   });
 }
+
+export async function sendTournamentCancelledEmail(
+  to: string,
+  userName: string,
+  tournamentTitle: string,
+  commissionerEmail: string,
+): Promise<void> {
+  if (await isEmailOptedOut(to)) return;
+
+  await brevoSend({
+    sender: { name: FROM_NAME, email: FROM_EMAIL },
+    to: [{ email: to }],
+    subject: `Tournament "${tournamentTitle}" has been cancelled`,
+    htmlContent: `
+      <h2>Tournament Cancelled</h2>
+      <p>Dear ${userName},</p>
+      <p>We regret to inform you that <strong>${tournamentTitle}</strong> has been cancelled.</p>
+      <p>If you have paid a registration fee, please contact the tournament commissioner directly to arrange a refund:</p>
+      <p><a href="mailto:${commissionerEmail}">${commissionerEmail}</a></p>
+      <p>We apologise for the inconvenience and hope to see you at future tournaments.</p>
+      <p><a href="${BASE_URL}/tournaments">Browse other tournaments</a></p>
+      <p>Best regards,<br/>ChesTourism Team</p>
+      ${buildUnsubscribeFooter(to)}
+    `,
+  });
+}

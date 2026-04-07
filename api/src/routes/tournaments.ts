@@ -4,7 +4,7 @@ import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
 import { submitResults, getResults, AppError } from '../services/tournament.service';
 import { generateParticipationCertificate } from '../services/pdf.service';
-import { sendThankYouEmail } from '../services/email.service';
+import { sendThankYouEmail, sendTournamentCancelledEmail } from '../services/email.service';
 import { debounceScheduleEmail } from '../lib/scheduleQueue';
 import prisma from '../lib/prisma';
 
@@ -306,7 +306,8 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
 
     if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
-    const { title, city, country, startDate, endDate, maxParticipants, fee, description, ratingLimit, timeControl, currency, status } = req.body;
+    // Note: status is intentionally excluded — all status transitions must go through PATCH /:id/status
+    const { title, city, country, startDate, endDate, maxParticipants, fee, description, ratingLimit, timeControl, currency } = req.body;
 
     const data: Record<string, unknown> = {};
     if (title !== undefined) data.title = title.trim();
@@ -318,7 +319,6 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
     if (currency !== undefined) data.currency = currency?.trim() || 'USD';
     if (maxParticipants !== undefined) data.maxParticipants = maxParticipants ? parseInt(maxParticipants, 10) : null;
     if (fee !== undefined) data.fee = fee != null ? parseFloat(fee) : null;
-    if (status !== undefined) data.status = status;
 
     if (startDate !== undefined) {
       const start = new Date(startDate);
@@ -378,7 +378,15 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
     const { userId, role } = req.user!;
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
-      include: { commissioner: { select: { userId: true, isVerified: true } } },
+      include: {
+        commissioner: {
+          select: {
+            userId: true,
+            isVerified: true,
+            user: { select: { email: true } },
+          },
+        },
+      },
     });
 
     if (!tournament) {
@@ -423,6 +431,63 @@ router.patch('/tournaments/:id/status', authenticate, requireRole('COMMISSIONER'
       where: { id: req.params.id },
       data: { status: newStatus },
     });
+
+    // ─── Cancellation side-effects ───────────────────────────────────────────
+    if (newStatus === 'CANCELLED') {
+      // Fetch affected registrations BEFORE updating their status
+      const affectedRegistrations = await prisma.tournamentRegistration.findMany({
+        where: {
+          tournamentId: req.params.id,
+          status: { in: ['APPROVED', 'PAID'] },
+        },
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+        },
+      });
+
+      // Bulk-cancel all APPROVED/PAID registrations
+      if (affectedRegistrations.length > 0) {
+        await prisma.tournamentRegistration.updateMany({
+          where: {
+            tournamentId: req.params.id,
+            status: { in: ['APPROVED', 'PAID'] },
+          },
+          data: { status: 'CANCELLED' },
+        });
+
+        // Fire-and-forget: email + in-app notification for each affected participant
+        const commissionerEmail = tournament.commissioner.user.email;
+        (async () => {
+          for (const reg of affectedRegistrations) {
+            try {
+              await sendTournamentCancelledEmail(
+                reg.user.email,
+                reg.user.name ?? reg.user.email,
+                tournament.title,
+                commissionerEmail,
+              );
+            } catch (e) {
+              console.error(`[cancel] sendTournamentCancelledEmail failed for ${reg.user.email}:`, (e as Error).message);
+            }
+
+            try {
+              await createNotification(
+                reg.user.id,
+                'TOURNAMENT_CANCELLED',
+                'Tournament cancelled',
+                `The tournament "${tournament.title}" has been cancelled. Contact the commissioner for refund details.`,
+                { tournamentId: req.params.id },
+              );
+            } catch (e) {
+              console.error(`[cancel] createNotification failed for ${reg.user.id}:`, (e as Error).message);
+            }
+          }
+        })().catch((err) =>
+          console.error('[cancel] side-effect loop failed:', (err as Error).message),
+        );
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     res.json(updated);
   } catch (err) {
