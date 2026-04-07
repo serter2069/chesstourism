@@ -1398,4 +1398,169 @@ router.delete('/tournaments/:id/schedule/:entryId', authenticate, async (req: Au
   }
 });
 
+// ─── ROUNDS ───────────────────────────────────────────────
+
+// GET /api/tournaments/:id/rounds — public, list rounds with pairings
+router.get('/tournaments/:id/rounds', async (req: Request, res: Response) => {
+  try {
+    const rounds = await prisma.round.findMany({
+      where: { tournamentId: req.params.id },
+      orderBy: { roundNumber: 'asc' },
+      include: {
+        pairings: {
+          orderBy: { board: 'asc' },
+        },
+      },
+    });
+    res.json(rounds);
+  } catch (err) {
+    console.error('List rounds error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/tournaments/:id/rounds — commissioner only, create round
+router.post('/tournaments/:id/rounds', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (role !== 'ADMIN' && tournament.commissioner?.userId !== userId) {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const { roundNumber } = req.body;
+    if (!roundNumber) {
+      res.status(400).json({ error: 'roundNumber required' });
+      return;
+    }
+    const round = await prisma.round.create({
+      data: { tournamentId: req.params.id, roundNumber: Number(roundNumber) },
+    });
+    res.status(201).json(round);
+  } catch (err: any) {
+    if (err?.code === 'P2002') {
+      res.status(409).json({ error: 'Round number already exists' });
+      return;
+    }
+    console.error('Create round error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/tournaments/:id/rounds/:roundId — commissioner only, update round status
+router.put('/tournaments/:id/rounds/:roundId', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (role !== 'ADMIN' && tournament.commissioner?.userId !== userId) {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const { status } = req.body;
+    if (!status) {
+      res.status(400).json({ error: 'status required' });
+      return;
+    }
+    const round = await prisma.round.update({
+      where: { id: req.params.roundId },
+      data: { status },
+    });
+    res.json(round);
+  } catch (err) {
+    console.error('Update round error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/tournaments/:id/rounds/:roundId/pairings — commissioner only, bulk set pairings
+router.post('/tournaments/:id/rounds/:roundId/pairings', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (role !== 'ADMIN' && tournament.commissioner?.userId !== userId) {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const pairings = req.body;
+    if (!Array.isArray(pairings) || pairings.length === 0) {
+      res.status(400).json({ error: 'pairings array required' });
+      return;
+    }
+    const ops: import('@prisma/client').Prisma.PrismaPromise<unknown>[] = [
+      prisma.pairing.deleteMany({ where: { roundId: req.params.roundId } }),
+      ...pairings.map((p: any) => prisma.pairing.create({
+        data: {
+          roundId: req.params.roundId,
+          player1Id: p.player1Id,
+          player2Id: p.player2Id ?? null,
+          board: p.board ? Number(p.board) : null,
+        },
+      })),
+    ];
+    await prisma.$transaction(ops);
+    const updated = await prisma.pairing.findMany({
+      where: { roundId: req.params.roundId },
+      orderBy: { board: 'asc' },
+    });
+    res.json(updated);
+  } catch (err) {
+    console.error('Set pairings error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/tournaments/:id/rounds/:roundId/pairings/:pairingId — commissioner only, set result
+router.patch('/tournaments/:id/rounds/:roundId/pairings/:pairingId', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId, role } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (role !== 'ADMIN' && tournament.commissioner?.userId !== userId) {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const validResults = ['1-0', '0-1', '0.5-0.5', null];
+    const { result } = req.body;
+    if (!validResults.includes(result)) {
+      res.status(400).json({ error: 'result must be 1-0, 0-1, 0.5-0.5, or null' });
+      return;
+    }
+    const pairing = await prisma.pairing.update({
+      where: { id: req.params.pairingId },
+      data: { result },
+    });
+    res.json(pairing);
+  } catch (err) {
+    console.error('Update pairing result error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
