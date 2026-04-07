@@ -467,4 +467,75 @@ router.get('/finances', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/admin/finances/export.csv — download all payments as CSV
+router.get('/finances/export.csv', async (req: AuthRequest, res: Response) => {
+  try {
+    const where: Record<string, unknown> = {};
+
+    // Date range filters
+    if (req.query.from || req.query.to) {
+      const createdAt: Record<string, Date> = {};
+      if (req.query.from) {
+        createdAt.gte = new Date(req.query.from as string);
+      }
+      if (req.query.to) {
+        const toDate = new Date(req.query.to as string);
+        toDate.setHours(23, 59, 59, 999);
+        createdAt.lte = toDate;
+      }
+      where.createdAt = createdAt;
+    }
+
+    // Status filter
+    if (req.query.status) {
+      const status = (req.query.status as string).toUpperCase();
+      if (['PENDING', 'PAID', 'FAILED', 'REFUNDED', 'DISPUTED'].includes(status)) {
+        where.status = status;
+      }
+    }
+
+    const payments = await prisma.payment.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        tournament: { select: { title: true, currency: true } },
+        user: { select: { email: true } },
+      },
+    });
+
+    // CSV injection protection: sanitize string fields
+    const sanitize = (val: string): string => {
+      let safe = val.replace(/"/g, '""');
+      if (/^[=+\-@]/.test(safe)) {
+        safe = '\t' + safe;
+      }
+      return `"${safe}"`;
+    };
+
+    const header = 'id,user_email,tournament_title,amount,currency,status,created_at';
+    const rows = payments.map((p) => {
+      const currency = p.tournament?.currency || p.currency || 'USD';
+      return [
+        sanitize(p.id),
+        sanitize(p.user?.email || ''),
+        sanitize(p.tournament?.title || ''),
+        p.amount,
+        sanitize(currency),
+        sanitize(p.status),
+        sanitize(p.createdAt.toISOString()),
+      ].join(',');
+    });
+
+    const csv = [header, ...rows].join('\n');
+    const dateStr = new Date().toISOString().slice(0, 10);
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="payments-${dateStr}.csv"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('Admin finances CSV export error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

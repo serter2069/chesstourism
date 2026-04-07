@@ -7,12 +7,14 @@ import {
   RefreshControl,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { SafeContainer, Header } from '../../../components/layout';
 import { Card, Badge, LoadingSpinner, Button } from '../../../components/ui';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
+import { storage } from '../../../lib/storage';
 import api from '../../../lib/api';
 
 // ── Types ───────────────────────────────────────────────
@@ -138,6 +140,32 @@ export default function AdminFinancesScreen() {
     fetchFinances(1);
   }, [fetchFinances]);
 
+  const handleExportCSV = useCallback(async () => {
+    if (Platform.OS !== 'web') return;
+    try {
+      const token = await storage.get('auth_token');
+      const params = new URLSearchParams();
+      const dateParams = periodToParams(period);
+      if (dateParams.from) params.set('from', dateParams.from);
+      if (dateParams.to) params.set('to', dateParams.to);
+      const baseURL = process.env.EXPO_PUBLIC_API_URL || 'https://chesstourism.smartlaunchhub.com/api';
+      const url = `${baseURL}/admin/finances/export.csv?${params.toString()}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const objURL = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objURL;
+      a.download = `payments-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objURL);
+    } catch {
+      // silent — export is best-effort
+    }
+  }, [period]);
+
   return (
     <SafeContainer>
       <Header title="Finances" showBack />
@@ -216,7 +244,14 @@ export default function AdminFinancesScreen() {
             </View>
 
             {/* Transactions header */}
-            <Text style={styles.sectionTitle}>Transactions</Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Transactions</Text>
+              {Platform.OS === 'web' && (
+                <TouchableOpacity onPress={handleExportCSV} style={styles.exportBtn} activeOpacity={0.7}>
+                  <Text style={styles.exportBtnText}>Export CSV</Text>
+                </TouchableOpacity>
+              )}
+            </View>
 
             {items.length === 0 && (
               <View style={styles.empty}>
@@ -340,12 +375,28 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     color: Colors.textMuted,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    marginTop: Spacing.sm,
+  },
   sectionTitle: {
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.semibold,
     color: Colors.text,
-    marginBottom: Spacing.md,
-    marginTop: Spacing.sm,
+  },
+  exportBtn: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  exportBtnText: {
+    color: Colors.white,
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.medium,
   },
   errorCard: {
     marginTop: Spacing.lg,
