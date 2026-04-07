@@ -1314,4 +1314,88 @@ router.patch('/tournaments/:id/announcements/:annId/publish', authenticate, asyn
   }
 });
 
+// ─── Schedule ──────────────────────────────────────────────
+
+// GET /api/tournaments/:id/schedule — public, ordered by startTime asc
+router.get('/tournaments/:id/schedule', async (req: Request, res: Response) => {
+  try {
+    const entries = await prisma.scheduleEntry.findMany({
+      where: { tournamentId: req.params.id },
+      orderBy: { startTime: 'asc' },
+    });
+    res.json(entries);
+  } catch (err) {
+    console.error('List schedule error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/tournaments/:id/schedule — commissioner only
+router.post('/tournaments/:id/schedule', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (tournament.commissioner.userId !== userId && req.user!.role !== 'ADMIN') {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    const { title, startTime, endTime, description, venue, roundNumber } = req.body;
+    if (!title || !startTime) {
+      res.status(400).json({ error: 'title and startTime are required' });
+      return;
+    }
+    const start = new Date(startTime);
+    if (isNaN(start.getTime())) {
+      res.status(400).json({ error: 'Invalid startTime format' });
+      return;
+    }
+    const entry = await prisma.scheduleEntry.create({
+      data: {
+        tournamentId: req.params.id,
+        title: title.trim(),
+        startTime: start,
+        endTime: endTime ? new Date(endTime) : undefined,
+        description: description?.trim() || undefined,
+        venue: venue?.trim() || undefined,
+        roundNumber: roundNumber ? Number(roundNumber) : undefined,
+      },
+    });
+    res.status(201).json(entry);
+  } catch (err) {
+    console.error('Create schedule entry error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/tournaments/:id/schedule/:entryId — commissioner only
+router.delete('/tournaments/:id/schedule/:entryId', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: req.params.id },
+      include: { commissioner: { select: { userId: true } } },
+    });
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+    if (tournament.commissioner.userId !== userId && req.user!.role !== 'ADMIN') {
+      res.status(403).json({ error: 'Commissioner access required' });
+      return;
+    }
+    await prisma.scheduleEntry.delete({ where: { id: req.params.entryId } });
+    res.status(204).send();
+  } catch (err) {
+    console.error('Delete schedule entry error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

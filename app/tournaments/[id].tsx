@@ -64,6 +64,16 @@ interface Photo {
   createdAt: string;
 }
 
+interface ScheduleEntry {
+  id: string;
+  title: string;
+  description?: string | null;
+  startTime: string;
+  endTime?: string | null;
+  venue?: string | null;
+  roundNumber?: number | null;
+}
+
 interface Announcement {
   id: string;
   title: string;
@@ -104,7 +114,7 @@ interface TournamentDetail {
   _count?: { registrations: number };
 }
 
-type TabKey = 'info' | 'participants' | 'results' | 'photos' | 'announcements';
+type TabKey = 'info' | 'participants' | 'results' | 'photos' | 'announcements' | 'schedule';
 
 const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
   DRAFT: { label: 'Draft', status: 'default' },
@@ -132,6 +142,9 @@ export default function TournamentDetailScreen() {
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [registering, setRegistering] = useState(false);
   const [downloadingCertificate, setDownloadingCertificate] = useState(false);
+
+  // Schedule state
+  const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
 
   // Announcements state
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -181,6 +194,16 @@ export default function TournamentDetailScreen() {
     }
   }, [id]);
 
+  const fetchSchedule = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await api.get(`/tournaments/${id}/schedule`);
+      setSchedule(res.data);
+    } catch {
+      // Silent — schedule is optional
+    }
+  }, [id]);
+
   const fetchAnnouncements = useCallback(async () => {
     if (!id) return;
     try {
@@ -194,6 +217,10 @@ export default function TournamentDetailScreen() {
   useEffect(() => {
     if (id) fetchPhotos();
   }, [id, fetchPhotos]);
+
+  useEffect(() => {
+    if (id) fetchSchedule();
+  }, [id, fetchSchedule]);
 
   useEffect(() => {
     if (id) fetchAnnouncements();
@@ -346,6 +373,7 @@ export default function TournamentDetailScreen() {
     { key: 'info', label: 'Info' },
     { key: 'participants', label: `Players (${tournament.participants?.length || 0})` },
     ...(hasResults ? [{ key: 'results' as TabKey, label: 'Results' }] : []),
+    ...(schedule.length > 0 ? [{ key: 'schedule' as TabKey, label: `Schedule (${schedule.length})` }] : []),
     { key: 'photos', label: photos.length ? `Photos (${photos.length})` : 'Photos' },
     ...(announcements.length > 0 ? [{ key: 'announcements' as TabKey, label: `News (${announcements.length})` }] : []),
   ];
@@ -611,6 +639,30 @@ export default function TournamentDetailScreen() {
                   </TouchableOpacity>
                 ))}
               </Card>
+            )}
+          </View>
+        )}
+
+        {activeTab === 'schedule' && (
+          <View style={styles.section}>
+            {schedule.length === 0 ? (
+              <Text style={styles.emptyTab}>No schedule entries yet.</Text>
+            ) : (
+              schedule.map((entry) => (
+                <Card key={entry.id} style={styles.scheduleCard}>
+                  <View style={styles.scheduleHeader}>
+                    <Text style={styles.scheduleTitle}>
+                      {entry.roundNumber != null ? `Round ${entry.roundNumber}: ` : ''}{entry.title}
+                    </Text>
+                  </View>
+                  <Text style={styles.scheduleTime}>
+                    {new Date(entry.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {entry.endTime ? ` — ${new Date(entry.endTime).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}` : ''}
+                  </Text>
+                  {entry.venue && <Text style={styles.scheduleVenue}>{entry.venue}</Text>}
+                  {entry.description && <Text style={styles.scheduleDesc}>{entry.description}</Text>}
+                </Card>
+              ))
             )}
           </View>
         )}
@@ -1002,6 +1054,35 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     color: Colors.error,
     fontWeight: Typography.weights.medium,
+  },
+  // Schedule
+  scheduleCard: {
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
+  },
+  scheduleHeader: {
+    marginBottom: Spacing.xs,
+  },
+  scheduleTitle: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.text,
+  },
+  scheduleTime: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.primary,
+    fontWeight: Typography.weights.medium,
+    marginBottom: Spacing.xs,
+  },
+  scheduleVenue: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    marginBottom: Spacing.xs,
+  },
+  scheduleDesc: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
   },
   // Announcements
   announcementCard: {

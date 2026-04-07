@@ -130,6 +130,7 @@ model Tournament {
   watchlistedBy TournamentWatchlist[]
   results       TournamentResult[]
   announcements Announcement[]
+  schedule      ScheduleEntry[]
 
   @@index([commissionerId])
   @@index([status])
@@ -276,6 +277,22 @@ model Announcement {
   title        String
   body         String
   published    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([tournamentId])
+}
+
+model ScheduleEntry {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  roundNumber  Int?
+  title        String
+  description  String?
+  startTime    DateTime
+  endTime      DateTime?
+  venue        String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
