@@ -20,6 +20,7 @@ import settingsRouter from './routes/settings';
 import verifyRouter from './routes/verify';
 import unsubscribeRouter from './routes/unsubscribe';
 import './lib/scheduleQueue'; // initialize BullMQ Worker for schedule-change email debounce
+import './lib/paymentRecoveryJob'; // BullMQ repeatable job: recover missed Stripe webhook payments
 
 dotenv.config();
 
