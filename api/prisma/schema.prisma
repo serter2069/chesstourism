@@ -258,7 +258,7 @@ model Notification {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      String   // "REGISTRATION_APPROVED" | "REGISTRATION_REJECTED" | "TOURNAMENT_OPEN" | "PAYMENT_CONFIRMED" | "PAYMENT_DISPUTED" | "SCHEDULE_UPDATED" | "TOURNAMENT_ANNOUNCEMENT" | "WATCHLIST_TOURNAMENT_OPEN"
+  type      String   // "REGISTRATION_APPROVED" | "REGISTRATION_REJECTED" | "TOURNAMENT_OPEN" | "PAYMENT_CONFIRMED" | "PAYMENT_DISPUTED" | "SCHEDULE_UPDATED" | "TOURNAMENT_ANNOUNCEMENT" | "WATCHLIST_TOURNAMENT_OPEN" | "NEW_REGISTRATION"
   title     String
   body      String
   isRead    Boolean  @default(false)

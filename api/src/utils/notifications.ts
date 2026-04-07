@@ -10,7 +10,8 @@ export type NotificationType =
   | 'SCHEDULE_UPDATED'
   | 'TOURNAMENT_ANNOUNCEMENT'
   | 'WATCHLIST_TOURNAMENT_OPEN'
-  | 'TOURNAMENT_CANCELLED';
+  | 'TOURNAMENT_CANCELLED'
+  | 'NEW_REGISTRATION';
 
 export async function createNotification(
   userId: string,
