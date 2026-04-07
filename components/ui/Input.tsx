@@ -17,6 +17,8 @@ export default function Input({ label, error, style, ...rest }: InputProps) {
       {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
         placeholderTextColor={Colors.textMuted}
+        accessibilityLabel={rest.accessibilityLabel ?? label}
+        accessibilityRole="text"
         style={[
           styles.input,
           focused && styles.inputFocused,
