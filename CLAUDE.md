@@ -31,8 +31,7 @@ International Chess Tourism Association platform.
 ## URLs
 - Staging: https://chesstourism.smartlaunchhub.com
 - API: https://chesstourism.smartlaunchhub.com/api
-- Local frontend: http://localhost:8081
-- Local API: http://localhost:3811
+- Local ports → see `~/.claude/guides/projects.md`
 
 ## Development
 ```bash
