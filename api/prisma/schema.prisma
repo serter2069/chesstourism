@@ -129,6 +129,7 @@ model Tournament {
   photos        TournamentPhoto[]
   watchlistedBy TournamentWatchlist[]
   results       TournamentResult[]
+  announcements Announcement[]
 
   @@index([commissionerId])
   @@index([status])
@@ -266,6 +267,19 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@index([userId, isRead])
+}
+
+model Announcement {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  title        String
+  body         String
+  published    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([tournamentId])
 }
 
 model WebhookEvent {

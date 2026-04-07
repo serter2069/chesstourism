@@ -64,6 +64,14 @@ interface Photo {
   createdAt: string;
 }
 
+interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  published: boolean;
+  createdAt: string;
+}
+
 interface MyRegistration {
   id: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID';
@@ -96,7 +104,7 @@ interface TournamentDetail {
   _count?: { registrations: number };
 }
 
-type TabKey = 'info' | 'participants' | 'results' | 'photos';
+type TabKey = 'info' | 'participants' | 'results' | 'photos' | 'announcements';
 
 const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
   DRAFT: { label: 'Draft', status: 'default' },
@@ -124,6 +132,9 @@ export default function TournamentDetailScreen() {
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [registering, setRegistering] = useState(false);
   const [downloadingCertificate, setDownloadingCertificate] = useState(false);
+
+  // Announcements state
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
   // Photos state
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -170,9 +181,23 @@ export default function TournamentDetailScreen() {
     }
   }, [id]);
 
+  const fetchAnnouncements = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await api.get(`/tournaments/${id}/announcements`);
+      setAnnouncements(res.data);
+    } catch {
+      // Silent — announcements are optional
+    }
+  }, [id]);
+
   useEffect(() => {
     if (id) fetchPhotos();
   }, [id, fetchPhotos]);
+
+  useEffect(() => {
+    if (id) fetchAnnouncements();
+  }, [id, fetchAnnouncements]);
 
   const handleAddPhoto = useCallback(async () => {
     const trimmedUrl = photoUrl.trim();
@@ -322,6 +347,7 @@ export default function TournamentDetailScreen() {
     { key: 'participants', label: `Players (${tournament.participants?.length || 0})` },
     ...(hasResults ? [{ key: 'results' as TabKey, label: 'Results' }] : []),
     { key: 'photos', label: photos.length ? `Photos (${photos.length})` : 'Photos' },
+    ...(announcements.length > 0 ? [{ key: 'announcements' as TabKey, label: `News (${announcements.length})` }] : []),
   ];
 
   const shareUrl = `https://chesstourism.smartlaunchhub.com/tournaments/${tournament.id}`;
@@ -666,6 +692,22 @@ export default function TournamentDetailScreen() {
           </View>
         )}
 
+        {activeTab === 'announcements' && (
+          <View style={styles.section}>
+            {announcements.length === 0 ? (
+              <Text style={styles.emptyTab}>No announcements yet.</Text>
+            ) : (
+              announcements.map((ann) => (
+                <Card key={ann.id} style={styles.announcementCard}>
+                  <Text style={styles.announcementTitle}>{ann.title}</Text>
+                  <Text style={styles.announcementBody}>{ann.body}</Text>
+                  <Text style={styles.announcementDate}>{formatDate(ann.createdAt)}</Text>
+                </Card>
+              ))
+            )}
+          </View>
+        )}
+
         <View style={styles.footer} />
       </ScrollView>
     </SafeContainer>
@@ -960,6 +1002,27 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     color: Colors.error,
     fontWeight: Typography.weights.medium,
+  },
+  // Announcements
+  announcementCard: {
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
+  },
+  announcementTitle: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.text,
+    marginBottom: Spacing.xs,
+  },
+  announcementBody: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
+    marginBottom: Spacing.sm,
+  },
+  announcementDate: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
   },
   // Error
   errorContainer: {
