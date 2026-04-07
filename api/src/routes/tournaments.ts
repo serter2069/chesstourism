@@ -1132,6 +1132,15 @@ router.post('/tournaments/:id/photos', authenticate, requireRole('COMMISSIONER',
       return;
     }
 
+    // Check photo limit (UC-09: max 10 photos per tournament)
+    const photoCount = await prisma.tournamentPhoto.count({
+      where: { tournamentId: req.params.id },
+    });
+    if (photoCount >= 10) {
+      res.status(400).json({ error: 'Maximum 10 photos allowed per tournament' });
+      return;
+    }
+
     const photo = await prisma.tournamentPhoto.create({
       data: {
         tournamentId: req.params.id,
