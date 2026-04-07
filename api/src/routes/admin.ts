@@ -420,7 +420,7 @@ router.get('/finances', async (req: AuthRequest, res: Response) => {
     }
 
     // Aggregations (always across the filtered set)
-    const [paidAgg, pendingAgg, refundedCount, items, total] = await Promise.all([
+    const [paidAgg, pendingAgg, refundedCount, disputedAgg, items, total] = await Promise.all([
       prisma.payment.aggregate({
         _sum: { amount: true },
         _count: true,
@@ -431,6 +431,11 @@ router.get('/finances', async (req: AuthRequest, res: Response) => {
         where: { ...where, status: 'PENDING' },
       }),
       prisma.payment.count({ where: { ...where, status: 'REFUNDED' } }),
+      prisma.payment.aggregate({
+        _sum: { amount: true },
+        _count: true,
+        where: { ...where, status: 'DISPUTED' },
+      }),
       prisma.payment.findMany({
         where,
         skip,
@@ -450,6 +455,8 @@ router.get('/finances', async (req: AuthRequest, res: Response) => {
         paidCount: paidAgg._count || 0,
         pendingAmount: pendingAgg._sum.amount || 0,
         refundedCount,
+        disputedCount: disputedAgg._count || 0,
+        disputedAmount: disputedAgg._sum.amount || 0,
       },
       items,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
