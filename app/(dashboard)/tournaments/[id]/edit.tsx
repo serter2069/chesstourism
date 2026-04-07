@@ -361,6 +361,12 @@ export default function EditTournamentScreen() {
             onPress={() => router.push(`/(dashboard)/tournaments/${id}/announcements` as never)}
             style={styles.quickBtn}
           />
+          <Button
+            title="Schedule"
+            variant="secondary"
+            onPress={() => router.push(`/(dashboard)/tournaments/${id}/schedule` as never)}
+            style={styles.quickBtn}
+          />
           {tournament.status === 'IN_PROGRESS' && (
             <Button
               title="Results"
