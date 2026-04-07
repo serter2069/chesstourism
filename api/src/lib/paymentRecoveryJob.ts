@@ -1,6 +1,7 @@
 import { Queue, Worker, Job } from 'bullmq';
 import Redis from 'ioredis';
 import Stripe from 'stripe';
+import { Prisma } from '@prisma/client';
 import prisma from './prisma';
 
 // Dedicated Redis connection for BullMQ — do NOT reuse auth.service connections
@@ -84,7 +85,7 @@ const worker = new Worker(
         }
 
         // Update Payment, TournamentRegistration, and record idempotency atomically
-        const ops: Parameters<typeof prisma.$transaction>[0] = [
+        const ops: Prisma.PrismaPromise<unknown>[] = [
           prisma.payment.update({
             where: { id: payment.id },
             data: { status: 'PAID' },
@@ -104,11 +105,11 @@ const worker = new Worker(
             prisma.tournamentRegistration.update({
               where: { tournamentId_userId: { tournamentId: payment.tournamentId, userId } },
               data: { status: 'PAID' },
-            }) as any,
+            }),
           );
         }
 
-        await prisma.$transaction(ops as any);
+        await prisma.$transaction(ops);
         console.log(`[PaymentRecovery] Recovered payment ${payment.id} for user ${userId}, tournament ${tournamentId}`);
       } catch (err) {
         console.error(`[PaymentRecovery] Failed to process payment ${payment.id}:`, (err as Error).message);
