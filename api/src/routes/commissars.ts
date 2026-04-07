@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import Redis from 'ioredis';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
+import { createNotification } from '../utils/notifications';
 
 const router = Router();
 const redis = new Redis({ host: '127.0.0.1', port: 6379, lazyConnect: true });
@@ -210,6 +211,20 @@ router.post('/register', authenticate, async (req: AuthRequest, res: Response) =
         where: { id: userId },
       }),
     ]);
+
+    // Notify all admins about the new commissioner application
+    try {
+      const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } });
+      await Promise.all(admins.map(admin => createNotification(
+        admin.id,
+        'COMMISSIONER_APPLICATION',
+        'New Commissioner Application',
+        `New commissioner application from ${user.name || user.email}.`,
+        { applicantUserId: userId, commissionerId: commissioner.id }
+      )));
+    } catch (notifyErr) {
+      console.error('Failed to notify admins of commissioner application:', notifyErr);
+    }
 
     res.status(201).json({
       ok: true,
