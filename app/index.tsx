@@ -35,15 +35,14 @@ interface Tournament {
 }
 
 interface RatingEntry {
-  id: string;
+  userId: string;
   rank: number;
-  player: {
-    id: string;
-    name: string;
-    surname: string;
-    country?: string;
-  };
+  name: string;
+  city?: string;
+  country?: string;
+  fideTitle?: string;
   rating: number;
+  tournamentCount?: number;
 }
 
 const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
@@ -96,7 +95,7 @@ export default function HomeScreen() {
       }
       if (ratingRes.status === 'fulfilled') {
         const data = ratingRes.value.data;
-        setRatings(Array.isArray(data) ? data : data.items || data.ratings || []);
+        setRatings(Array.isArray(data) ? data : data.data || data.items || data.ratings || []);
       }
     } catch {
       setError('Failed to load data');
@@ -206,16 +205,16 @@ export default function HomeScreen() {
               </View>
               {ratings.map((entry, idx) => (
                 <View
-                  key={entry.id}
+                  key={entry.userId || entry.rank}
                   style={[styles.ratingsRow, idx % 2 === 0 && styles.ratingsRowEven]}
                 >
                   <Text style={[styles.ratingsText, styles.rankCol]}>{entry.rank || idx + 1}</Text>
                   <View style={styles.nameCol}>
                     <Text style={styles.ratingsText} numberOfLines={1}>
-                      {[entry.player.name, entry.player.surname].filter(Boolean).join(' ')}
+                      {entry.name}
                     </Text>
-                    {entry.player.country && (
-                      <Text style={styles.ratingsMeta}>{entry.player.country}</Text>
+                    {entry.country && (
+                      <Text style={styles.ratingsMeta}>{entry.country}</Text>
                     )}
                   </View>
                   <Text style={[styles.ratingsText, styles.ratingCol, styles.ratingValue]}>
