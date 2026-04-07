@@ -94,7 +94,8 @@ export default function TournamentResultsScreen() {
       Alert.alert('Success', 'Results submitted and tournament completed.');
     } catch (err: unknown) {
       const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.message ||
         'Failed to submit results';
       Alert.alert('Error', message);
     } finally {
