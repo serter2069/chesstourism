@@ -469,6 +469,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes['2xl'],
     fontWeight: Typography.weights.bold,
     color: Colors.text,
+    fontFamily: Typography.fontFamilyHeading,
   },
   // Filters
   filters: {
@@ -491,7 +492,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   chip: {
-    paddingVertical: Spacing.xs,
+    paddingVertical: 12,
     paddingHorizontal: Spacing.md,
     borderRadius: 16,
     backgroundColor: Colors.background,
