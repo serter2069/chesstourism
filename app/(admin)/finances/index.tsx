@@ -22,6 +22,8 @@ interface FinanceSummary {
   paidCount: number;
   pendingAmount: number;
   refundedCount: number;
+  disputedCount: number;
+  disputedAmount: number;
 }
 
 interface PaymentItem {
@@ -89,6 +91,7 @@ const STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning
   PENDING: { label: 'Pending', status: 'warning' },
   FAILED: { label: 'Failed', status: 'error' },
   REFUNDED: { label: 'Refunded', status: 'info' },
+  DISPUTED: { label: 'Disputed', status: 'error' },
 };
 
 // ── Component ───────────────────────────────────────────
@@ -197,6 +200,18 @@ export default function AdminFinancesScreen() {
               <Card style={styles.statCard}>
                 <Text style={styles.statValue}>{summary.refundedCount}</Text>
                 <Text style={styles.statLabel}>Refunds</Text>
+              </Card>
+            </View>
+            <View style={styles.statsRow}>
+              <Card style={styles.statCard}>
+                <Text style={styles.statValue}>{summary.disputedCount}</Text>
+                <Text style={styles.statLabel}>Disputes</Text>
+              </Card>
+              <Card style={styles.statCard}>
+                <Text style={[styles.statValue, { color: Colors.error }]}>
+                  {formatCurrency(summary.disputedAmount)}
+                </Text>
+                <Text style={styles.statLabel}>Disputed Amount</Text>
               </Card>
             </View>
 
