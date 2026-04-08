@@ -780,6 +780,63 @@ async function seedMemberships(emailToId: Map<string, string>): Promise<void> {
   console.log(`  Created ${count} memberships`);
 }
 
+// DISPUTED - for testing admin disputes screen
+async function seedDisputedPayments(
+  tournaments: { id: string; def: TournamentDef }[],
+  emailToId: Map<string, string>,
+): Promise<void> {
+  console.log('Seeding disputed payments...');
+
+  // Use two specific users and completed tournaments for stable disputed records
+  const userEmail1 = 'gabriel.santos@gmail.com';
+  const userEmail2 = 'hans.mueller@gmail.com';
+  const userId1 = emailToId.get(userEmail1);
+  const userId2 = emailToId.get(userEmail2);
+
+  const completedTournaments = tournaments.filter(t => t.def.status === TournamentStatus.COMPLETED);
+  if (completedTournaments.length < 2) {
+    console.log('  Not enough completed tournaments for disputed payments, skipping');
+    return;
+  }
+
+  const disputedData = [
+    {
+      userId: userId1,
+      tournament: completedTournaments[0],
+      externalId: 'cs_test_disputed_4aX8kP2mNqR7vL',
+    },
+    {
+      userId: userId2,
+      tournament: completedTournaments[1],
+      externalId: 'cs_test_disputed_9bY3jQ5nWsT1cM',
+    },
+  ];
+
+  let count = 0;
+  for (const d of disputedData) {
+    if (!d.userId) continue;
+
+    const existing = await prisma.payment.findFirst({
+      where: { externalId: d.externalId },
+    });
+    if (existing) continue;
+
+    await prisma.payment.create({
+      data: {
+        userId: d.userId,
+        tournamentId: d.tournament.id,
+        amount: d.tournament.def.fee,
+        currency: d.tournament.def.currency,
+        status: PaymentStatus.DISPUTED,
+        externalId: d.externalId,
+      },
+    });
+    count++;
+  }
+
+  console.log(`  Created ${count} disputed payments`);
+}
+
 async function seedOrganizationRequests(): Promise<void> {
   console.log('Seeding organization requests...');
 
@@ -816,6 +873,7 @@ async function main() {
   await seedPhotos(tournaments, emailToId);
   await seedNotifications(emailToId, tournaments);
   await seedMemberships(emailToId);
+  await seedDisputedPayments(tournaments, emailToId);
   await seedOrganizationRequests();
 
   console.log('\n=== Seed complete! ===');
