@@ -184,6 +184,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: Spacing['4xl'],
+    maxWidth: 430,
+    alignSelf: 'center' as const,
+    width: '100%',
   },
   container: {
     padding: Spacing.lg,
