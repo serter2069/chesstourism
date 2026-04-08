@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { LoadingSpinner } from '../../components/ui';
+import { SkeletonCard } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { COUNTRY_FLAGS, getCountryFlag } from '../../constants/countryFlags';
 import { Spacing } from '../../constants/spacing';
@@ -314,7 +314,7 @@ export default function RatingsScreen() {
         </View>
 
         {loading ? (
-          <LoadingSpinner />
+          <SkeletonCard variant="ratings-row" count={10} />
         ) : error ? (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>{'♜'}</Text>
