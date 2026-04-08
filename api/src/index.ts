@@ -1,9 +1,12 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { ExpressAdapter } from '@bull-board/express';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import commissarsRouter from './routes/commissars';
@@ -21,7 +24,8 @@ import verifyRouter from './routes/verify';
 import unsubscribeRouter from './routes/unsubscribe';
 import './lib/scheduleQueue'; // initialize BullMQ Worker for schedule-change email debounce
 import './lib/paymentRecoveryJob'; // BullMQ repeatable job: recover missed Stripe webhook payments
-import './lib/emailQueue'; // initialize BullMQ Worker for async email delivery with retry
+import { emailQueue } from './lib/emailQueue'; // initialize BullMQ Worker for async email delivery with retry
+import { pushQueue } from './lib/pushQueue'; // initialize BullMQ Worker for FCM push delivery with retry
 
 dotenv.config();
 
@@ -93,6 +97,40 @@ app.use('/api/organization-requests', publicLimiter);
 
 app.use(express.json());
 app.use(cookieParser());
+
+// ─── Bull Board (queue monitor) — scoped to /admin/queues ────────────────────
+
+const bullBoardAdapter = new ExpressAdapter();
+bullBoardAdapter.setBasePath('/admin/queues');
+
+createBullBoard({
+  queues: [new BullMQAdapter(emailQueue), new BullMQAdapter(pushQueue)],
+  serverAdapter: bullBoardAdapter,
+});
+
+// Basic-auth guard — scoped ONLY to /admin/queues, does not affect any other route
+function bullBoardAuth(req: Request, res: Response, next: NextFunction): void {
+  const password = process.env.BULL_BOARD_PASSWORD;
+  if (!password) {
+    // If no password configured, block access entirely
+    res.status(503).json({ error: 'Bull Board not configured' });
+    return;
+  }
+
+  const authHeader = req.headers.authorization ?? '';
+  const encoded = Buffer.from(`admin:${password}`).toString('base64');
+  if (authHeader !== `Basic ${encoded}`) {
+    res.set('WWW-Authenticate', 'Basic realm="Bull Board"');
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  next();
+}
+
+app.use('/admin/queues', bullBoardAuth, bullBoardAdapter.getRouter());
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', project: 'chesstourism', version: process.env.npm_package_version });
