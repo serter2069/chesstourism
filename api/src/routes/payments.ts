@@ -468,6 +468,114 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
     } catch (err) {
       console.error('Webhook dispute: failed to create admin notifications:', err);
     }
+  } else if (event.type === 'checkout.session.expired') {
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    // Idempotency check
+    const alreadyProcessed = await prisma.webhookEvent.findUnique({
+      where: { stripeEventId: event.id },
+    });
+    if (alreadyProcessed) {
+      console.log(`Webhook: duplicate checkout.session.expired event ${event.id}, skipping`);
+      res.json({ received: true });
+      return;
+    }
+
+    const { tournamentId, userId } = session.metadata || {};
+    if (!tournamentId || !userId) {
+      console.warn(`Webhook checkout.session.expired: missing metadata for session ${session.id}`);
+      // Dead letter — cannot identify registration without metadata
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: event.id,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: `Missing metadata on expired session ${session.id}`,
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook checkout.session.expired: dead letter write failed:', dlErr);
+      }
+      res.json({ received: true });
+      return;
+    }
+
+    const payment = await prisma.payment.findFirst({
+      where: { externalId: session.id },
+    });
+
+    if (!payment) {
+      console.warn(`Webhook checkout.session.expired: no Payment record for session ${session.id}`);
+      // Record idempotency and return 200 — nothing to update
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: event.id,
+            eventType: event.type,
+            status: 'processed',
+            rawRef: `${event.id}:no_payment_record`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook checkout.session.expired: idempotency write failed:', dlErr);
+      }
+      res.json({ received: true });
+      return;
+    }
+
+    try {
+      // Fetch current registration status to guard against overwriting PAID (trap #5)
+      const registration = await prisma.tournamentRegistration.findUnique({
+        where: { tournamentId_userId: { tournamentId, userId } },
+        select: { status: true },
+      });
+
+      const ops = [
+        prisma.payment.update({
+          where: { id: payment.id },
+          data: { status: 'FAILED' },
+        }),
+        prisma.webhookEvent.create({
+          data: { stripeEventId: event.id, eventType: event.type, status: 'processed' },
+        }),
+      ];
+
+      // Only expire registration if it has not already been paid
+      if (registration && registration.status !== 'PAID') {
+        ops.push(
+          prisma.tournamentRegistration.update({
+            where: { tournamentId_userId: { tournamentId, userId } },
+            data: { status: 'EXPIRED' },
+          }),
+        );
+      } else if (registration?.status === 'PAID') {
+        console.log(`Webhook checkout.session.expired: registration for user ${userId}, tournament ${tournamentId} is already PAID — skipping registration update`);
+      }
+
+      await prisma.$transaction(ops);
+      console.log(`Checkout session ${session.id} expired: Payment ${payment.id} → FAILED, Registration → EXPIRED (user ${userId}, tournament ${tournamentId})`);
+    } catch (err) {
+      console.error('Webhook checkout.session.expired: DB update failed:', err);
+      // Dead letter
+      try {
+        await prisma.webhookEvent.create({
+          data: {
+            stripeEventId: `${event.id}:${Date.now()}`,
+            eventType: event.type,
+            status: 'failed',
+            errorMessage: err instanceof Error ? err.message : String(err),
+            rawRef: `${event.id}:${event.type}`,
+          },
+        });
+      } catch (dlErr) {
+        console.error('Webhook checkout.session.expired: dead letter write also failed:', dlErr);
+      }
+      // Return 500 so Stripe retries
+      res.status(500).json({ error: 'DB update failed' });
+      return;
+    }
   }
 
   res.json({ received: true });
