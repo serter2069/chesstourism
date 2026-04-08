@@ -725,6 +725,9 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       await prisma.$transaction(ops);
       console.log(`Checkout session ${session.id} expired: Payment ${payment.id} → FAILED, Registration → EXPIRED (user ${userId}, tournament ${tournamentId})`);
     } catch (err) {
+      if (isPrismaUniqueViolation(err)) {
+        return res.json({ received: true, skipped: 'duplicate' });
+      }
       console.error('Webhook checkout.session.expired: DB update failed:', err);
       // Dead letter
       try {
