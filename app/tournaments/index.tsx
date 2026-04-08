@@ -366,7 +366,7 @@ export default function TournamentsListScreen() {
           <View style={styles.createRow}>
             <Button
               title="Create Tournament"
-              onPress={() => router.push('/(dashboard)/tournaments/create' as never)}
+              onPress={() => router.push('/(dashboard)/tournament-manage/create' as never)}
               style={styles.createBtn}
             />
           </View>

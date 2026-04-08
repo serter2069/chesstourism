@@ -272,7 +272,7 @@ export default function CommissionerCabinetScreen() {
                 <Text style={styles.sectionTitle}>My Tournaments</Text>
                 <Button
                   title="Create"
-                  onPress={() => router.push('/(dashboard)/tournaments/create' as never)}
+                  onPress={() => router.push('/(dashboard)/tournament-manage/create' as never)}
                   variant="secondary"
                 />
               </View>
@@ -291,7 +291,7 @@ export default function CommissionerCabinetScreen() {
                 return (
                   <TouchableOpacity
                     key={t.id}
-                    onPress={() => router.push(`/(dashboard)/tournaments/${t.id}/edit` as never)}
+                    onPress={() => router.push(`/(dashboard)/tournament-manage/${t.id}/edit` as never)}
                     activeOpacity={0.7}
                     style={styles.tournamentCard}
                   >
