@@ -21,6 +21,7 @@ interface Stats {
   totalRegistrations: number;
   totalRevenue: number;
   pendingOrgRequests: number;
+  disputedCount: number;
 }
 
 interface QuickLink {
@@ -83,6 +84,12 @@ export default function AdminDashboardScreen() {
       description: 'Tournament requests from organizations',
       href: '/(admin)/organizations',
       badgeCount: stats?.pendingOrgRequests || 0,
+    },
+    {
+      title: 'Disputes',
+      description: 'Stripe chargeback disputes',
+      href: '/(admin)/disputes',
+      badgeCount: stats?.disputedCount || 0,
     },
     {
       title: 'Webhook Events',

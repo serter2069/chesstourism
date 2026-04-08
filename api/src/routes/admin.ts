@@ -18,6 +18,7 @@ router.get('/stats', async (_req: AuthRequest, res: Response) => {
       totalRegistrations,
       pendingOrgRequests,
       revenueResult,
+      disputedCount,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.tournament.count(),
@@ -27,6 +28,7 @@ router.get('/stats', async (_req: AuthRequest, res: Response) => {
         _sum: { amount: true },
         where: { status: 'PAID' },
       }),
+      prisma.payment.count({ where: { status: 'DISPUTED' } }),
     ]);
 
     res.json({
@@ -35,6 +37,7 @@ router.get('/stats', async (_req: AuthRequest, res: Response) => {
       totalRegistrations,
       totalRevenue: revenueResult._sum.amount || 0,
       pendingOrgRequests,
+      disputedCount,
     });
   } catch (err) {
     console.error('Admin stats error:', err);
@@ -532,6 +535,39 @@ router.get('/finances/export.csv', async (req: AuthRequest, res: Response) => {
     res.send(csv);
   } catch (err) {
     console.error('Admin finances CSV export error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ── Disputes ────────────────────────────────────────────────────────────────
+
+// GET /api/admin/disputes — paginated list of disputed payments
+router.get('/disputes', async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      prisma.payment.findMany({
+        where: { status: 'DISPUTED' },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          tournament: { select: { title: true, currency: true } },
+          user: { select: { name: true, email: true } },
+        },
+      }),
+      prisma.payment.count({ where: { status: 'DISPUTED' } }),
+    ]);
+
+    res.json({
+      items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (err) {
+    console.error('Admin disputes list error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
