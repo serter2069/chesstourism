@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeContainer, Header } from '../../components/layout';
-import { Button, Card, Badge, LoadingSpinner, Input, WatchlistButton } from '../../components/ui';
+import { Button, Card, Badge, SkeletonCard, Input, WatchlistButton } from '../../components/ui';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
@@ -373,7 +373,7 @@ export default function TournamentsListScreen() {
         )}
 
         {/* Loading state */}
-        {loading && <LoadingSpinner />}
+        {loading && <SkeletonCard variant="tournament" count={6} />}
 
         {/* Error state */}
         {error && !loading && (
