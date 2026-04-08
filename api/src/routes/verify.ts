@@ -14,12 +14,6 @@ router.get('/verify/:certificateId', async (req: Request, res: Response) => {
         user: { select: { name: true, surname: true } },
         tournament: {
           select: { title: true, startDate: true, status: true },
-          include: {
-            results: {
-              where: { userId: undefined as unknown as string },
-              select: { place: true },
-            },
-          },
         },
       },
     });
