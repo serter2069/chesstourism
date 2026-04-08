@@ -20,8 +20,21 @@ import { useAuth } from '../../store/auth';
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN_SEC = 60;
 
-// Validates that returnUrl is a safe relative path to prevent open redirect attacks.
-// Accepts paths starting with '/' but rejects protocol-relative URLs like '//evil.com'.
+/**
+ * Validates returnUrl to prevent open-redirect attacks.
+ * Accepts only relative paths starting with "/" (not "//").
+ *
+ * Tested vectors (all safe):
+ * - "//evil.com"          → blocked (regex: must start with / but not //)
+ * - "%2F%2Fevil.com"     → blocked (expo-router decodes before safeReturnUrl, becomes "//evil.com")
+ * - "javascript:alert()" → blocked (no leading /)
+ * - "\\/evil.com"         → blocked (no leading /)
+ * - undefined/empty       → fallback to "/"
+ * - "/%2Fevil.com"        → passes regex, stays on same domain (not protocol-relative in router.replace)
+ *
+ * Note: router.replace() (React Navigation) does not expose raw strings to window.location,
+ * so protocol-relative and javascript: vectors are neutralized even if they bypass regex.
+ */
 function safeReturnUrl(url?: string): string {
   if (!url) return '/';
   if (/^\/(?!\/)/.test(url)) return url;
