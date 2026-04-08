@@ -1,10 +1,18 @@
 import { Router, Response, Request } from 'express';
 import Stripe from 'stripe';
+import { Prisma } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { createNotification } from '../utils/notifications';
 import { sendDisputeAlertEmail } from '../services/email.service';
 import { enqueueEmail } from '../lib/emailQueue';
+
+// P2002 = unique constraint violation — two parallel webhook deliveries for the same event
+// both passed the findUnique check before either inserted the WebhookEvent row.
+// Treat as "already processed" and return 200 to stop Stripe retrying.
+function isPrismaUniqueViolation(err: unknown): boolean {
+  return err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002';
+}
 
 const router = Router();
 
@@ -218,6 +226,13 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
         }
       })();
     } catch (err) {
+      // Race condition: two parallel deliveries both passed the findUnique check.
+      // The second insert hits the @unique constraint — treat as duplicate, return 200.
+      if (isPrismaUniqueViolation(err)) {
+        console.log(`Webhook: P2002 race on event ${event.id} (checkout.session.completed), treating as duplicate`);
+        res.json({ received: true, skipped: 'duplicate' });
+        return;
+      }
       console.error('Webhook: DB update failed:', err);
       // Dead letter: record failed event so it can be inspected/replayed
       try {
@@ -316,6 +331,12 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       ]);
       console.log(`Payment ${payment.id} marked FAILED (PI: ${pi.id})`);
     } catch (err) {
+      // Race condition: parallel delivery hit @unique on WebhookEvent — treat as duplicate.
+      if (isPrismaUniqueViolation(err)) {
+        console.log(`Webhook: P2002 race on event ${event.id} (payment_intent.payment_failed), treating as duplicate`);
+        res.json({ received: true, skipped: 'duplicate' });
+        return;
+      }
       console.error('Webhook payment_failed: DB update failed:', err);
       // Dead letter
       try {
@@ -393,6 +414,12 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       ]);
       console.log(`Payment ${payment.id} marked DISPUTED (charge ${chargeId}, dispute ${dispute.id})`);
     } catch (err) {
+      // Race condition: parallel delivery hit @unique on WebhookEvent — treat as duplicate.
+      if (isPrismaUniqueViolation(err)) {
+        console.log(`Webhook: P2002 race on event ${event.id} (charge.dispute.created), treating as duplicate`);
+        res.json({ received: true, skipped: 'duplicate' });
+        return;
+      }
       console.error('Webhook dispute: DB update failed:', err);
       // Dead letter
       try {
