@@ -559,7 +559,7 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
         select: { status: true },
       });
 
-      const ops = [
+      const ops: Prisma.PrismaPromise<unknown>[] = [
         prisma.payment.update({
           where: { id: payment.id },
           data: { status: 'FAILED' },
