@@ -97,7 +97,7 @@ export default function CommissarTournamentsScreen() {
         <View style={styles.createRow}>
           <Button
             title="Create Tournament"
-            onPress={() => router.push('/(dashboard)/tournaments/create' as never)}
+            onPress={() => router.push('/(dashboard)/tournament-manage/create' as never)}
           />
         </View>
 
@@ -124,7 +124,7 @@ export default function CommissarTournamentsScreen() {
             return (
               <TouchableOpacity
                 key={t.id}
-                onPress={() => router.push(`/(dashboard)/tournaments/${t.id}/edit` as never)}
+                onPress={() => router.push(`/(dashboard)/tournament-manage/${t.id}/edit` as never)}
                 activeOpacity={0.7}
                 style={styles.cardWrapper}
               >

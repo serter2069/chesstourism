@@ -399,7 +399,7 @@ export default function EditTournamentScreen() {
           {tournament.status === 'IN_PROGRESS' && (
             <Button
               title="Enter Results"
-              onPress={() => router.push(`/(dashboard)/tournaments/${id}/results` as never)}
+              onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/results` as never)}
               style={styles.statusBtn}
             />
           )}
@@ -420,38 +420,38 @@ export default function EditTournamentScreen() {
           <Button
             title="Registrations"
             variant="secondary"
-            onPress={() => router.push(`/(dashboard)/tournaments/${id}/registrations` as never)}
+            onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/registrations` as never)}
             style={styles.quickBtn}
           />
           <Button
             title="Photos"
             variant="secondary"
-            onPress={() => router.push(`/(dashboard)/tournaments/${id}/photos` as never)}
+            onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/photos` as never)}
             style={styles.quickBtn}
           />
           <Button
             title="Announcements"
             variant="secondary"
-            onPress={() => router.push(`/(dashboard)/tournaments/${id}/announcements` as never)}
+            onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/announcements` as never)}
             style={styles.quickBtn}
           />
           <Button
             title="Schedule"
             variant="secondary"
-            onPress={() => router.push(`/(dashboard)/tournaments/${id}/schedule` as never)}
+            onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/schedule` as never)}
             style={styles.quickBtn}
           />
           <Button
             title="Rounds"
             variant="secondary"
-            onPress={() => router.push(`/(dashboard)/tournaments/${id}/rounds` as never)}
+            onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/rounds` as never)}
             style={styles.quickBtn}
           />
           {tournament.status === 'IN_PROGRESS' && (
             <Button
               title="Results"
               variant="secondary"
-              onPress={() => router.push(`/(dashboard)/tournaments/${id}/results` as never)}
+              onPress={() => router.push(`/(dashboard)/tournament-manage/${id}/results` as never)}
               style={styles.quickBtn}
             />
           )}
