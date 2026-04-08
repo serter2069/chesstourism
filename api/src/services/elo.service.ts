@@ -1,8 +1,8 @@
 /**
  * ELO Rating calculation service for multi-player chess tournaments.
  *
- * Algorithm:
- * - K factor: 32 (elo < 2000), 24 (elo < 2400), 16 (elo >= 2400)
+ * Algorithm (aligned to FIDE standard):
+ * - K factor: 40 (elo < 2300), 20 (elo < 2400), 10 (elo >= 2400)
  * - Expected score: E = 1 / (1 + 10^((R_opponent - R_player) / 400))
  * - New rating: R_new = R_old + K * (S - E)
  * - For tournaments: opponent rating = average of all OTHER participants
@@ -24,9 +24,9 @@ export interface EloChange {
 }
 
 function getKFactor(elo: number): number {
-  if (elo < 2000) return 32;
-  if (elo < 2400) return 24;
-  return 16;
+  if (elo < 2300) return 40;
+  if (elo < 2400) return 20;
+  return 10;
 }
 
 function expectedScore(playerElo: number, opponentElo: number): number {
