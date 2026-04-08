@@ -350,6 +350,12 @@ router.patch('/commissars/:id/approve', async (req: AuthRequest, res: Response) 
       }),
     ]);
 
+    // Enqueue email notification (fire and forget, with retry)
+    enqueueEmail('commissar_approval', updated.user.email, {
+      userName: updated.user.name,
+      approved: true,
+    }).catch((err) => console.error('Failed to enqueue commissar approval email:', err));
+
     res.json(updated);
   } catch (err) {
     console.error('Admin approve commissioner error:', err);
