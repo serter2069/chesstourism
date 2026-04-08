@@ -8,6 +8,24 @@ import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 import api from '../../../lib/api';
 
+/**
+ * Local payment UI state machine. Steps:
+ *
+ *   info        — show tournament fee + "Pay" button
+ *   processing  — user was redirected to Stripe Checkout; waiting for webhook
+ *                 NOTE: actual payment confirmation happens server-side via the
+ *                 checkout.session.completed webhook, NOT by any polling here.
+ *                 The user lands on /payment-success after Stripe redirects them
+ *                 to success_url, which then checks Registration.status via API.
+ *   success     — reached only if handleConfirmPayment (legacy manual confirm path) succeeds
+ *   error       — reached only if handleConfirmPayment fails (legacy path)
+ *
+ * In the current Stripe Checkout flow (redirect mode), steps 'success' and 'error'
+ * are NOT reached via the normal webhook path. The user is redirected away from this
+ * screen to Stripe Checkout; on return they land on /payment-success, not here.
+ * The handleConfirmPayment function and 'success'/'error' steps are retained for
+ * backward compatibility / alternative flows.
+ */
 type PaymentStep = 'info' | 'processing' | 'success' | 'error';
 
 interface TournamentInfo {
@@ -175,7 +193,16 @@ export default function PaymentScreen() {
             </>
           )}
 
-          {/* Step: Processing — redirected to Stripe Checkout */}
+          {/* Step: Processing — user was redirected to Stripe Checkout.
+              The payment outcome is determined entirely server-side:
+              - Success: Stripe calls POST /api/payments/webhook with checkout.session.completed
+                         → Payment/Registration updated to PAID → user lands on /payment-success
+              - Failure: Stripe calls POST /api/payments/webhook with payment_intent.payment_failed
+                         → Payment updated to FAILED → Registration stays APPROVED (user can retry)
+              - Expiry:  Stripe calls POST /api/payments/webhook with checkout.session.expired
+                         → Payment → FAILED, Registration → EXPIRED
+              This screen is no longer visible once the redirect happens; it is only shown
+              if the user navigates back to this route manually while the session is open. */}
           {!isFree && step === 'processing' && (
             <Card style={styles.card}>
               <Text style={styles.confirmTitle}>Complete Payment</Text>
@@ -237,7 +264,10 @@ export default function PaymentScreen() {
             </Card>
           )}
 
-          {/* Step: Error — retry */}
+          {/* Step: Error — shown when the legacy handleConfirmPayment call fails.
+              In the current Stripe Checkout redirect flow, payment failures are surfaced
+              via the Stripe-hosted UI (the user never returns to this screen on failure).
+              This step exists as a fallback for non-redirect / manual confirmation paths. */}
           {!isFree && step === 'error' && (
             <Card style={styles.card}>
               <View style={styles.receiptHeader}>

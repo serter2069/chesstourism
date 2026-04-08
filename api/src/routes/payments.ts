@@ -1,3 +1,61 @@
+/**
+ * @file payments.ts
+ * @description Stripe payment routes: checkout session creation and webhook event handling.
+ *
+ * ## Webhook event table
+ *
+ * | Stripe event                    | Payment.status | Registration.status | User notified? |
+ * |---------------------------------|----------------|---------------------|----------------|
+ * | checkout.session.completed      | PENDING → PAID | APPROVED → PAID     | Yes (in-app + email) |
+ * | payment_intent.payment_failed   | PENDING → FAILED | unchanged (APPROVED) | NO — intentional, see note below |
+ * | checkout.session.expired        | PENDING → FAILED | APPROVED → EXPIRED  | No             |
+ * | charge.dispute.created          | PAID → DISPUTED  | unchanged (PAID)    | No (admin only) |
+ *
+ * ## Payment failure flow — full propagation chain
+ *
+ * There are TWO distinct failure paths. Understanding both is critical:
+ *
+ * ### Path A — payment_intent.payment_failed
+ * Fires when a card charge attempt fails INSIDE an active checkout session
+ * (e.g. insufficient funds, card declined). The session is NOT yet expired.
+ *
+ *   Stripe → payment_intent.payment_failed webhook
+ *     → resolve PaymentIntent ID to checkout session ID via Stripe API
+ *     → find Payment row by externalId (= checkout session ID)
+ *     → update Payment.status = FAILED  (atomic with WebhookEvent insert)
+ *     → Registration.status is NOT changed — stays APPROVED
+ *       (the user can retry payment on the same or a new session)
+ *     → NO user notification is sent
+ *       (intentional: the Stripe Checkout UI already shows the error inline;
+ *        sending an in-app notification here would be premature and confusing
+ *        because the user may immediately retry successfully within the same session)
+ *
+ * ### Path B — checkout.session.expired
+ * Fires when the user closes the Stripe Checkout window without paying and
+ * Stripe eventually expires the session (default: 24 hours).
+ *
+ *   Stripe → checkout.session.expired webhook
+ *     → find Payment row by externalId (= checkout session ID)
+ *     → update Payment.status = FAILED
+ *     → update Registration.status = EXPIRED
+ *       (UNLESS registration is already PAID — guard prevents overwrite; see handler)
+ *     → WebhookEvent insert — all three ops in one $transaction
+ *     → No user notification is sent
+ *       (gap — future improvement: notify user that their session expired
+ *        and prompt them to re-initiate payment)
+ *
+ * ## Idempotency strategy
+ * Every handler checks WebhookEvent.stripeEventId (@unique) before acting.
+ * If the row exists → return 200 immediately (Stripe retry safety).
+ * Race condition (two parallel deliveries) → second writer hits P2002 unique violation
+ * → isPrismaUniqueViolation() catches it → treated as duplicate → 200.
+ *
+ * ## Dead letter pattern
+ * When a handler cannot complete (no session found, DB error) it writes a
+ * WebhookEvent row with status='failed' and errorMessage so ops can inspect
+ * and replay events from the Stripe Dashboard or admin webhooks page (/admin/webhooks).
+ */
+
 import { Router, Response, Request } from 'express';
 import Stripe from 'stripe';
 import { Prisma } from '@prisma/client';
@@ -7,9 +65,14 @@ import { createNotification } from '../utils/notifications';
 import { sendDisputeAlertEmail } from '../services/email.service';
 import { enqueueEmail } from '../lib/emailQueue';
 
-// P2002 = unique constraint violation — two parallel webhook deliveries for the same event
-// both passed the findUnique check before either inserted the WebhookEvent row.
-// Treat as "already processed" and return 200 to stop Stripe retrying.
+/**
+ * Detects a Prisma unique constraint violation (error code P2002).
+ *
+ * Used to handle the race condition where two parallel Stripe webhook deliveries
+ * for the same event both pass the idempotency findUnique check, then both attempt
+ * to insert the WebhookEvent row. The second insert fails with P2002 — we treat
+ * it as "already processed" and return 200 to prevent Stripe from retrying.
+ */
 function isPrismaUniqueViolation(err: unknown): boolean {
   return err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002';
 }
@@ -137,8 +200,24 @@ router.post('/payments/tournament/:tournamentId', authenticate, async (req: Auth
   }
 });
 
-// POST /api/payments/webhook — Stripe webhook handler
-// Note: raw body middleware is applied in index.ts before express.json()
+/**
+ * POST /api/payments/webhook
+ *
+ * Central Stripe webhook handler. All payment lifecycle events arrive here.
+ * The raw body (Buffer) is required by stripe.webhooks.constructEvent() for
+ * HMAC signature verification — raw body middleware is applied in index.ts
+ * BEFORE express.json() so this route receives req.body as a Buffer.
+ *
+ * Every event type follows the same pattern:
+ *   1. Verify signature
+ *   2. Idempotency check (WebhookEvent.stripeEventId)
+ *   3. Business logic (DB updates)
+ *   4. WebhookEvent insert (atomic with step 3 where possible)
+ *   5. Fire-and-forget side effects (notifications, emails) — never delay the response
+ *   6. Return { received: true } — always 200 unless DB fails (→ 500 triggers Stripe retry)
+ *
+ * See module-level JSDoc for the full event table and failure flow narrative.
+ */
 router.post('/payments/webhook', async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'] as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
@@ -252,6 +331,34 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       res.status(500).json({ error: 'DB update failed' });
       return;
     }
+  // ─────────────────────────────────────────────────────────────────────────
+  // payment_intent.payment_failed
+  //
+  // Fired by Stripe when a card charge attempt fails within an active Checkout
+  // session (e.g. card declined, insufficient funds, 3DS failed). The Checkout
+  // session itself is still open — the user can retry with a different card.
+  //
+  // Resolution chain (Stripe does not include the session ID directly on the PI):
+  //   PaymentIntent.id
+  //     → stripe.checkout.sessions.list({ payment_intent }) → session.id
+  //       → Payment row (externalId = session.id)
+  //         → Payment.status = FAILED  (atomic $transaction with WebhookEvent)
+  //
+  // IMPORTANT — Registration.status is NOT updated here.
+  // The registration stays APPROVED so the user can re-initiate payment.
+  // Only checkout.session.expired moves the registration to EXPIRED.
+  //
+  // IMPORTANT — No user notification is sent (contrast with checkout.session.completed
+  // which sends both in-app + email). This is intentional:
+  //   - Stripe Checkout already shows the failure inline to the user.
+  //   - The user can immediately retry with a different card in the same session.
+  //   - Sending a "payment failed" notification at this point would be premature
+  //     and could alarm a user who is about to succeed on a retry.
+  //
+  // Known gap: if stripe.checkout.sessions.list returns no results (e.g. the PI
+  // was created outside a Checkout session), we cannot update any Payment row.
+  // The event is dead-lettered (WebhookEvent status='failed') for manual inspection.
+  // ─────────────────────────────────────────────────────────────────────────
   } else if (event.type === 'payment_intent.payment_failed') {
     const pi = event.data.object as Stripe.PaymentIntent;
 
@@ -265,7 +372,8 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
       return;
     }
 
-    // Resolve payment_intent → checkout session → our Payment record
+    // Stripe does not embed the checkout session ID on the PaymentIntent object,
+    // so we must do a reverse lookup via the sessions list API.
     let sessionId: string | null = null;
     try {
       const sessions = await stripe.checkout.sessions.list({ payment_intent: pi.id, limit: 1 });
@@ -495,6 +603,37 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
     } catch (err) {
       console.error('Webhook dispute: failed to create admin notifications:', err);
     }
+  // ─────────────────────────────────────────────────────────────────────────
+  // checkout.session.expired
+  //
+  // Fired by Stripe when a Checkout session expires without a completed payment
+  // (default TTL: 24 hours). This is the definitive "user abandoned checkout"
+  // signal — the session cannot be reopened.
+  //
+  // State changes (all in one $transaction):
+  //   Payment.status  PENDING → FAILED
+  //   Registration.status  APPROVED → EXPIRED  (see guard below)
+  //   WebhookEvent  inserted with status='processed'
+  //
+  // PAID guard (critical):
+  //   Edge case: checkout.session.completed and checkout.session.expired can
+  //   theoretically arrive out of order due to Stripe retry timing. Before
+  //   setting Registration.status = EXPIRED we re-read the current status.
+  //   If it is already PAID (set by a prior checkout.session.completed delivery),
+  //   we skip the registration update entirely — we must never downgrade PAID → EXPIRED.
+  //   Payment.status is still set to FAILED even in this case (the expired session
+  //   record is indeed failed; the successful payment came through a different path).
+  //
+  // UI impact:
+  //   Registration.status = EXPIRED causes the user to see status badge "EXPIRED"
+  //   in My Registrations. Note: as of 2026-04-08, the REG_STATUS_BADGE map in
+  //   app/(dashboard)/my-registrations/index.tsx does NOT have an EXPIRED entry —
+  //   it falls back to { label: 'EXPIRED', status: 'default' } (unstyled grey badge).
+  //   Fixing the badge is tracked separately.
+  //
+  // No user notification is sent. Future improvement: notify the user that their
+  // payment window expired and provide a deep link to re-initiate payment.
+  // ─────────────────────────────────────────────────────────────────────────
   } else if (event.type === 'checkout.session.expired') {
     const session = event.data.object as Stripe.Checkout.Session;
 
@@ -553,7 +692,9 @@ router.post('/payments/webhook', async (req: Request, res: Response) => {
     }
 
     try {
-      // Fetch current registration status to guard against overwriting PAID (trap #5)
+      // Re-read registration status immediately before the transaction to guard against
+      // the out-of-order delivery race: if checkout.session.completed already ran and
+      // set status=PAID, we must not overwrite it with EXPIRED. See handler JSDoc above.
       const registration = await prisma.tournamentRegistration.findUnique({
         where: { tournamentId_userId: { tournamentId, userId } },
         select: { status: true },
