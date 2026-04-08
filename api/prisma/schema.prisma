@@ -89,6 +89,7 @@ model User {
   notifications           Notification[]
   tournamentResults       TournamentResult[]
   tournamentCommissioners TournamentCommissioner[]
+  deviceTokens            DeviceToken[]
 }
 
 model OtpCode {
@@ -292,6 +293,18 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@index([userId, isRead])
+}
+
+model DeviceToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  platform  String   // "ios" | "android" | "web"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Announcement {
