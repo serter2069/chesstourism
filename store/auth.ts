@@ -8,9 +8,11 @@ export interface User {
   email: string;
   name?: string;
   surname?: string;
+  phone?: string;
   role: 'PARTICIPANT' | 'COMMISSIONER' | 'ADMIN';
   country?: string;
   city?: string;
+  birthDate?: string | null;
   onboardingCompleted?: boolean;
   preferences?: Record<string, any> | null;
   fideId?: string | null;

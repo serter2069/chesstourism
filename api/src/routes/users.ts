@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import prisma from '../lib/prisma';
 
@@ -12,9 +13,12 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
       select: {
         id: true,
         name: true,
+        surname: true,
         email: true,
         phone: true,
         city: true,
+        country: true,
+        birthDate: true,
         role: true,
         rating: true,
         fideId: true,
@@ -141,12 +145,25 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
 // PUT /api/users/me — update own profile (authenticated)
 router.put('/me', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { name, phone, city } = req.body;
+    const { name, surname, phone, city, country, birthDate, fideId } = req.body;
 
-    const data: Record<string, string | undefined> = {};
+    const data: Prisma.UserUpdateInput = {};
     if (name !== undefined) data.name = name;
+    if (surname !== undefined) data.surname = surname;
     if (phone !== undefined) data.phone = phone;
     if (city !== undefined) data.city = city;
+    if (country !== undefined) data.country = country;
+    if (fideId !== undefined) data.fideId = fideId;
+
+    if (birthDate !== undefined) {
+      // Validate ISO date string (YYYY-MM-DD or full ISO)
+      const parsed = new Date(birthDate);
+      if (isNaN(parsed.getTime())) {
+        res.status(400).json({ error: 'Invalid birthDate format. Use YYYY-MM-DD.' });
+        return;
+      }
+      data.birthDate = parsed;
+    }
 
     if (Object.keys(data).length === 0) {
       res.status(400).json({ error: 'No fields to update' });
@@ -159,14 +176,18 @@ router.put('/me', authenticate, async (req: AuthRequest, res: Response) => {
       select: {
         id: true,
         name: true,
+        surname: true,
         email: true,
         phone: true,
         city: true,
+        country: true,
+        birthDate: true,
         role: true,
         rating: true,
         fideId: true,
         fideRating: true,
         fideTitle: true,
+        onboardingCompleted: true,
         createdAt: true,
       },
     });

@@ -73,6 +73,7 @@ model User {
   fideId              String?
   fideRating          Int?
   fideTitle           String?
+  birthDate           DateTime?
   preferences         Json?
   onboardingCompleted Boolean  @default(false)
   emailOptOut         Boolean  @default(false)

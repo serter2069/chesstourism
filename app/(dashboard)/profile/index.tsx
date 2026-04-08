@@ -24,9 +24,25 @@ const TITLE_LABELS: Record<string, string> = {
   WCM: 'Woman Candidate Master',
 };
 
+// Format DateTime from server (ISO string) to YYYY-MM-DD for display/editing
+function toDateString(val?: string | null): string {
+  if (!val) return '';
+  return val.slice(0, 10); // "2025-01-15T00:00:00.000Z" -> "2025-01-15"
+}
+
 export default function ProfileScreen() {
   const { user, loadUser } = useAuth();
 
+  // ── Personal Info state ──────────────────────────────────
+  const [name, setName] = useState(user?.name || '');
+  const [surname, setSurname] = useState(user?.surname || '');
+  const [country, setCountry] = useState(user?.country || '');
+  const [birthDate, setBirthDate] = useState(toDateString(user?.birthDate));
+  const [infoLoading, setInfoLoading] = useState(false);
+  const [infoError, setInfoError] = useState<string | null>(null);
+  const [infoSuccess, setInfoSuccess] = useState<string | null>(null);
+
+  // ── FIDE state ───────────────────────────────────────────
   const [fideId, setFideId] = useState(user?.fideId || '');
   const [fideRating, setFideRating] = useState(
     user?.fideRating ? String(user.fideRating) : ''
@@ -36,6 +52,43 @@ export default function ProfileScreen() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // ── Personal Info save ───────────────────────────────────
+  async function handleInfoSave() {
+    // Validate birthDate if provided
+    if (birthDate.trim()) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate.trim())) {
+        setInfoError('Birth date must be in YYYY-MM-DD format (e.g. 1990-01-15)');
+        return;
+      }
+      const parsed = new Date(birthDate.trim());
+      if (isNaN(parsed.getTime())) {
+        setInfoError('Invalid birth date');
+        return;
+      }
+    }
+
+    setInfoError(null);
+    setInfoSuccess(null);
+    setInfoLoading(true);
+
+    try {
+      await api.put('/users/me', {
+        name: name.trim() || undefined,
+        surname: surname.trim() || undefined,
+        country: country.trim() || undefined,
+        birthDate: birthDate.trim() || undefined,
+      });
+      await loadUser();
+      setInfoSuccess('Personal info saved');
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || 'Failed to save personal info';
+      setInfoError(msg);
+    } finally {
+      setInfoLoading(false);
+    }
+  }
+
+  // ── FIDE save ────────────────────────────────────────────
   async function handleSave() {
     const cleanId = fideId.trim();
     if (!cleanId) {
@@ -80,7 +133,62 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Current FIDE badge */}
+        {/* ── Personal Info section ── */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Personal Info</Text>
+
+          <Input
+            label="First Name"
+            value={name}
+            onChangeText={(text) => { setName(text); setInfoError(null); setInfoSuccess(null); }}
+            placeholder="e.g. Magnus"
+            autoCapitalize="words"
+          />
+
+          <Input
+            label="Surname"
+            value={surname}
+            onChangeText={(text) => { setSurname(text); setInfoError(null); setInfoSuccess(null); }}
+            placeholder="e.g. Carlsen"
+            autoCapitalize="words"
+          />
+
+          <Input
+            label="Country"
+            value={country}
+            onChangeText={(text) => { setCountry(text); setInfoError(null); setInfoSuccess(null); }}
+            placeholder="e.g. Norway"
+            autoCapitalize="words"
+          />
+
+          <Input
+            label="Birth Date"
+            value={birthDate}
+            onChangeText={(text) => { setBirthDate(text); setInfoError(null); setInfoSuccess(null); }}
+            placeholder="YYYY-MM-DD (e.g. 1990-11-30)"
+            keyboardType="numeric"
+            maxLength={10}
+          />
+
+          <Button
+            title="Save Personal Info"
+            onPress={handleInfoSave}
+            loading={infoLoading}
+          />
+
+          {infoError && (
+            <View style={styles.messageBox}>
+              <Text style={styles.errorText}>{infoError}</Text>
+            </View>
+          )}
+          {infoSuccess && (
+            <View style={[styles.messageBox, styles.successBox]}>
+              <Text style={styles.successText}>{infoSuccess}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* ── Current FIDE badge ── */}
         {hasFide && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>FIDE Profile</Text>
@@ -103,7 +211,7 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* FIDE fields — text entry */}
+        {/* ── FIDE fields — text entry ── */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             {hasFide ? 'Update FIDE Profile' : 'Link FIDE Profile'}
@@ -159,14 +267,12 @@ export default function ProfileScreen() {
             disabled={!fideId.trim()}
           />
 
-          {/* Error */}
           {error && (
             <View style={styles.messageBox}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
 
-          {/* Success */}
           {success && (
             <View style={[styles.messageBox, styles.successBox]}>
               <Text style={styles.successText}>{success}</Text>
