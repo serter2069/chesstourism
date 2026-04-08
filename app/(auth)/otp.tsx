@@ -209,6 +209,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing['3xl'],
+    maxWidth: 430,
+    alignSelf: 'center' as const,
+    width: '100%',
   },
   logo: {
     fontSize: 56,
