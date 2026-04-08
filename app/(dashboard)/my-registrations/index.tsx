@@ -26,17 +26,34 @@ interface RegistrationTournament {
 }
 
 interface Registration {
+  // NOTE: the API can return status='EXPIRED' (set by the checkout.session.expired webhook
+  // when a Stripe Checkout session times out without payment). The union type here only
+  // lists the statuses the UI explicitly handles — EXPIRED is missing intentionally
+  // until the badge map below is updated. At runtime, an EXPIRED registration will
+  // still render correctly via the REG_STATUS_BADGE fallback (unstyled grey badge).
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID' | 'EXPIRED';
   id: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID';
   createdAt: string;
   tournament: RegistrationTournament;
 }
 
+/**
+ * Badge display config for each registration status.
+ *
+ * KNOWN GAP — EXPIRED status is not mapped here.
+ * When the checkout.session.expired webhook fires, Registration.status is set to EXPIRED
+ * (see api/src/routes/payments.ts → checkout.session.expired handler).
+ * Because EXPIRED has no entry in this map, it falls back to:
+ *   { label: 'EXPIRED', status: 'default' }  — an unstyled grey badge.
+ * This is functional but not ideal UX. To fix: add an EXPIRED entry with status: 'error'
+ * and label: 'Payment Expired'. Tracked as a separate UI task.
+ */
 const REG_STATUS_BADGE: Record<string, { label: string; status: 'success' | 'warning' | 'error' | 'info' | 'default' }> = {
   PENDING: { label: 'Pending', status: 'warning' },
   APPROVED: { label: 'Approved', status: 'success' },
   REJECTED: { label: 'Rejected', status: 'error' },
   PAID: { label: 'Paid', status: 'success' },
+  // EXPIRED intentionally omitted — see JSDoc above
 };
 
 function formatDate(dateStr: string): string {
