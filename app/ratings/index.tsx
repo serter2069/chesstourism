@@ -317,8 +317,15 @@ export default function RatingsScreen() {
           <SkeletonCard variant="ratings-row" count={10} />
         ) : error ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{'♜'}</Text>
-            <Text style={styles.emptyText}>{error}</Text>
+            <Text style={styles.errorIcon}>{'♚'}</Text>
+            <Text style={styles.errorText}>Ошибка загрузки. Попробуйте снова.</Text>
+            <TouchableOpacity
+              style={styles.retryBtn}
+              onPress={() => fetchData(selectedCountry, 1)}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.retryBtnText}>Повторить</Text>
+            </TouchableOpacity>
           </View>
         ) : filteredRatings.length === 0 ? (
           <View style={styles.empty}>
@@ -615,6 +622,29 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: Typography.sizes.base,
     color: Colors.textMuted,
+  },
+  // Error state — visually distinct from empty
+  errorIcon: {
+    fontSize: 48,
+    marginBottom: Spacing.lg,
+    color: Colors.error,
+  },
+  errorText: {
+    fontSize: Typography.sizes.base,
+    color: Colors.error,
+    marginBottom: Spacing.lg,
+    textAlign: 'center',
+  },
+  retryBtn: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing['2xl'],
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+  },
+  retryBtnText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.white,
   },
   footer: {
     paddingVertical: Spacing.lg,
