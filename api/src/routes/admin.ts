@@ -90,10 +90,59 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
 
     res.json({
       items: users,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
     });
   } catch (err) {
     console.error('Admin users error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/admin/registrations — paginated list of all tournament registrations
+router.get('/registrations', async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = {};
+
+    if (req.query.status) {
+      const allowed = ['PENDING', 'APPROVED', 'REJECTED', 'PAID', 'CANCELLED'];
+      const s = (req.query.status as string).toUpperCase();
+      if (allowed.includes(s)) where.status = s;
+    }
+
+    if (req.query.tournamentId) {
+      where.tournamentId = req.query.tournamentId as string;
+    }
+
+    const [registrations, total] = await Promise.all([
+      prisma.tournamentRegistration.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          status: true,
+          createdAt: true,
+          tournamentId: true,
+          userId: true,
+          tournament: { select: { title: true, startDate: true, currency: true } },
+          user: { select: { name: true, email: true } },
+          payment: { select: { id: true, status: true, amount: true } },
+        },
+      }),
+      prisma.tournamentRegistration.count({ where }),
+    ]);
+
+    res.json({
+      items: registrations,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
+    });
+  } catch (err) {
+    console.error('Admin registrations error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

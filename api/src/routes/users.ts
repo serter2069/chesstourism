@@ -159,11 +159,13 @@ router.put('/me', authenticate, async (req: AuthRequest, res: Response) => {
     if (name !== undefined) {
       const cleaned = stripHtml(name);
       if (cleaned === null) { res.status(400).json({ error: 'name must not be empty' }); return; }
+      if (cleaned.length > 100) { res.status(400).json({ error: 'name must be 100 characters or fewer' }); return; }
       data.name = cleaned;
     }
     if (surname !== undefined) {
       const cleaned = stripHtml(surname);
       if (cleaned === null) { res.status(400).json({ error: 'surname must not be empty' }); return; }
+      if (cleaned.length > 100) { res.status(400).json({ error: 'surname must be 100 characters or fewer' }); return; }
       data.surname = cleaned;
     }
     if (phone !== undefined) data.phone = phone;
