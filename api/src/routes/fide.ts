@@ -55,4 +55,28 @@ router.put('/fide', authenticate, async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/profile/fide — return authenticated user's FIDE data
+router.get('/fide', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      select: {
+        fideId: true,
+        fideRating: true,
+        fideTitle: true,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error('Get FIDE data error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
