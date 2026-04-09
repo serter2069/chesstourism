@@ -117,6 +117,10 @@ router.get('/registrations', async (req: AuthRequest, res: Response) => {
       where.tournamentId = req.query.tournamentId as string;
     }
 
+    if (req.query.userId) {
+      where.userId = req.query.userId as string;
+    }
+
     const [registrations, total] = await Promise.all([
       prisma.tournamentRegistration.findMany({
         where,
