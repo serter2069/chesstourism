@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,9 @@ import {
   ScrollView,
   Image,
   Alert,
+  Platform,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams } from 'expo-router';
 import { SafeContainer, Header } from '../../../../components/layout';
 import { Button, Card, Input, LoadingSpinner } from '../../../../components/ui';
@@ -20,6 +22,7 @@ const MAX_PHOTOS = 10;
 interface Photo {
   id: string;
   url: string;
+  caption?: string;
   thumbnailUrl?: string;
 }
 
@@ -28,9 +31,12 @@ export default function TournamentPhotosScreen() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState('');
+  const [showCaptionForm, setShowCaptionForm] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
   const [photoCaption, setPhotoCaption] = useState('');
+
+  // Hidden file input for web
+  const fileInputRef = useRef<any>(null);
 
   const fetchPhotos = useCallback(async () => {
     try {
@@ -39,7 +45,6 @@ export default function TournamentPhotosScreen() {
       const data = res.data;
       setPhotos(Array.isArray(data) ? data : data.items || data.photos || []);
     } catch {
-      // Photos endpoint may not exist yet — show empty
       setPhotos([]);
     } finally {
       setLoading(false);
@@ -50,43 +55,95 @@ export default function TournamentPhotosScreen() {
     fetchPhotos();
   }, [fetchPhotos]);
 
-  function handleUploadPhoto() {
-    setShowForm(true);
+  // --- Upload helpers ---
+
+  async function uploadPhotoBlob(blob: Blob, filename: string) {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('photo', blob, filename);
+      const res = await api.post(`/tournaments/${id}/photos/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const url: string = res.data.url;
+      // Store url and show caption form before final DB save
+      setPendingUrl(url);
+      setShowCaptionForm(true);
+    } catch (err: unknown) {
+      const message =
+        (err as any)?.response?.data?.error || 'Failed to upload photo';
+      Alert.alert('Upload Error', message);
+    } finally {
+      setUploading(false);
+    }
   }
 
-  async function handleSubmitPhoto() {
-    const trimmedUrl = photoUrl.trim();
-    if (!trimmedUrl) {
-      Alert.alert('Error', 'Photo URL is required');
+  async function handlePickPhotoNative() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission required', 'Photo library permission is required');
       return;
     }
 
-    try {
-      new URL(trimmedUrl);
-    } catch {
-      Alert.alert('Error', 'Please enter a valid URL (https://...)');
-      return;
-    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 0.9,
+    });
 
+    if (result.canceled || !result.assets?.length) return;
+
+    const asset = result.assets[0];
+    const response = await fetch(asset.uri);
+    const blob = await response.blob();
+    const ext = asset.uri.split('.').pop() || 'jpg';
+    await uploadPhotoBlob(blob, `photo.${ext}`);
+  }
+
+  function handlePickPhotoWeb() {
+    fileInputRef.current?.click();
+  }
+
+  async function handleWebFileChange(e: any) {
+    const file = e.target?.files?.[0];
+    if (!file) return;
+    await uploadPhotoBlob(file, file.name);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  function handleUploadPhoto() {
+    if (Platform.OS === 'web') {
+      handlePickPhotoWeb();
+    } else {
+      handlePickPhotoNative();
+    }
+  }
+
+  async function handleConfirmCaption() {
+    if (!pendingUrl) return;
     try {
       setUploading(true);
       await api.post(`/tournaments/${id}/photos`, {
-        url: trimmedUrl,
+        url: pendingUrl,
         caption: photoCaption.trim() || undefined,
       });
-      setPhotoUrl('');
+      setPendingUrl(null);
       setPhotoCaption('');
-      setShowForm(false);
+      setShowCaptionForm(false);
       fetchPhotos();
     } catch (err: unknown) {
       const message =
-        (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
-        (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.message ||
-        'Failed to add photo';
+        (err as any)?.response?.data?.error || 'Failed to save photo';
       Alert.alert('Error', message);
     } finally {
       setUploading(false);
     }
+  }
+
+  function handleCancelCaption() {
+    setPendingUrl(null);
+    setPhotoCaption('');
+    setShowCaptionForm(false);
   }
 
   if (loading) {
@@ -103,6 +160,18 @@ export default function TournamentPhotosScreen() {
   return (
     <SafeContainer>
       <Header title="Tournament Photos" showBack />
+
+      {/* Hidden file input for web */}
+      {Platform.OS === 'web' && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' } as any}
+          onChange={handleWebFileChange}
+        />
+      )}
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -112,10 +181,11 @@ export default function TournamentPhotosScreen() {
             <Text style={styles.subtitle}>
               {photos.length} / {MAX_PHOTOS} photos
             </Text>
-            {!limitReached && (
+            {!limitReached && !showCaptionForm && (
               <Button
-                title="Upload Photo"
+                title={uploading ? 'Uploading...' : 'Upload Photo'}
                 onPress={handleUploadPhoto}
+                disabled={uploading}
                 style={styles.uploadBtn}
               />
             )}
@@ -124,15 +194,13 @@ export default function TournamentPhotosScreen() {
             )}
           </View>
 
-          {showForm && (
+          {showCaptionForm && pendingUrl && (
             <Card style={styles.formCard}>
-              <Input
-                label="Photo URL *"
-                placeholder="https://example.com/photo.jpg"
-                value={photoUrl}
-                onChangeText={setPhotoUrl}
-                autoCapitalize="none"
-                keyboardType="url"
+              <Text style={styles.formTitle}>Photo uploaded. Add a caption?</Text>
+              <Image
+                source={{ uri: pendingUrl }}
+                style={styles.previewImage}
+                resizeMode="cover"
               />
               <Input
                 label="Caption (optional)"
@@ -144,16 +212,12 @@ export default function TournamentPhotosScreen() {
                 <Button
                   title="Cancel"
                   variant="secondary"
-                  onPress={() => {
-                    setShowForm(false);
-                    setPhotoUrl('');
-                    setPhotoCaption('');
-                  }}
+                  onPress={handleCancelCaption}
                   style={styles.formBtn}
                 />
                 <Button
-                  title="Add Photo"
-                  onPress={handleSubmitPhoto}
+                  title="Save Photo"
+                  onPress={handleConfirmCaption}
                   loading={uploading}
                   disabled={uploading}
                   style={styles.formBtn}
@@ -221,6 +285,19 @@ const styles = StyleSheet.create({
   },
   formCard: {
     marginBottom: Spacing.lg,
+  },
+  formTitle: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.text,
+    marginBottom: Spacing.md,
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    marginBottom: Spacing.md,
+    backgroundColor: Colors.background,
   },
   formButtons: {
     flexDirection: 'row',
