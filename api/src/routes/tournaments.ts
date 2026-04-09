@@ -1242,6 +1242,14 @@ router.post('/tournaments/:id/photos/upload', authenticate, requireRole('COMMISS
 
       if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
 
+      const photoCount = await prisma.tournamentPhoto.count({
+        where: { tournamentId: req.params.id },
+      });
+      if (photoCount >= 10) {
+        res.status(400).json({ error: 'Maximum 10 photos allowed per tournament' });
+        return;
+      }
+
       const url = await validateAndUpload(
         req.file.buffer,
         req.file.mimetype,
