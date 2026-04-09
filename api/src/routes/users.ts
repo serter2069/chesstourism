@@ -121,6 +121,7 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
         id: true,
         name: true,
         city: true,
+        country: true,
         role: true,
         rating: true,
         fideId: true,
