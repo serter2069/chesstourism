@@ -226,6 +226,62 @@ router.post(
   }
 );
 
+// GET /api/ratings/history — paginated rating change history across all users (public)
+router.get('/history', async (req: Request, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const where = {
+      tournament: { status: 'COMPLETED' as const },
+      eloChange: { not: null },
+    };
+
+    const [results, total] = await Promise.all([
+      prisma.tournamentResult.findMany({
+        where,
+        include: {
+          tournament: {
+            select: { id: true, title: true, endDate: true },
+          },
+          user: {
+            select: { id: true, name: true, city: true, country: true },
+          },
+        },
+        orderBy: { tournament: { endDate: 'desc' } },
+        skip,
+        take: limit,
+      }),
+      prisma.tournamentResult.count({ where }),
+    ]);
+
+    res.json({
+      data: results.map((r) => ({
+        userId: r.userId,
+        userName: r.user.name,
+        city: r.user.city,
+        country: r.user.country,
+        tournamentId: r.tournamentId,
+        tournamentName: r.tournament.title,
+        place: r.place,
+        score: r.score,
+        eloChange: r.eloChange,
+        date: r.tournament.endDate,
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
+  } catch (err: any) {
+    console.error('Rating history error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/ratings/:userId/history — paginated ELO change history for a user
 router.get('/:userId/history', async (req: Request, res: Response) => {
   try {

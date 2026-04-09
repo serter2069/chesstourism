@@ -137,6 +137,57 @@ router.get('/tournaments', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/tournaments/my — list tournaments managed by current commissioner (auth required)
+// IMPORTANT: declared BEFORE /tournaments/:id to prevent "my" matching as :id
+router.get('/tournaments/my', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.user!;
+
+    // Find commissioner record for this user
+    const commissioner = await prisma.commissioner.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!commissioner) {
+      res.json({ data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 1 } });
+      return;
+    }
+
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
+
+    const where = { commissionerId: commissioner.id };
+
+    const [tournaments, total] = await Promise.all([
+      prisma.tournament.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          _count: { select: { registrations: true } },
+        },
+      }),
+      prisma.tournament.count({ where }),
+    ]);
+
+    res.json({
+      data: tournaments,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
+  } catch (err) {
+    console.error('My tournaments error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/tournaments/:id — single tournament (with registration count + user's own registration)
 router.get('/tournaments/:id', async (req: Request, res: Response) => {
   try {
