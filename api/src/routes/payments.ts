@@ -112,7 +112,7 @@ router.post('/payments/tournament/:tournamentId', authenticate, async (req: Auth
       return;
     }
 
-    if (registration.status !== 'APPROVED') {
+    if (registration.status !== 'APPROVED' && registration.status !== 'PENDING') {
       res.status(400).json({ error: 'Registration must be approved before payment' });
       return;
     }
