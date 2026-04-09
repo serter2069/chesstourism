@@ -785,7 +785,7 @@ router.get('/tournaments/:id/results', async (req: Request, res: Response) => {
 
 // ─── Registration Endpoints ──────────────────────────────
 
-const REGISTRABLE_STATUSES = ['PUBLISHED', 'REGISTRATION_OPEN'];
+const REGISTRABLE_STATUSES = ['REGISTRATION_OPEN'];
 
 // POST /api/tournaments/:id/register — apply to tournament
 router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, res: Response) => {
@@ -1271,7 +1271,24 @@ router.post('/tournaments/:id/photos/upload', authenticate, requireRole('COMMISS
         'tournament-photo',
       );
 
-      res.status(201).json({ url });
+      const caption = (req.body as Record<string, unknown>).caption;
+      const photo = await prisma.tournamentPhoto.create({
+        data: {
+          tournamentId: req.params.id,
+          url,
+          caption: caption ? String(caption).trim() || null : null,
+          uploadedBy: userId,
+        },
+        select: {
+          id: true,
+          url: true,
+          caption: true,
+          createdAt: true,
+          uploader: { select: { id: true, name: true } },
+        },
+      });
+
+      res.status(201).json(photo);
     } catch (uploadErr: any) {
       if (uploadErr instanceof UploadValidationError) {
         res.status(400).json({ error: uploadErr.message });
