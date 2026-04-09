@@ -52,5 +52,5 @@ jobs:
           npm run build
           # Write .env for PM2 process (dotenv.config reads from .env at runtime)
           doppler secrets download --no-file --format env > .env
-          pm2 restart chesstourism-api --update-env || pm2 start dist/index.js --name chesstourism-api
-          pm2 save
+          sudo pm2 restart chesstourism-api --update-env || sudo pm2 start dist/index.js --name chesstourism-api
+          sudo pm2 save
