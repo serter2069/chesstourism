@@ -954,6 +954,53 @@ router.get('/my-registrations', authenticate, async (req: AuthRequest, res: Resp
   }
 });
 
+// DELETE /api/tournaments/:id/register — participant withdraws own registration
+router.delete('/tournaments/:id/register', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const tournamentId = req.params.id;
+    const userId = req.user!.userId;
+
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      select: { status: true, title: true },
+    });
+
+    if (!tournament) {
+      res.status(404).json({ error: 'Tournament not found' });
+      return;
+    }
+
+    if (['IN_PROGRESS', 'COMPLETED'].includes(tournament.status)) {
+      res.status(400).json({ error: 'Cannot withdraw from a tournament that is in progress or completed' });
+      return;
+    }
+
+    const registration = await prisma.tournamentRegistration.findFirst({
+      where: { tournamentId, userId },
+    });
+
+    if (!registration) {
+      res.status(404).json({ error: 'Not registered for this tournament' });
+      return;
+    }
+
+    if (['CANCELLED', 'REJECTED', 'EXPIRED'].includes(registration.status)) {
+      res.status(400).json({ error: 'Registration is already cancelled or inactive' });
+      return;
+    }
+
+    await prisma.tournamentRegistration.update({
+      where: { id: registration.id },
+      data: { status: 'CANCELLED' },
+    });
+
+    res.json({ success: true, message: 'Registration cancelled' });
+  } catch (err) {
+    console.error('Tournament withdraw error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/tournaments/:id/registrations — list registrations (Commissioner/Admin)
 router.get('/tournaments/:id/registrations', authenticate, requireRole('COMMISSIONER', 'ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
