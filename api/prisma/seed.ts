@@ -119,6 +119,7 @@ interface PlayerDef {
   fideTitle?: string;
   fideRating?: number;
   isCommissioner?: boolean;
+  isPendingCommissioner?: boolean; // role=COMMISSIONER but isVerified=false (for admin-001 test)
 }
 
 const PLAYERS: PlayerDef[] = [
@@ -165,6 +166,8 @@ const PLAYERS: PlayerDef[] = [
   { name: 'Gabriel Santos', country: 'Brazil', city: 'Rio de Janeiro', rating: 1830 },
   { name: 'Mateus Silva', country: 'Brazil', city: 'Brasilia', rating: 1550 },
   { name: 'Pedro Costa', country: 'Brazil', city: 'Salvador', rating: 1370 },
+  // Pending (unverified) commissar — needed for admin-001 UC test
+  { name: 'Ivan Pending', country: 'Ukraine', city: 'Kyiv', rating: 1800, isCommissioner: true, isPendingCommissioner: true },
   // Extra filler players
   { name: 'Erik Johansson', country: 'Sweden', city: 'Stockholm', rating: 1690, isCommissioner: true },
   { name: 'Yuki Tanaka', country: 'Japan', city: 'Tokyo', rating: 1870 },
@@ -294,6 +297,26 @@ const TOURNAMENTS: TournamentDef[] = [
     description: 'Free entry beginner-friendly rapid tournament. Open to all players rated under 1600.',
     ratingLimit: 1600,
   },
+  // DRAFT tournament — needed for inter-009 (Publish tournament state machine test)
+  {
+    title: 'Dublin Test Open',
+    city: 'Dublin', country: 'Ireland',
+    status: TournamentStatus.DRAFT,
+    format: 'RAPID 15+10',
+    fee: 0, currency: 'EUR', maxParticipants: 32,
+    daysOffset: [-30, -33],
+    description: 'Draft tournament for UC testing. Not yet published.',
+  },
+  // FREE PUBLISHED tournament — needed for inter-003 (Free registration test)
+  {
+    title: 'Cairo Open Free Cup',
+    city: 'Cairo', country: 'Egypt',
+    status: TournamentStatus.PUBLISHED,
+    format: 'RAPID 15+10',
+    fee: 0, currency: 'USD', maxParticipants: 48,
+    daysOffset: [-40, -44],
+    description: 'Free entry open tournament in Cairo. Open to all ratings.',
+  },
   // UPCOMING (2) — use PUBLISHED status since no UPCOMING enum
   {
     title: 'Dubai Grand Prix 2026',
@@ -396,6 +419,7 @@ async function seedCommissioners(emailToId: Map<string, string>): Promise<Map<st
     const email = `${nameParts[0]}.${nameParts[nameParts.length - 1]}@gmail.com`;
     const userId = emailToId.get(email)!;
 
+    const isVerified = !p.isPendingCommissioner;
     const comm = await prisma.commissioner.upsert({
       where: { userId },
       update: {
@@ -403,7 +427,7 @@ async function seedCommissioners(emailToId: Map<string, string>): Promise<Map<st
         specialization: p.fideTitle ? 'International Events' : 'Regional Events',
         country: p.country,
         city: p.city,
-        isVerified: true,
+        isVerified,
       },
       create: {
         userId,
@@ -411,11 +435,14 @@ async function seedCommissioners(emailToId: Map<string, string>): Promise<Map<st
         specialization: p.fideTitle ? 'International Events' : 'Regional Events',
         country: p.country,
         city: p.city,
-        isVerified: true,
+        isVerified,
       },
     });
 
-    commissionerMap.set(p.country, comm.id);
+    // Only add verified commissioners to the map (pending ones can't own tournaments)
+    if (isVerified) {
+      commissionerMap.set(p.country, comm.id);
+    }
   }
 
   console.log(`  Created/updated ${commissioners.length} commissioners`);
@@ -443,6 +470,8 @@ async function seedTournaments(commissionerMap: Map<string, string>): Promise<{ 
     'Sweden': 'Sweden',
     'UAE': 'Spain',
     'Italy': 'France',
+    'Ireland': 'Germany',  // Klaus Weber (fallback for Ireland)
+    'Egypt': 'India',      // Ravi Patel (fallback for Egypt)
   };
 
   for (const t of TOURNAMENTS) {
@@ -513,8 +542,8 @@ async function seedRegistrationsAndPayments(
   const allUserIds = Array.from(emailToId.values());
 
   for (const t of tournaments) {
-    // Skip PUBLISHED (upcoming) tournaments — no registrations yet
-    if (t.def.status === TournamentStatus.PUBLISHED) {
+    // Skip PUBLISHED (upcoming) and DRAFT tournaments — no registrations yet
+    if (t.def.status === TournamentStatus.PUBLISHED || t.def.status === TournamentStatus.DRAFT) {
       tournamentParticipants.set(t.id, []);
       continue;
     }
