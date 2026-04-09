@@ -910,7 +910,15 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
         console.error('createNotification (new registration) error:', e);
       }
     })();
-  } catch (err) {
+  } catch (err: unknown) {
+    // Handle race condition: two parallel requests pass duplicate check simultaneously
+    if (
+      typeof err === 'object' && err !== null &&
+      'code' in err && (err as { code: string }).code === 'P2002'
+    ) {
+      res.status(409).json({ error: 'Already registered for this tournament' });
+      return;
+    }
     console.error('Tournament register error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
