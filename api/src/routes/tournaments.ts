@@ -30,7 +30,13 @@ router.get('/tournaments', async (req: Request, res: Response) => {
       status: { not: 'DRAFT' },
     };
 
-    if (req.query.status) where.status = req.query.status as string;
+    const VALID_STATUSES = ['DRAFT', 'PUBLISHED', 'REGISTRATION_OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+    if (req.query.status) {
+      if (!VALID_STATUSES.includes(req.query.status as string)) {
+        return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` });
+      }
+      where.status = req.query.status as string;
+    }
     if (req.query.country) where.country = { contains: req.query.country as string, mode: 'insensitive' };
     if (req.query.city) where.city = { contains: req.query.city as string, mode: 'insensitive' };
 
