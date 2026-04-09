@@ -147,9 +147,24 @@ router.put('/me', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { name, surname, phone, city, country, birthDate, fideId } = req.body;
 
+    // Strip HTML tags to prevent stored XSS
+    const stripHtml = (val: unknown): string | null => {
+      if (val === null || val === undefined) return null;
+      const s = String(val).replace(/<[^>]*>/g, '').trim();
+      return s.length > 0 ? s : null;
+    };
+
     const data: Prisma.UserUpdateInput = {};
-    if (name !== undefined) data.name = name;
-    if (surname !== undefined) data.surname = surname;
+    if (name !== undefined) {
+      const cleaned = stripHtml(name);
+      if (cleaned === null) { res.status(400).json({ error: 'name must not be empty' }); return; }
+      data.name = cleaned;
+    }
+    if (surname !== undefined) {
+      const cleaned = stripHtml(surname);
+      if (cleaned === null) { res.status(400).json({ error: 'surname must not be empty' }); return; }
+      data.surname = cleaned;
+    }
     if (phone !== undefined) data.phone = phone;
     if (city !== undefined) data.city = city;
     if (country !== undefined) data.country = country;
