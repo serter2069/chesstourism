@@ -876,9 +876,9 @@ router.post('/tournaments/:id/register', authenticate, async (req: AuthRequest, 
         }
       })();
     } else {
-      // Paid tournament: registration starts as PENDING, awaiting payment
+      // Paid tournament: registration starts as APPROVED so payment can be initiated immediately
       registration = await prisma.tournamentRegistration.create({
-        data: { tournamentId, userId, status: 'PENDING' },
+        data: { tournamentId, userId, status: 'APPROVED' },
         select: { id: true, status: true, createdAt: true },
       });
     }
