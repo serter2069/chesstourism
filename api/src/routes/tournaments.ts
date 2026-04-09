@@ -336,6 +336,12 @@ router.post('/tournaments', authenticate, requireRole('COMMISSIONER', 'ADMIN'), 
       return;
     }
 
+    const parsedFee = fee != null ? parseFloat(fee) : null;
+    if (parsedFee !== null && parsedFee < 0) {
+      res.status(400).json({ error: 'Entry fee cannot be negative' });
+      return;
+    }
+
     const tournament = await prisma.tournament.create({
       data: {
         title: title.trim(),
@@ -344,7 +350,7 @@ router.post('/tournaments', authenticate, requireRole('COMMISSIONER', 'ADMIN'), 
         startDate: start,
         endDate: end,
         maxParticipants: maxParticipants ? parseInt(maxParticipants, 10) : null,
-        fee: fee != null ? parseFloat(fee) : null,
+        fee: parsedFee,
         currency: currency?.trim() || 'USD',
         description: description?.trim() || null,
         ratingLimit: ratingLimit ? parseInt(ratingLimit, 10) : null,
@@ -398,7 +404,14 @@ router.put('/tournaments/:id', authenticate, requireRole('COMMISSIONER', 'ADMIN'
     if (timeControl !== undefined) data.timeControl = timeControl?.trim()?.toLowerCase() || null;
     if (currency !== undefined) data.currency = currency?.trim() || 'USD';
     if (maxParticipants !== undefined) data.maxParticipants = maxParticipants ? parseInt(maxParticipants, 10) : null;
-    if (fee !== undefined) data.fee = fee != null ? parseFloat(fee) : null;
+    if (fee !== undefined) {
+      const parsedFee = fee != null ? parseFloat(fee) : null;
+      if (parsedFee !== null && parsedFee < 0) {
+        res.status(400).json({ error: 'Entry fee cannot be negative' });
+        return;
+      }
+      data.fee = parsedFee;
+    }
 
     if (startDate !== undefined) {
       const start = new Date(startDate);
