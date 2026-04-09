@@ -16,6 +16,7 @@
     "@bull-board/api": "^6.21.0",
     "@bull-board/express": "^6.21.0",
     "@prisma/client": "^5.22.0",
+    "@types/sharp": "^0.31.1",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.73.0",
     "cookie-parser": "^1.4.7",
