@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import multer from 'multer';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
 import { createNotification } from '../utils/notifications';
@@ -7,7 +8,14 @@ import { submitResults, getResults, AppError } from '../services/tournament.serv
 import { generateParticipationCertificate } from '../services/pdf.service';
 import { debounceScheduleEmail } from '../lib/scheduleQueue';
 import { enqueueEmail } from '../lib/emailQueue';
+import { validateAndUpload, UploadValidationError } from '../services/storage.service';
 import prisma from '../lib/prisma';
+
+// Accept up to 10MB at the multer layer; fine-grained validation handled inside validateAndUpload()
+const photoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 const router = Router();
 
@@ -1192,6 +1200,65 @@ router.post('/tournaments/:id/photos', authenticate, requireRole('COMMISSIONER',
     console.error('Add photo error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// POST /api/tournaments/:id/photos/upload — upload photo file via multipart (Commissioner/Admin)
+// MUST be declared BEFORE DELETE /:id/photos/:photoId to avoid route conflict
+router.post('/tournaments/:id/photos/upload', authenticate, requireRole('COMMISSIONER', 'ADMIN'), (req: AuthRequest, res: Response) => {
+  photoUpload.single('photo')(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        res.status(400).json({ error: 'File too large. Maximum size is 10MB' });
+        return;
+      }
+      res.status(400).json({ error: err.message });
+      return;
+    } else if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: 'No file uploaded. Use field name "photo"' });
+        return;
+      }
+
+      const { userId, role } = req.user!;
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: req.params.id },
+        include: { commissioner: { select: { userId: true, isVerified: true } } },
+      });
+
+      if (!tournament) {
+        res.status(404).json({ error: 'Tournament not found' });
+        return;
+      }
+
+      if (role !== 'ADMIN' && tournament.commissioner.userId !== userId) {
+        res.status(403).json({ error: 'Not authorized' });
+        return;
+      }
+
+      if (!assertCommissionerVerified(tournament.commissioner, role, res)) return;
+
+      const url = await validateAndUpload(
+        req.file.buffer,
+        req.file.mimetype,
+        req.file.originalname,
+        'tournament-photo',
+      );
+
+      res.status(201).json({ url });
+    } catch (uploadErr: any) {
+      if (uploadErr instanceof UploadValidationError) {
+        res.status(400).json({ error: uploadErr.message });
+        return;
+      }
+      console.error('Tournament photo upload error:', uploadErr);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 });
 
 // DELETE /api/tournaments/:id/photos/:photoId — remove photo (Commissioner who owns tournament / Admin)
