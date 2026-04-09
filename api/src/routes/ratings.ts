@@ -235,13 +235,17 @@ router.get('/history', async (req: Request, res: Response) => {
 
     const where = {
       tournament: { status: 'COMPLETED' as const },
-      eloChange: { not: null },
     };
 
     const [results, total] = await Promise.all([
       prisma.tournamentResult.findMany({
         where,
-        include: {
+        select: {
+          userId: true,
+          tournamentId: true,
+          place: true,
+          score: true,
+          eloChange: true,
           tournament: {
             select: { id: true, title: true, endDate: true },
           },
