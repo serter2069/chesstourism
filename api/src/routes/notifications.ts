@@ -34,8 +34,8 @@ router.get('/notifications/unread-count', authenticate, async (req: AuthRequest,
   }
 });
 
-// PUT /api/notifications/read-all — mark all as read
-router.put('/notifications/read-all', authenticate, async (req: AuthRequest, res: Response) => {
+// PATCH /api/notifications/read-all — mark all as read
+router.patch('/notifications/read-all', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.user!;
     await prisma.notification.updateMany({
@@ -49,8 +49,8 @@ router.put('/notifications/read-all', authenticate, async (req: AuthRequest, res
   }
 });
 
-// PUT /api/notifications/:id/read — mark single notification as read
-router.put('/notifications/:id/read', authenticate, async (req: AuthRequest, res: Response) => {
+// PATCH /api/notifications/:id/read — mark single notification as read
+router.patch('/notifications/:id/read', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.user!;
     const notification = await prisma.notification.findFirst({
