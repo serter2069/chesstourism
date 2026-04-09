@@ -1,6 +1,7 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import path from 'path';
 import crypto from 'crypto';
+import sharp from 'sharp';
 
 const STORAGE_ENDPOINT = process.env.STORAGE_ENDPOINT;
 const STORAGE_BUCKET = process.env.STORAGE_BUCKET || 'chesstourism';
@@ -156,6 +157,23 @@ export async function validateAndUpload(
   // Magic byte check — only for image uploads to prevent type spoofing
   if (mimeType.startsWith('image/')) {
     checkMagicBytes(buffer, mimeType);
+
+    // Re-encode through sharp to strip non-image data (polyglot bypass prevention).
+    // sharp will throw if the buffer is not a valid image, regardless of magic bytes.
+    try {
+      const formatMap: Record<string, keyof sharp.FormatEnum> = {
+        'image/jpeg': 'jpeg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+      };
+      const fmt = formatMap[mimeType];
+      if (fmt) {
+        const opts = fmt === 'jpeg' ? { quality: 90 } : {};
+        buffer = await sharp(buffer).toFormat(fmt, opts).toBuffer();
+      }
+    } catch {
+      throw new UploadValidationError('Invalid image file');
+    }
   }
 
   const key = generateKey(config.prefix, originalName);
