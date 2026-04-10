@@ -2,14 +2,13 @@ import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Image,
   useWindowDimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
+import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -25,6 +24,8 @@ function useLayout() {
   return { isWide, cols, maxW, width };
 }
 
+import ProtoNav from '../ProtoNav';
+
 // ─── Chess Logo Mark ──────────────────────────────────────────────────────────
 
 function LogoMark({ size = 28 }: { size?: number }) {
@@ -39,25 +40,22 @@ function LogoMark({ size = 28 }: { size?: number }) {
   );
 }
 
-// ─── Nav ─────────────────────────────────────────────────────────────────────
+// ─── Dark Nav (hero overlay variant — landing only) ───────────────────────────
 
-function Nav({ dark = false }: { dark?: boolean }) {
+function DarkNav() {
   const { isWide } = useLayout();
-  const bg = dark ? 'transparent' : Colors.background;
-  const textColor = dark ? Colors.white : Colors.text;
-  const mutedColor = dark ? 'rgba(255,255,255,0.65)' : Colors.textMuted;
   return (
-    <View style={[navS.bar, { backgroundColor: bg, borderBottomColor: dark ? 'transparent' : Colors.border }]}>
+    <View style={navS.bar}>
       <TouchableOpacity style={navS.logoRow} activeOpacity={0.8}>
         <LogoMark size={24} />
-        <Text style={[navS.logoText, { color: textColor }]}>Chess</Text>
+        <Text style={navS.logoText}>Chess</Text>
         <Text style={navS.logoGold}>Tourism</Text>
       </TouchableOpacity>
       {isWide && (
         <View style={navS.links}>
           {['Tournaments', 'Commissars', 'Rankings', 'About'].map((l) => (
             <TouchableOpacity key={l} style={navS.linkBtn} activeOpacity={0.7}>
-              <Text style={[navS.linkText, { color: mutedColor }]}>{l}</Text>
+              <Text style={navS.linkText}>{l}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -76,21 +74,21 @@ const navS = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.xl,
     height: 60,
-    borderBottomWidth: 1,
+    backgroundColor: 'transparent',
   },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  logoText: { fontFamily: Typography.fontFamilyHeading, fontSize: 17, fontWeight: '700' },
+  logoText: { fontFamily: Typography.fontFamilyHeading, fontSize: 17, fontWeight: '700', color: Colors.white },
   logoGold: { fontFamily: Typography.fontFamilyHeading, fontSize: 17, fontWeight: '700', color: Colors.gold },
   links: { flexDirection: 'row', gap: Spacing.xl },
   linkBtn: { paddingVertical: 4 },
-  linkText: { fontSize: 14, fontFamily: Typography.fontFamilyMedium },
+  linkText: { fontSize: 14, fontFamily: Typography.fontFamilyMedium, color: 'rgba(255,255,255,0.65)' },
   signInBtn: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs + 2,
     borderRadius: 4,
     backgroundColor: Colors.gold,
   },
-  signInText: { fontSize: 13, fontFamily: Typography.fontFamilySemiBold, color: Colors.white },
+  signInText: { fontSize: 13, fontFamily: Typography.fontFamilySemiBold, color: Colors.primary },
 });
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
@@ -99,12 +97,8 @@ function Hero() {
   const { isWide } = useLayout();
   return (
     <View style={heroS.root}>
-      {/* Background image */}
-      <Image
-        source={{ uri: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=1600&q=80' }}
-        style={StyleSheet.absoluteFillObject}
-        resizeMode="cover"
-      />
+      {/* Hero background */}
+      <ProtoPlaceholderImage type="banner" width="100%" height="100%" borderRadius={0} label="Hero — chess tournament photo" />
       {/* Dark overlay */}
       <View style={heroS.overlay} />
       {/* Pattern overlay — thin gold lines */}
@@ -235,13 +229,9 @@ function TCard({ t }: { t: typeof mockTournaments[0] }) {
   const startD = new Date(t.startDate).getDate();
   return (
     <TouchableOpacity style={tS.card} activeOpacity={0.85}>
-      {/* Image placeholder with gradient overlay */}
+      {/* Image placeholder */}
       <View style={tS.imgWrap}>
-        <Image
-          source={{ uri: `https://picsum.photos/seed/${t.id}/400/220` }}
-          style={tS.img}
-          resizeMode="cover"
-        />
+        <ProtoPlaceholderImage type="photo" width="100%" height={150} borderRadius={0} label="Tournament photo" />
         <View style={tS.imgOverlay} />
         {/* Date badge */}
         <View style={tS.dateBadge}>
@@ -401,7 +391,7 @@ const calS = StyleSheet.create({
 
 // ─── Rankings ────────────────────────────────────────────────────────────────
 
-const MEDAL = ['🥇', '🥈', '🥉'];
+const TOP3_COLORS = [Colors.gold, '#A8A9AD', '#CD7F32'] as const;
 
 function RankingsSection() {
   const { isWide } = useLayout();
@@ -420,7 +410,9 @@ function RankingsSection() {
           <TouchableOpacity key={r.rank} style={[rankS.row, i % 2 === 0 && rankS.rowAlt]} activeOpacity={0.75}>
             <View style={[rankS.rankCell, { width: 44 }]}>
               {i < 3 ? (
-                <Text style={rankS.medal}>{MEDAL[i]}</Text>
+                <View style={[rankS.medalBadge, { backgroundColor: TOP3_COLORS[i] + '22', borderColor: TOP3_COLORS[i] }]}>
+                  <Text style={[rankS.medalNum, { color: TOP3_COLORS[i] }]}>{r.rank}</Text>
+                </View>
               ) : (
                 <Text style={rankS.rankNum}>{r.rank}</Text>
               )}
@@ -430,7 +422,7 @@ function RankingsSection() {
               <Text style={rankS.country}>{r.country}</Text>
             </View>
             <Text style={[rankS.elo, { width: 60 }]}>{r.rating}</Text>
-            <Text style={[rankS.tp, { width: 50 }]}>{r.tournamentCount ?? Math.floor(Math.random() * 40 + 5)}</Text>
+            <Text style={[rankS.tp, { width: 50 }]}>{r.tournamentCount ?? 0}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -452,7 +444,8 @@ const rankS = StyleSheet.create({
   },
   rowAlt: { backgroundColor: Colors.backgroundAlt },
   rankCell: { alignItems: 'center' },
-  medal: { fontSize: 16 },
+  medalBadge: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  medalNum: { fontSize: 11, fontFamily: Typography.fontFamilyBold, fontWeight: '700' },
   rankNum: { fontSize: 13, fontFamily: Typography.fontFamilyBold, color: Colors.textMuted, textAlign: 'center' },
   name: { fontSize: 14, fontFamily: Typography.fontFamilySemiBold, color: Colors.text },
   country: { fontSize: 12, fontFamily: Typography.fontFamily, color: Colors.textMuted },
@@ -540,11 +533,7 @@ function CtaSection() {
   const { isWide } = useLayout();
   return (
     <View style={ctaS.section}>
-      <Image
-        source={{ uri: 'https://images.unsplash.com/photo-1560174038-da43ac74f01b?w=1400&q=80' }}
-        style={StyleSheet.absoluteFillObject}
-        resizeMode="cover"
-      />
+      <ProtoPlaceholderImage type="banner" width="100%" height="100%" borderRadius={0} label="CTA background" />
       <View style={ctaS.overlay} />
       <View style={[ctaS.inner, isWide && ctaS.innerWide]}>
         <View style={[ctaS.cardDark, isWide && { flex: 1 }]}>
@@ -712,7 +701,7 @@ function FullPage({ isLoading, isEmpty }: { isLoading?: boolean; isEmpty?: boole
   if (isLoading) return <LoadingState />;
   return (
     <View>
-      <Nav dark />
+      <DarkNav />
       <View style={{ marginTop: -60 }}>
         <Hero />
       </View>

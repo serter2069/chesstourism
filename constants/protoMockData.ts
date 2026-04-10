@@ -73,14 +73,14 @@ export const mockTournaments: MockTournament[] = [
 ];
 
 export const mockRatings: MockRatingEntry[] = [
-  { rank: 1, name: 'Magnus Carlsen', country: 'Norway', rating: 2847 },
-  { rank: 2, name: 'Fabiano Caruana', country: 'USA', rating: 2805 },
-  { rank: 3, name: 'Hikaru Nakamura', country: 'USA', rating: 2794 },
-  { rank: 4, name: 'Arjun Erigaisi', country: 'India', rating: 2778 },
-  { rank: 5, name: 'Nodirbek Abdusattorov', country: 'Uzbekistan', rating: 2762 },
-  { rank: 6, name: 'Wesley So', country: 'USA', rating: 2755 },
-  { rank: 7, name: 'Levon Aronian', country: 'Armenia', rating: 2749 },
-  { rank: 8, name: 'Viswanathan Anand', country: 'India', rating: 2740 },
-  { rank: 9, name: 'Ian Nepomniachtchi', country: 'Russia', rating: 2736 },
-  { rank: 10, name: 'Maxime Vachier-Lagrave', country: 'France', rating: 2728 },
+  { rank: 1, name: 'Magnus Carlsen', country: 'Norway', rating: 2847, tournamentCount: 62 },
+  { rank: 2, name: 'Fabiano Caruana', country: 'USA', rating: 2805, tournamentCount: 58 },
+  { rank: 3, name: 'Hikaru Nakamura', country: 'USA', rating: 2794, tournamentCount: 71 },
+  { rank: 4, name: 'Arjun Erigaisi', country: 'India', rating: 2778, tournamentCount: 44 },
+  { rank: 5, name: 'Nodirbek Abdusattorov', country: 'Uzbekistan', rating: 2762, tournamentCount: 39 },
+  { rank: 6, name: 'Wesley So', country: 'USA', rating: 2755, tournamentCount: 53 },
+  { rank: 7, name: 'Levon Aronian', country: 'Armenia', rating: 2749, tournamentCount: 48 },
+  { rank: 8, name: 'Viswanathan Anand', country: 'India', rating: 2740, tournamentCount: 87 },
+  { rank: 9, name: 'Ian Nepomniachtchi', country: 'Russia', rating: 2736, tournamentCount: 41 },
+  { rank: 10, name: 'Maxime Vachier-Lagrave', country: 'France', rating: 2728, tournamentCount: 55 },
 ];
