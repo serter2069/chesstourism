@@ -6,48 +6,61 @@ import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import { usePlatform } from '../../hooks/usePlatform';
+import type { NavVariant } from '../../constants/pageRegistry';
+import { ProtoNavTop, ProtoBottomNav } from './ProtoNav';
 
 interface ProtoLayoutProps {
   title: string;
   route: string;
+  nav?: NavVariant;
   children: React.ReactNode;
 }
 
-export default function ProtoLayout({ title, route, children }: ProtoLayoutProps) {
+export default function ProtoLayout({ title, route, nav, children }: ProtoLayoutProps) {
   const router = useRouter();
   const { contentMaxWidth } = usePlatform();
+  const showNav = nav && nav !== 'none';
+  const hasBottomNav = nav === 'client' || nav === 'admin';
 
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-      <View style={[styles.inner, { maxWidth: contentMaxWidth }]}>
-        {/* Top bar */}
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => router.push('/proto' as any)}
-            accessibilityRole="button"
-            accessibilityLabel="Back to proto dashboard"
-          >
-            <Feather name="arrow-left" size={16} color={Colors.primary} />
-            <Text style={styles.backText}>Proto</Text>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      {showNav && <ProtoNavTop variant={nav!} />}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.inner, { maxWidth: contentMaxWidth }]}>
+          {/* Top bar */}
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => router.push('/proto' as any)}
+              accessibilityRole="button"
+              accessibilityLabel="Back to proto dashboard"
+            >
+              <Feather name="arrow-left" size={16} color={Colors.primary} />
+              <Text style={styles.backText}>Proto</Text>
+            </TouchableOpacity>
 
+          </View>
+
+          {/* Page header */}
+          <View style={styles.pageHeader}>
+            <Text style={styles.pageTitle}>{title}</Text>
+            <Text style={styles.pageRoute}>{route}</Text>
+          </View>
+
+          {/* States */}
+          {children}
         </View>
-
-        {/* Page header */}
-        <View style={styles.pageHeader}>
-          <Text style={styles.pageTitle}>{title}</Text>
-          <Text style={styles.pageRoute}>{route}</Text>
-        </View>
-
-        {/* States */}
-        {children}
-      </View>
-    </ScrollView>
+      </ScrollView>
+      {showNav && hasBottomNav && <ProtoBottomNav variant={nav!} />}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.backgroundAlt,
+  },
   scroll: {
     flex: 1,
     backgroundColor: Colors.backgroundAlt,

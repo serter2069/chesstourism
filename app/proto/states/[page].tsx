@@ -233,7 +233,7 @@ export default function ProtoStatePage() {
 
   if (!StatesComponent) {
     return (
-      <ProtoLayout title={pageDef.title} route={pageDef.route}>
+      <ProtoLayout title={pageDef.title} route={pageDef.route} nav={pageDef.nav}>
         <WorkInProgress
           id={pageDef.id}
           title={pageDef.title}
@@ -246,7 +246,7 @@ export default function ProtoStatePage() {
   }
 
   return (
-    <ProtoLayout title={pageDef.title} route={pageDef.route}>
+    <ProtoLayout title={pageDef.title} route={pageDef.route} nav={pageDef.nav}>
       <StatesComponent />
     </ProtoLayout>
   );

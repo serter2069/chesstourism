@@ -157,6 +157,42 @@ export default function ProtoNav({ variant, activeTab }: ProtoNavProps) {
   return <PublicNav />;
 }
 
+// Top header only — for use in ProtoLayout (renders above the back bar)
+export function ProtoNavTop({ variant }: Pick<ProtoNavProps, 'variant'>) {
+  if (variant === 'none') return null;
+  if (variant === 'auth') return <AuthNav />;
+  if (variant === 'client') {
+    return (
+      <View style={styles.header}>
+        <View style={styles.logoRow}>
+          <View style={styles.logoMark}>
+            <View style={[styles.logoDot, { backgroundColor: Colors.gold }]} />
+            <View style={[styles.logoDot, { backgroundColor: Colors.primary }]} />
+            <View style={[styles.logoDot, { backgroundColor: Colors.primary }]} />
+            <View style={[styles.logoDot, { backgroundColor: Colors.gold }]} />
+          </View>
+          <Text style={styles.logoText}>Chess</Text>
+          <Text style={styles.logoGold}>Tourism</Text>
+        </View>
+        <TouchableOpacity style={styles.notifBtn} activeOpacity={0.8}>
+          <Feather name="bell" size={18} color={Colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+    );
+  }
+  if (variant === 'admin') {
+    return (
+      <View style={[styles.header, styles.adminHeader]}>
+        <Text style={styles.adminTitle}>Admin Panel</Text>
+        <View style={styles.adminBadge}>
+          <Text style={styles.adminBadgeText}>ADMIN</Text>
+        </View>
+      </View>
+    );
+  }
+  return <PublicNav />;
+}
+
 // Bottom nav is rendered separately for client/admin — export for use in page wrappers
 export function ProtoBottomNav({ variant, activeTab }: ProtoNavProps) {
   if (variant === 'client') {
@@ -168,6 +204,21 @@ export function ProtoBottomNav({ variant, activeTab }: ProtoNavProps) {
             <TouchableOpacity key={tab.key} style={styles.tabItem} activeOpacity={0.7}>
               <Feather name={tab.icon as any} size={20} color={active ? Colors.gold : Colors.textMuted} />
               <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
+  }
+  if (variant === 'admin') {
+    return (
+      <View style={styles.bottomTab}>
+        {ADMIN_TABS.map((tab) => {
+          const active = activeTab === tab.key;
+          return (
+            <TouchableOpacity key={tab.key} style={styles.tabItem} activeOpacity={0.7}>
+              <Feather name={tab.icon as any} size={18} color={active ? '#e07070' : Colors.textMuted} />
+              <Text style={[styles.tabLabel, active && styles.tabLabelAdmin]}>{tab.label}</Text>
             </TouchableOpacity>
           );
         })}
