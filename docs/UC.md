@@ -1148,6 +1148,579 @@
 chesstourism.com / chesstourism.ru
 НКО Международная Ассоциация Шахматного Туризма
 
+## STATUS: PAGE_MAP
+## PAGE_PROGRESS: 0/40 approved
+
+---
+
+## PAGES
+
+### Public (GUEST — без авторизации)
+
+- [ ] PAG-001: Landing
+  Роли: PUBLIC
+  Что видит: hero-секция (заголовок, CTA "Upcoming Tournaments"), ближайшие турниры (4 карточки, статус REGISTRATION_OPEN), топ-рейтинг (10 позиций), "How It Works" (4 шага), CTA-карточки "Become a Commissar" + "Host a Tournament", footer
+  Действия: клик "Upcoming Tournaments" → /tournaments, клик турнира → /tournaments/[id], клик рейтинга → /ratings, клик "Become a Commissar" → /(auth)/login, клик "Host a Tournament" → /organizations/apply
+  Состояния: default, loading (спиннеры секций), empty_tournaments (секция скрыта/заглушка)
+  Элементы:
+    - Button(primary): "Upcoming Tournaments" — CTA hero
+    - Button(secondary): "Sign In" — nav
+    - Card x4: турнир (title, startDate, city, country, status-badge, fee)
+    - Card x2: CTA (Commissar / Host)
+    - List x10: рейтинг (rank, name, country, elo)
+    - Navigation: header (logo, links: Tournaments/Commissars/Rankings, btn Sign In)
+    - Spinner: loading секций
+    - Icon: chess, globe, calendar, trophy (How It Works)
+
+- [ ] PAG-002: Tournament Catalog
+  Роли: PUBLIC
+  Что видит: список турниров (PUBLISHED+, без DRAFT), фильтры (страна, timeControl, статус, fee, дата), пагинация
+  Действия: применить фильтры → обновить список, клик карточки → /tournaments/[id], Sign In → /(auth)/login
+  Состояния: default, loading, empty (нет турниров), filtered_empty (фильтры дали 0 результатов)
+  Элементы:
+    - Input(select): "Country" — фильтр по стране
+    - Input(select): "Time Control" — фильтр по типу контроля
+    - Input(select): "Status" — фильтр по статусу
+    - Input(select): "Fee" — Бесплатно / Платно
+    - Button(secondary): "Reset Filters"
+    - Card: турнир (title, startDate–endDate, city, country, status-badge, fee, commissioner name, registrationCount)
+    - Badge(status): PUBLISHED / REGISTRATION_OPEN / ACTIVE / COMPLETED / CANCELLED
+    - Pagination: prev/next + page numbers
+    - Empty: иллюстрация + "No tournaments found"
+    - Spinner: loading
+
+- [ ] PAG-003: Tournament Detail
+  Роли: PUBLIC (гость), CLIENT (зарегистрированный)
+  Что видит: заголовок, даты, город, страна, формат, взнос, status-badge, OG-теги; табы: Info / Participants / Results / Photos; кнопка регистрации (если REGISTRATION_OPEN)
+  Действия: выбрать таб, клик "Register" → POST /register (auth) → /dashboard/payment/[id] или подтверждение, клик "Watchlist" → добавить в watchlist, экспорт iCal
+  Состояния: default, loading, error_404, tab_info, tab_participants (list/empty/loading), tab_results (list/empty), tab_photos (grid/empty), popup_registered (успешная бесплатная регистрация), already_registered (кнопка disabled), registration_closed (кнопка disabled + сообщение)
+  Элементы:
+    - Badge(status): турнир статус
+    - Button(primary): "Register" — регистрация (CLIENT, REGISTRATION_OPEN)
+    - Button(secondary): "Add to Watchlist" / "Remove from Watchlist"
+    - Button(ghost): "Export to Calendar (.ics)"
+    - Tabs: Info / Participants / Results / Photos
+    - List(participants): участники (name, country, elo, registration status)
+    - List(results): итоговые результаты (place, name, score)
+    - Grid(photos): фотогалерея
+    - Alert(info): "Registration closes in X days"
+    - Alert(success): popup "Successfully registered!"
+    - Spinner: loading tabs
+
+- [ ] PAG-004: Commissar Catalog
+  Роли: PUBLIC
+  Что видит: карточки верифицированных комиссаров, фильтр по стране, поиск
+  Действия: фильтр по стране, клик карточки → /commissars/[id]
+  Состояния: default, loading, empty, filtered_empty, error
+  Элементы:
+    - Input(select): "Country" — фильтр
+    - Input(text): "Search" — поиск по имени
+    - Button(secondary): "Reset"
+    - Card: комиссар (фото/аватар, имя, страна, город, кол-во турниров, badge "Verified")
+    - Badge: "Verified"
+    - Empty: "No commissars found"
+    - Spinner: loading
+
+- [ ] PAG-005: Commissar Public Profile
+  Роли: PUBLIC
+  Что видит: фото, имя, страна, город, bio, кол-во турниров, история проведённых турниров
+  Действия: клик на турнир → /tournaments/[id]
+  Состояния: default, loading, error_404
+  Элементы:
+    - Avatar: фото комиссара 96x96
+    - Badge: "Verified Commissar"
+    - List: проведённые турниры (title, date, city)
+    - Spinner: loading
+    - Alert(error): "Commissioner not found"
+
+- [ ] PAG-006: Public User Profile
+  Роли: PUBLIC
+  Что видит: имя, фото, страна, ELO рейтинг, история турниров участника
+  Действия: клик на турнир → /tournaments/[id]
+  Состояния: default, loading, error_404
+  Элементы:
+    - Avatar: фото 80x80
+    - Badge: ELO elo-рейтинг
+    - List: история турниров (tournament, date, result, elo_change)
+    - Icon: flag страны
+    - Spinner: loading
+
+- [ ] PAG-007: Rating List
+  Роли: PUBLIC
+  Что видит: топ рейтинг участников (ELO), пагинация, флаги стран
+  Действия: клик игрока → /users/[id], пагинация
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: рейтинг (rank, avatar, name, country-flag, elo, tournaments_count)
+    - Pagination: страницы
+    - Spinner: loading
+    - Empty: "No ratings yet"
+
+- [ ] PAG-008: ELO Rating History
+  Роли: PUBLIC (смотреть), CLIENT (свой)
+  Что видит: график изменения ELO по времени, список событий (турнир, elo_before, elo_after, delta)
+  Действия: клик на событие → /tournaments/[id]
+  Состояния: default, loading, empty (нет партий), error, needs_auth (для своей страницы)
+  Элементы:
+    - Chart: линейный график ELO по дате
+    - List: события (tournament, date, elo_before → elo_after, Δ)
+    - Badge(positive): "+12" (зелёный)
+    - Badge(negative): "−5" (красный)
+    - Alert(info): "Sign in to track your ELO history" (для гостя)
+    - Spinner: loading
+
+- [ ] PAG-009: Organization Apply
+  Роли: PUBLIC
+  Что видит: форма заявки от организации (отель, клуб) для партнёрства с ассоциацией
+  Действия: заполнить и отправить → success
+  Состояния: default, loading, success, validation_error, error_server
+  Элементы:
+    - Input(text): "Organization Name" — обязательное
+    - Input(text): "Contact Name"
+    - Input(email): "Contact Email"
+    - Input(text): "City / Country"
+    - Input(select): "Organization Type" — Hotel / Chess Club / Other
+    - Input(textarea): "Message" — до 1000 символов
+    - Button(primary): "Submit Application"
+    - Alert(success): "Application submitted! We'll be in touch."
+    - Alert(error): validation errors
+
+- [ ] PAG-010: Certificate Verify
+  Роли: PUBLIC
+  Что видит: публичная страница верификации сертификата участника
+  Действия: страница открывается по ссылке из сертификата
+  Состояния: default (valid), loading, error_not_found, error_expired
+  Элементы:
+    - Card: данные сертификата (имя, турнир, место, дата)
+    - Badge(success): "Verified Certificate"
+    - Alert(error): "Certificate not found or expired"
+    - Spinner: loading
+
+- [ ] PAG-011: Payment Success
+  Роли: PUBLIC (redirect после Stripe)
+  Что видит: страница подтверждения успешной оплаты
+  Действия: клик "Go to Dashboard" → /(dashboard)/
+  Состояния: default
+  Элементы:
+    - Icon: checkmark (большой)
+    - Button(primary): "Go to My Registrations" → /(dashboard)/my-registrations
+    - Button(secondary): "View Tournament" → /tournaments/[id]
+
+---
+
+### Auth (PUBLIC)
+
+- [ ] PAG-012: Email Login
+  Роли: PUBLIC
+  Что видит: поле email, кнопка "Get Code", ссылка на условия
+  Действия: ввести email → POST /api/auth/request-otp → редирект на PAG-013
+  Состояния: default, loading, validation_error (невалидный email), error_server, already_auth (редирект на dashboard)
+  Элементы:
+    - Input(email): "Your email" — обязательное
+    - Button(primary): "Get Code"
+    - Alert(error): validation / server error
+    - Spinner: loading состояние кнопки
+    - Link: "Back to home" → /
+
+- [ ] PAG-013: OTP Verification
+  Роли: PUBLIC
+  Что видит: 6 полей для ввода кода, таймер для resend (60с), кнопка "Verify"
+  Действия: ввести 6 цифр → POST /api/auth/verify-otp → dashboard или onboarding; resend → POST /api/auth/request-otp
+  Состояния: default, loading, error_wrong_code, resend_available, resend_loading, success
+  Элементы:
+    - Input(otp): x6 цифр — автофокус следующее поле
+    - Button(primary): "Verify Code"
+    - Button(ghost): "Resend Code" — disabled пока таймер
+    - Timer: "Resend in 00:45"
+    - Alert(error): "Invalid code. Try again."
+    - Spinner: loading
+
+---
+
+### Dashboard — Participant (CLIENT / COMMISSIONER)
+
+- [ ] PAG-014: Dashboard Home
+  Роли: CLIENT, COMMISSIONER
+  Что видит: приветствие, ссылки на разделы (My Registrations, Watchlist, Profile, Notifications), быстрый доступ к следующему турниру
+  Действия: переходы по разделам
+  Состояния: empty (новый пользователь), with_data, loading
+  Элементы:
+    - Card: следующий зарегистрированный турнир (дата, название, статус)
+    - Button(primary): "Browse Tournaments" (empty state)
+    - List: быстрые ссылки (My Registrations, Watchlist, Profile)
+    - Badge: кол-во непрочитанных уведомлений
+    - Spinner: loading
+    - Empty: "You haven't registered for any tournaments yet"
+
+- [ ] PAG-015: Profile Settings
+  Роли: CLIENT, COMMISSIONER
+  Что видит: форма редактирования профиля (имя, фамилия, страна, город, FIDE ID, фото, дата рождения)
+  Действия: изменить поля → сохранить → PUT /api/users/me; загрузить фото
+  Состояния: default, loading, saving, success_toast, validation_error, error_server
+  Элементы:
+    - Avatar: фото 80x80 + кнопка "Change Photo"
+    - Input(text): "First Name" — обязательное, maxLength 100
+    - Input(text): "Last Name" — обязательное, maxLength 100
+    - Input(select): "Country"
+    - Input(text): "City"
+    - Input(text): "FIDE ID" — опциональное, только цифры
+    - Input(date): "Date of Birth"
+    - Button(primary): "Save Changes"
+    - Toast(success): "Profile updated"
+    - Alert(error): validation errors
+
+- [ ] PAG-016: My Registrations
+  Роли: CLIENT
+  Что видит: список своих регистраций на турниры с их статусами
+  Действия: клик турнира → /tournaments/[id], кнопка "Withdraw" (если доступно)
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: регистрации (tournament title, dates, city, fee, payment status badge)
+    - Badge(status): PENDING / APPROVED / PAID / REJECTED / WITHDRAWN
+    - Button(ghost): "Withdraw" — доступна до REGISTRATION_OPEN закрытия
+    - Empty: "No registrations yet. Browse tournaments →"
+    - Spinner: loading
+
+- [ ] PAG-017: Watchlist
+  Роли: CLIENT
+  Что видит: список отслеживаемых турниров
+  Действия: клик турнира → /tournaments/[id], удалить из watchlist
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: турниры (title, startDate, city, status-badge)
+    - Button(ghost): "Remove" — удалить из watchlist
+    - Empty: "No tournaments in watchlist. Browse →"
+    - Spinner: loading
+
+- [ ] PAG-018: Notifications
+  Роли: CLIENT, COMMISSIONER, ADMIN
+  Что видит: список in-app уведомлений (новые регистрации, изменения статусов, объявления комиссара)
+  Действия: клик уведомления → соответствующий экран, "Mark all as read"
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: уведомления (иконка, текст, дата, read/unread indicator)
+    - Button(secondary): "Mark all as read"
+    - Badge: кол-во непрочитанных
+    - Empty: "No notifications"
+    - Spinner: loading
+
+- [ ] PAG-019: Payment
+  Роли: CLIENT
+  Что видит: детали турнира, сумма взноса, кнопка "Pay with Card" (Stripe Checkout)
+  Действия: клик "Pay" → Stripe Checkout → redirect /payment-success
+  Состояния: default, loading, error_already_paid, error_tournament_not_found
+  Элементы:
+    - Card: турнир (title, dates, fee, currency)
+    - Button(primary): "Pay €XX with Card" — открывает Stripe Checkout
+    - Alert(info): "Your spot is reserved for 24 hours"
+    - Alert(error): "Payment already completed" / tournament not found
+    - Spinner: loading
+
+---
+
+### Commissioner (COMMISSIONER)
+
+- [ ] PAG-020: Commissioner Cabinet
+  Роли: COMMISSIONER
+  Что видит: профиль комиссара (публичные данные), статус верификации, ссылки на управление турнирами
+  Действия: перейти к редактированию профиля, перейти к турнирам
+  Состояния: default, loading, unverified (ожидает модерации)
+  Элементы:
+    - Avatar: фото 80x80
+    - Badge: "Verified" / "Pending Verification" / "Rejected"
+    - Button(primary): "Edit Profile" → PAG-021
+    - Button(secondary): "My Tournaments" → PAG-022
+    - Alert(warning): "Your profile is under review" (Pending)
+    - Alert(error): "Profile rejected. Please resubmit." (Rejected)
+    - Spinner: loading
+
+- [ ] PAG-021: Commissioner Profile Edit
+  Роли: COMMISSIONER
+  Что видит: форма редактирования комиссарского профиля (bio, специализация, опыт, фото)
+  Действия: изменить поля → сохранить → PATCH /api/commissioner/profile
+  Состояния: default, loading, saving, success_toast, validation_error
+  Элементы:
+    - Avatar: фото + "Change Photo"
+    - Input(textarea): "Bio" — до 500 символов
+    - Input(text): "Specialization" — категории шахмат
+    - Input(number): "Years of Experience"
+    - Input(select): "Country" / "City"
+    - Button(primary): "Save"
+    - Toast(success): "Profile updated"
+    - Alert(error): validation errors
+
+- [ ] PAG-022: My Tournaments List
+  Роли: COMMISSIONER
+  Что видит: список всех своих турниров (включая DRAFT)
+  Действия: клик турнира → PAG-024, создать новый → PAG-023
+  Состояния: default, loading, empty, error
+  Элементы:
+    - Button(primary): "Create Tournament" → PAG-023
+    - List: турниры (title, status-badge, dates, city, registrationCount)
+    - Badge(status): DRAFT / PUBLISHED / REGISTRATION_OPEN / ACTIVE / COMPLETED / CANCELLED
+    - Empty: "No tournaments yet. Create one →"
+    - Spinner: loading
+
+- [ ] PAG-023: Create Tournament
+  Роли: COMMISSIONER
+  Что видит: многошаговая форма создания турнира (название, даты, город, страна, формат, взнос, лимиты)
+  Действия: заполнить форму → POST /api/tournaments → создан DRAFT → редирект на PAG-024
+  Состояния: default, loading, saving, validation_error, success
+  Элементы:
+    - Input(text): "Tournament Name" — обязательное, maxLength 200
+    - Input(date): "Start Date" / "End Date"
+    - Input(text): "City" / Input(select): "Country"
+    - Input(select): "Time Control" — Classical / Rapid / Blitz
+    - Input(number): "Entry Fee" (0 = бесплатно)
+    - Input(select): "Currency" — EUR / USD / RUB
+    - Input(number): "Max Participants"
+    - Input(number): "Rating Limit" (0 = Open)
+    - Input(textarea): "Description"
+    - Button(primary): "Create Tournament"
+    - Button(secondary): "Cancel"
+    - Alert(error): validation errors
+
+- [ ] PAG-024: Tournament Management Hub
+  Роли: COMMISSIONER
+  Что видит: навигационный хаб с разделами управления конкретным турниром
+  Действия: переходы в подразделы (Edit, Registrations, Results, Photos, Rounds, Schedule, Announcements)
+  Состояния: default, loading, error_404
+  Элементы:
+    - Card(header): название турнира, status-badge, даты
+    - Button: "Edit" → PAG-025
+    - Button: "Registrations" → PAG-026
+    - Button: "Results" → PAG-027
+    - Button: "Photos" → PAG-028
+    - Button: "Rounds" → PAG-029
+    - Button: "Schedule" → PAG-030
+    - Button: "Announcements" → PAG-031
+    - Badge(status): текущий статус турнира
+    - Button(danger): "Cancel Tournament" → popup подтверждения
+
+- [ ] PAG-025: Tournament Edit
+  Роли: COMMISSIONER
+  Что видит: форма редактирования турнира (те же поля что PAG-023 + управление статусом)
+  Действия: изменить поля → PATCH /api/tournaments/[id]; сменить статус (Publish / Open Registration / etc.)
+  Состояния: default, loading, saving, validation_error, success_toast, popup_status_change, popup_cancel
+  Элементы:
+    - (те же поля что PAG-023)
+    - Button(primary): "Save Changes"
+    - Button(secondary): "Publish" (DRAFT → PUBLISHED)
+    - Button(secondary): "Open Registration" (PUBLISHED → REGISTRATION_OPEN)
+    - Button(danger): "Cancel Tournament" — confirmation popup
+    - Toast(success): "Tournament updated"
+
+- [ ] PAG-026: Tournament Registrations
+  Роли: COMMISSIONER
+  Что видит: список зарегистрированных участников с их статусами оплаты; форма добавления вручную
+  Действия: одобрить/отклонить регистрацию, отметить оплату наличными, добавить участника вручную
+  Состояния: default, loading, empty, error, popup_add_participant, popup_mark_cash
+  Элементы:
+    - Button(primary): "Add Participant" — popup форма
+    - List: участники (name, country, elo, registration_status, payment_status)
+    - Button(secondary): "Approve" — PENDING → APPROVED
+    - Button(ghost): "Reject"
+    - Button(secondary): "Mark Cash Paid" — APPROVED → PAID (наличные)
+    - Badge(status): PENDING / APPROVED / PAID / REJECTED
+    - Modal: "Add Participant" (email, name)
+    - Empty: "No registrations yet"
+    - Spinner: loading
+
+- [ ] PAG-027: Tournament Results
+  Роли: COMMISSIONER
+  Что видит: форма ввода итоговых результатов (место, имя/id участника, очки)
+  Действия: ввести результаты → PUT /api/tournaments/[id]/results → автоматический расчёт ELO
+  Состояния: default, loading, saving, success_toast, validation_error, results_locked (турнир COMPLETED)
+  Элементы:
+    - List: результаты (rank, participant select, score, elo_change preview)
+    - Input(number): "Place" / "Score"
+    - Button(primary): "Save Results"
+    - Button(secondary): "Finalize & Calculate ELO" — блокирует редактирование
+    - Alert(info): "ELO will be recalculated automatically"
+    - Toast(success): "Results saved"
+
+- [ ] PAG-028: Tournament Photos
+  Роли: COMMISSIONER
+  Что видит: галерея фотографий, форма загрузки
+  Действия: загрузить фото → POST /api/tournaments/[id]/photos, удалить фото
+  Состояния: default, loading, uploading, upload_success, upload_error, empty
+  Элементы:
+    - Input(file): "Upload Photos" — multiple, max 10MB each
+    - Button(primary): "Upload"
+    - Grid: фото с кнопкой удаления
+    - Button(danger): "Delete" — на каждом фото
+    - Progress: upload progress bar
+    - Alert(error): upload error (size, format)
+    - Empty: "No photos yet"
+
+- [ ] PAG-029: Tournament Rounds
+  Роли: COMMISSIONER
+  Что видит: раунды турнира, пары (participant vs participant), результаты по партиям
+  Действия: создать раунд, ввести результат партии, завершить раунд
+  Состояния: default, loading, empty_rounds, popup_create_round, error
+  Элементы:
+    - Button(primary): "Create Next Round"
+    - List(rounds): раунд (номер, дата, статус, пары)
+    - List(pairs): пара (белые vs чёрные, результат 1-0 / 0-1 / ½-½)
+    - Input(select): результат партии
+    - Button(secondary): "Finalize Round"
+    - Badge: статус раунда (PENDING / ONGOING / COMPLETED)
+    - Empty: "No rounds created"
+
+- [ ] PAG-030: Tournament Schedule
+  Роли: COMMISSIONER (редактирование), PUBLIC (просмотр)
+  Что видит: расписание мероприятий турнира (открытие, туры, закрытие)
+  Действия: добавить событие, редактировать, удалить; просмотр публичной версии
+  Состояния: default, loading, empty, editing, success_toast
+  Элементы:
+    - Button(primary): "Add Event" (COMMISSIONER)
+    - List: события (date, time, title, description)
+    - Input(date): "Date" / Input(time): "Time"
+    - Input(text): "Event Name"
+    - Input(textarea): "Description"
+    - Button(ghost): "Edit" / Button(danger): "Delete"
+    - Toast(success): "Schedule updated"
+    - Empty: "No schedule yet"
+
+- [ ] PAG-031: Tournament Announcements
+  Роли: COMMISSIONER (создание), CLIENT/PUBLIC (просмотр)
+  Что видит: лента объявлений от комиссара (важные сообщения участникам)
+  Действия: создать объявление → POST /api/tournaments/[id]/announcements → in-app уведомления участникам
+  Состояния: default, loading, empty, popup_create, success_toast, validation_error
+  Элементы:
+    - Button(primary): "New Announcement" — popup форма (COMMISSIONER)
+    - List: объявления (дата, заголовок, текст, badge "New")
+    - Modal: форма (Input(text): title, Input(textarea): body — maxLength 1000, Button(primary): "Publish")
+    - Badge: "New" — непрочитанное
+    - Empty: "No announcements yet"
+    - Toast(success): "Announcement published"
+
+---
+
+### Admin (ADMIN)
+
+- [ ] PAG-032: Admin Dashboard
+  Роли: ADMIN
+  Что видит: сводные метрики (users, tournaments, revenue, open disputes), быстрые ссылки на разделы
+  Действия: переходы в подразделы
+  Состояния: default, loading, error
+  Элементы:
+    - Card x4: метрики (Total Users, Active Tournaments, Revenue, Open Disputes)
+    - Button: "Users" / "Tournaments" / "Moderation" / "Finances" / "Disputes" / "Webhooks"
+    - Spinner: loading метрик
+
+- [ ] PAG-033: Admin Users
+  Роли: ADMIN
+  Что видит: список всех пользователей с ролями и статусами
+  Действия: поиск, фильтр по роли, изменить роль пользователя
+  Состояния: default, loading, empty, error
+  Элементы:
+    - Input(text): "Search" — по имени/email
+    - Input(select): "Role" — ALL / CLIENT / COMMISSIONER / ADMIN
+    - List: пользователи (avatar, name, email, role, createdAt)
+    - Button(secondary): "Change Role" → popup
+    - Modal: "Change Role" (select)
+    - Pagination
+    - Spinner: loading
+
+- [ ] PAG-034: Admin Tournaments
+  Роли: ADMIN
+  Что видит: список всех турниров (включая DRAFT), возможность смены статуса, удаления
+  Действия: поиск, фильтр по статусу, изменить статус, удалить
+  Состояния: default, loading, empty, error, popup_delete
+  Элементы:
+    - Input(text): "Search"
+    - Input(select): "Status"
+    - List: турниры (title, commissioner, status-badge, dates, participants count)
+    - Button(ghost): "Change Status"
+    - Button(danger): "Delete" + confirmation popup
+    - Pagination
+    - Spinner: loading
+
+- [ ] PAG-035: Admin Organizations
+  Роли: ADMIN
+  Что видит: список заявок от организаций
+  Действия: просмотр деталей, одобрить / отклонить
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: заявки (название, тип, контакт, статус-badge, дата)
+    - Badge(status): PENDING / APPROVED / REJECTED
+    - Button(secondary): "Approve"
+    - Button(danger): "Reject"
+    - Spinner: loading
+    - Empty: "No applications"
+
+- [ ] PAG-036: Admin Moderation
+  Роли: ADMIN
+  Что видит: заявки комиссаров на верификацию
+  Действия: просмотр профиля комиссара, одобрить / отклонить
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: заявки (имя, страна, опыт, bio, дата подачи, статус)
+    - Badge(status): PENDING / VERIFIED / REJECTED
+    - Button(primary): "Verify"
+    - Button(danger): "Reject"
+    - Spinner: loading
+    - Empty: "No pending applications"
+
+- [ ] PAG-037: Admin Finances
+  Роли: ADMIN
+  Что видит: 4 summary-карточки (Total Revenue, Paid Count, Pending, Refunds+Disputes), список транзакций с фильтром периода
+  Действия: фильтр периода (All / This Month / Last 30d / This Year), пагинация "Load More"
+  Состояния: default, loading, empty, error
+  Элементы:
+    - Card x4: Total Revenue / Paid Count / Pending / Refunds+Disputes
+    - Input(select): период фильтрации
+    - List: транзакции (user, tournament, amount, currency, status-badge, date)
+    - Badge(status): PAID / PENDING / FAILED / DISPUTED / REFUNDED
+    - Button(secondary): "Load More"
+    - Spinner: loading
+
+- [ ] PAG-038: Admin Disputes
+  Роли: ADMIN
+  Что видит: список чарджбэков и диспутов от Stripe, статусы
+  Действия: просмотр деталей диспута, отметить как обработанный
+  Состояния: default, loading, empty, error
+  Элементы:
+    - List: диспуты (stripe_id, user, tournament, amount, status, date)
+    - Badge(status): OPEN / WON / LOST / NEEDS_RESPONSE
+    - Button(secondary): "Mark Resolved"
+    - Alert(warning): "Respond to disputes within 7 days"
+    - Spinner: loading
+    - Empty: "No disputes"
+
+- [ ] PAG-039: Admin Webhooks
+  Роли: ADMIN
+  Что видит: лог Stripe webhook событий для отладки
+  Действия: просмотр, фильтр по типу события, клик → PAG-040
+  Состояния: default, loading, empty, error
+  Элементы:
+    - Input(select): "Event Type" — фильтр
+    - List: события (type, status, createdAt, payload preview)
+    - Badge(status): PROCESSED / FAILED / SKIPPED
+    - Pagination
+    - Spinner: loading
+    - Empty: "No webhook events"
+
+- [ ] PAG-040: Admin Webhook Detail
+  Роли: ADMIN
+  Что видит: детали одного webhook события (полный payload, ответ, ошибки)
+  Действия: просмотр, кнопка "Retry" если FAILED
+  Состояния: default, loading, error_404
+  Элементы:
+    - Card: event type, status-badge, createdAt, processedAt
+    - Code block: JSON payload
+    - Code block: response / error
+    - Button(secondary): "Retry" (FAILED только)
+    - Alert(error): "Processing failed: [message]"
+    - Spinner: loading
+
+---
+
+## USER STORIES (LEGACY — see PAGES)
+
+---
+
 ## Product Vision & Roles
 
 **What:** A platform for discovering, registering, and managing chess tournaments worldwide, serving both competitive players and tournament organizers under the umbrella of an international non-profit association.
