@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
@@ -42,8 +43,15 @@ function LogoMark({ size = 28 }: { size?: number }) {
 
 // ─── Dark Nav (hero overlay variant — landing only) ───────────────────────────
 
+const NAV_LINKS: { label: string; route: string }[] = [
+  { label: 'Tournaments', route: '/proto/states/tournaments' },
+  { label: 'Commissars', route: '/proto/states/commissars' },
+  { label: 'Rankings', route: '/proto/states/ratings' },
+];
+
 function DarkNav() {
   const { isWide } = useLayout();
+  const router = useRouter();
   return (
     <View style={navS.bar}>
       <TouchableOpacity style={navS.logoRow} activeOpacity={0.8}>
@@ -53,14 +61,14 @@ function DarkNav() {
       </TouchableOpacity>
       {isWide && (
         <View style={navS.links}>
-          {['Tournaments', 'Commissars', 'Rankings', 'About'].map((l) => (
-            <TouchableOpacity key={l} style={navS.linkBtn} activeOpacity={0.7}>
-              <Text style={navS.linkText}>{l}</Text>
+          {NAV_LINKS.map((l) => (
+            <TouchableOpacity key={l.label} style={navS.linkBtn} activeOpacity={0.7} onPress={() => router.push(l.route as any)}>
+              <Text style={navS.linkText}>{l.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
       )}
-      <TouchableOpacity style={navS.signInBtn} activeOpacity={0.8}>
+      <TouchableOpacity style={navS.signInBtn} activeOpacity={0.8} onPress={() => router.push('/proto/states/login' as any)}>
         <Text style={navS.signInText}>Sign In</Text>
       </TouchableOpacity>
     </View>
@@ -95,11 +103,12 @@ const navS = StyleSheet.create({
 
 function Hero() {
   const { isWide } = useLayout();
+  const router = useRouter();
   return (
     <View style={heroS.root}>
-      {/* Hero background */}
+      {/* Hero background — chess tournament hall */}
       <Image
-        source={{ uri: 'https://picsum.photos/seed/chess-hero/1200/600' }}
+        source={{ uri: 'https://picsum.photos/seed/chess-grand-hall/1200/600' }}
         style={{ ...StyleSheet.absoluteFillObject } as any}
         resizeMode="cover"
       />
@@ -124,11 +133,11 @@ function Hero() {
         </Text>
 
         <View style={heroS.btnRow}>
-          <TouchableOpacity style={heroS.btnPrimary} activeOpacity={0.85}>
+          <TouchableOpacity style={heroS.btnPrimary} activeOpacity={0.85} onPress={() => router.push('/proto/states/tournaments' as any)}>
             <Text style={heroS.btnPrimaryText}>Browse Tournaments</Text>
             <Feather name="arrow-right" size={16} color={Colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity style={heroS.btnGhost} activeOpacity={0.85}>
+          <TouchableOpacity style={heroS.btnGhost} activeOpacity={0.85} onPress={() => router.push('/proto/states/org-apply' as any)}>
             <Text style={heroS.btnGhostText}>Become a Commissar</Text>
           </TouchableOpacity>
         </View>
@@ -191,7 +200,8 @@ const heroS = StyleSheet.create({
 
 // ─── Section Header ───────────────────────────────────────────────────────────
 
-function SectionHeader({ title, sub, linkLabel }: { title: string; sub?: string; linkLabel?: string }) {
+function SectionHeader({ title, sub, linkLabel, linkRoute }: { title: string; sub?: string; linkLabel?: string; linkRoute?: string }) {
+  const router = useRouter();
   return (
     <View style={shS.row}>
       <View style={{ flex: 1 }}>
@@ -199,7 +209,7 @@ function SectionHeader({ title, sub, linkLabel }: { title: string; sub?: string;
         {sub && <Text style={shS.sub}>{sub}</Text>}
       </View>
       {linkLabel && (
-        <TouchableOpacity style={shS.linkBtn} activeOpacity={0.7}>
+        <TouchableOpacity style={shS.linkBtn} activeOpacity={0.7} onPress={() => linkRoute && router.push(linkRoute as any)}>
           <Text style={shS.linkText}>{linkLabel}</Text>
           <Feather name="chevron-right" size={14} color={Colors.gold} />
         </TouchableOpacity>
@@ -230,12 +240,13 @@ function TCard({ t }: { t: typeof mockTournaments[0] }) {
   const startY = new Date(t.startDate).getFullYear();
   const startM = new Date(t.startDate).toLocaleString('en', { month: 'short' });
   const startD = new Date(t.startDate).getDate();
+  const router = useRouter();
   return (
-    <TouchableOpacity style={tS.card} activeOpacity={0.85}>
-      {/* Image placeholder */}
+    <TouchableOpacity style={tS.card} activeOpacity={0.85} onPress={() => router.push('/proto/states/tournament-detail' as any)}>
+      {/* Tournament image — unique per city */}
       <View style={tS.imgWrap}>
         <Image
-          source={{ uri: 'https://picsum.photos/seed/chess-tournament/800/400' }}
+          source={{ uri: `https://picsum.photos/seed/chess-${t.city.toLowerCase()}/800/400` }}
           style={{ width: '100%' as any, height: 150 }}
           resizeMode="cover"
         />
@@ -313,7 +324,7 @@ function TournamentsSection() {
   const cardW = cols > 2 ? `${Math.floor(100 / cols) - 1.5}%` : '48%';
   return (
     <View style={secS.section}>
-      <SectionHeader title="Upcoming Tournaments" sub="Open for registration worldwide" linkLabel="View all" />
+      <SectionHeader title="Upcoming Tournaments" sub="Open for registration worldwide" linkLabel="View all" linkRoute="/proto/states/tournaments" />
       <View style={secS.grid}>
         {mockTournaments.map((t) => (
           <View key={t.id} style={{ width: cardW as any, marginBottom: Spacing.md }}>
@@ -345,7 +356,7 @@ const TYPE_COLOR: Record<string, string> = {
 function CalendarSection() {
   return (
     <View style={[secS.section, secS.altBg]}>
-      <SectionHeader title="Event Calendar" sub="Chess events coming up worldwide" linkLabel="Full calendar" />
+      <SectionHeader title="Event Calendar" sub="Chess events coming up worldwide" linkLabel="Full calendar" linkRoute="/proto/states/tournaments" />
       <View style={calS.list}>
         {EVENTS.map((ev, i) => (
           <TouchableOpacity key={i} style={calS.row} activeOpacity={0.8}>
@@ -404,7 +415,7 @@ function RankingsSection() {
   const { isWide } = useLayout();
   return (
     <View style={secS.section}>
-      <SectionHeader title="Top Rankings" sub="World ranking by ELO score" linkLabel="Full list" />
+      <SectionHeader title="Top Rankings" sub="World ranking by ELO score" linkLabel="Full list" linkRoute="/proto/states/ratings" />
       <View style={[rankS.tableWrap, isWide && { maxWidth: 700 }]}>
         {/* Header */}
         <View style={rankS.thead}>
@@ -413,7 +424,7 @@ function RankingsSection() {
           <Text style={[rankS.th, { width: 60, textAlign: 'right' }]}>ELO</Text>
           <Text style={[rankS.th, { width: 50, textAlign: 'right' }]}>T. Played</Text>
         </View>
-        {mockRatings.map((r, i) => (
+        {mockRatings.slice(0, 5).map((r, i) => (
           <TouchableOpacity key={r.rank} style={[rankS.row, i % 2 === 0 && rankS.rowAlt]} activeOpacity={0.75}>
             <View style={[rankS.rankCell, { width: 44 }]}>
               {i < 3 ? (
@@ -489,7 +500,7 @@ function HowItWorks() {
   const { isWide } = useLayout();
   return (
     <View style={[secS.section, secS.altBg]}>
-      <SectionHeader title="How It Works" sub="From discovery to the final round" />
+      <SectionHeader title="How It Works" sub="From discovery to the final round" linkLabel="Get started" linkRoute="/proto/states/login" />
       <View style={[howS.grid, isWide && howS.gridWide]}>
         {STEPS.map((s, i) => (
           <View key={s.n} style={[howS.card, isWide && howS.cardWide]}>
@@ -538,10 +549,11 @@ const howS = StyleSheet.create({
 
 function CtaSection() {
   const { isWide } = useLayout();
+  const router = useRouter();
   return (
     <View style={ctaS.section}>
       <Image
-        source={{ uri: 'https://picsum.photos/seed/chess-cta/1200/400' }}
+        source={{ uri: 'https://picsum.photos/seed/chess-venue-hall/1200/400' }}
         style={{ ...StyleSheet.absoluteFillObject } as any}
         resizeMode="cover"
       />
@@ -551,7 +563,7 @@ function CtaSection() {
           <Text style={ctaS.cardLabel}>For Tournament Organizers</Text>
           <Text style={ctaS.cardTitle}>Become a Certified Commissar</Text>
           <Text style={ctaS.cardDesc}>Get accredited by the International Chess Tourism Association and manage tournaments on our platform. Earn income organizing events in your city.</Text>
-          <TouchableOpacity style={ctaS.btnGold} activeOpacity={0.85}>
+          <TouchableOpacity style={ctaS.btnGold} activeOpacity={0.85} onPress={() => router.push('/proto/states/org-apply' as any)}>
             <Text style={ctaS.btnGoldText}>Apply Now</Text>
             <Feather name="arrow-right" size={14} color={Colors.primary} />
           </TouchableOpacity>
@@ -559,8 +571,8 @@ function CtaSection() {
         <View style={[ctaS.cardLight, isWide && { flex: 1 }]}>
           <Text style={[ctaS.cardLabel, { color: Colors.textMuted }]}>For Venues & Clubs</Text>
           <Text style={[ctaS.cardTitle, { color: Colors.text }]}>Host a Tournament at Your Venue</Text>
-          <Text style={[ctaS.cardDesc, { color: Colors.textMuted }]}>Partner with us to host FIDE-rated events. We provide the full platform — registration, payments, results, and certificates.</Text>
-          <TouchableOpacity style={ctaS.btnOutline} activeOpacity={0.85}>
+          <Text style={[ctaS.cardDesc, { color: Colors.textMuted }]}>Partner with us to host FIDE-rated events. We provide the full platform -- registration, payments, results, and certificates.</Text>
+          <TouchableOpacity style={ctaS.btnOutline} activeOpacity={0.85} onPress={() => router.push('/proto/states/org-apply' as any)}>
             <Text style={ctaS.btnOutlineText}>Submit Request</Text>
           </TouchableOpacity>
         </View>
@@ -600,8 +612,16 @@ const ctaS = StyleSheet.create({
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
+const FOOTER_ROUTES: Record<string, string> = {
+  'Tournaments': '/proto/states/tournaments',
+  'Commissars': '/proto/states/commissars',
+  'Rankings': '/proto/states/ratings',
+  'Host a Tournament': '/proto/states/org-apply',
+};
+
 function Footer() {
   const { isWide } = useLayout();
+  const router = useRouter();
   const groups = [
     { title: 'Platform', links: ['Tournaments', 'Commissars', 'Rankings', 'Results'] },
     { title: 'Association', links: ['About Us', 'Membership', 'Host a Tournament', 'Contact'] },
@@ -624,7 +644,7 @@ function Footer() {
           <View key={g.title} style={ftS.linkCol}>
             <Text style={ftS.groupTitle}>{g.title}</Text>
             {g.links.map((l) => (
-              <TouchableOpacity key={l} style={{ marginBottom: 6 }} activeOpacity={0.7}>
+              <TouchableOpacity key={l} style={{ marginBottom: 6 }} activeOpacity={0.7} onPress={() => FOOTER_ROUTES[l] && router.push(FOOTER_ROUTES[l] as any)}>
                 <Text style={ftS.linkText}>{l}</Text>
               </TouchableOpacity>
             ))}
