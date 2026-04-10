@@ -93,7 +93,7 @@ function DashboardDefault() {
         <View style={s.statsRow}>
           <StatCard icon="calendar" label="Registered" value="2 upcoming" color={Colors.primary} />
           <StatCard icon="trending-up" label="ELO" value="2156" color={Colors.gold} />
-          <StatCard icon="award" label="Rank" value="#312" color="#2E7D32" />
+          <StatCard icon="award" label="Rank" value="#312" color={Colors.eloPositive} />
         </View>
 
         <View style={s.section}>
@@ -103,7 +103,7 @@ function DashboardDefault() {
               <Text style={s.linkGold}>View all</Text>
             </TouchableOpacity>
           </View>
-          <RegCard name="Tbilisi Open 2025" date="Jun 14-20" city="Tbilisi, Georgia" status="Registered" statusColor="#2E7D32" />
+          <RegCard name="Tbilisi Open 2025" date="Jun 14-20" city="Tbilisi, Georgia" status="Registered" statusColor={Colors.eloPositive} />
           <RegCard name="Warsaw Classical Open" date="Aug 10-17" city="Warsaw, Poland" status="Pending Payment" statusColor={Colors.statusWarningText} />
         </View>
 
@@ -135,7 +135,7 @@ function DashboardEmpty() {
         <View style={s.statsRow}>
           <StatCard icon="calendar" label="Registered" value="0" color={Colors.primary} />
           <StatCard icon="trending-up" label="ELO" value="--" color={Colors.gold} />
-          <StatCard icon="award" label="Rank" value="--" color="#2E7D32" />
+          <StatCard icon="award" label="Rank" value="--" color={Colors.eloPositive} />
         </View>
 
         <View style={s.section}>

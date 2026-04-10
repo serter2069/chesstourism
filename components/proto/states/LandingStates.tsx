@@ -219,10 +219,10 @@ const shS = StyleSheet.create({
 // ─── Tournament Cards ─────────────────────────────────────────────────────────
 
 const STATUS_META: Record<string, { label: string; bg: string; text: string }> = {
-  open: { label: 'Open', bg: '#E6F4EA', text: '#1A6B3A' },
-  in_progress: { label: 'In Progress', bg: '#EEF1F8', text: Colors.primary },
-  completed: { label: 'Completed', bg: '#F5F6FA', text: Colors.textMuted },
-  cancelled: { label: 'Cancelled', bg: '#FAEAEA', text: Colors.error },
+  open: { label: 'Open', bg: Colors.statusSuccessBg, text: Colors.eloPositive },
+  in_progress: { label: 'In Progress', bg: Colors.statusInfoBg, text: Colors.primary },
+  completed: { label: 'Completed', bg: Colors.backgroundAlt, text: Colors.textMuted },
+  cancelled: { label: 'Cancelled', bg: Colors.statusErrorBg, text: Colors.error },
 };
 
 function TCard({ t }: { t: typeof mockTournaments[0] }) {
@@ -303,8 +303,8 @@ const tS = StyleSheet.create({
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, marginTop: 2 },
   infoText: { fontSize: 12, fontFamily: Typography.fontFamily, color: Colors.textMuted },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: Spacing.xs },
-  feePill: { backgroundColor: '#F5F3EE', paddingHorizontal: Spacing.sm, paddingVertical: 3, borderRadius: 20 },
-  feeText: { fontSize: 12, fontFamily: Typography.fontFamilySemiBold, color: '#7A5C1E' },
+  feePill: { backgroundColor: Colors.statusWarningBg, paddingHorizontal: Spacing.sm, paddingVertical: 3, borderRadius: 20 },
+  feeText: { fontSize: 12, fontFamily: Typography.fontFamilySemiBold, color: Colors.statusWarningText },
   control: { fontSize: 11, fontFamily: Typography.fontFamily, color: Colors.textMuted },
 });
 
@@ -338,8 +338,8 @@ const EVENTS = [
 
 const TYPE_COLOR: Record<string, string> = {
   Classical: Colors.primary,
-  Rapid: '#2E7D32',
-  Blitz: '#C0392B',
+  Rapid: Colors.eloPositive,
+  Blitz: Colors.error,
 };
 
 function CalendarSection() {
@@ -398,7 +398,7 @@ const calS = StyleSheet.create({
 
 // ─── Rankings ────────────────────────────────────────────────────────────────
 
-const TOP3_COLORS = [Colors.gold, '#A8A9AD', '#CD7F32'] as const;
+const TOP3_COLORS = [Colors.gold, Colors.silver, Colors.bronze] as const;
 
 function RankingsSection() {
   const { isWide } = useLayout();
@@ -639,7 +639,7 @@ function Footer() {
 }
 
 const ftS = StyleSheet.create({
-  footer: { backgroundColor: '#0C1629', paddingTop: Spacing['2xl'] },
+  footer: { backgroundColor: Colors.primary, paddingTop: Spacing['2xl'] },
   inner: { paddingHorizontal: Spacing.xl, gap: Spacing['2xl'] },
   innerWide: { flexDirection: 'row', alignItems: 'flex-start' },
   brandCol: { gap: Spacing.md },
@@ -669,7 +669,7 @@ const secS = StyleSheet.create({
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function SkeletonBlock({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | number; mb?: number }) {
-  return <View style={{ height: h, width: w as any, backgroundColor: '#E8ECF0', borderRadius: 6, marginBottom: mb }} />;
+  return <View style={{ height: h, width: w as any, backgroundColor: Colors.border, borderRadius: 6, marginBottom: mb }} />;
 }
 
 function LoadingState() {
@@ -678,7 +678,7 @@ function LoadingState() {
   return (
     <View>
       {/* Hero skeleton */}
-      <View style={{ height: 460, backgroundColor: '#1A2B4A', justifyContent: 'flex-end', padding: Spacing.xl }}>
+      <View style={{ height: 460, backgroundColor: Colors.primary, justifyContent: 'flex-end', padding: Spacing.xl }}>
         <SkeletonBlock h={14} w={200} mb={Spacing.md} />
         <SkeletonBlock h={52} mb={Spacing.sm} />
         <SkeletonBlock h={40} w="75%" mb={Spacing.xl} />
@@ -693,7 +693,7 @@ function LoadingState() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md }}>
           {[1, 2, 3, 4].map((i) => (
             <View key={i} style={{ width: cardW as any, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border }}>
-              <View style={{ height: 150, backgroundColor: '#D8DDE8' }} />
+              <View style={{ height: 150, backgroundColor: Colors.border }} />
               <View style={{ padding: Spacing.md, gap: Spacing.sm }}>
                 <SkeletonBlock h={16} />
                 <SkeletonBlock h={12} w="60%" />

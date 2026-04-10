@@ -10,7 +10,7 @@ import { Typography } from '../../../constants/typography';
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function Skeleton({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | number; mb?: number }) {
-  return <View style={{ height: h, width: w as any, backgroundColor: '#E8ECF0', borderRadius: 6, marginBottom: mb }} />;
+  return <View style={{ height: h, width: w as any, backgroundColor: Colors.border, borderRadius: 6, marginBottom: mb }} />;
 }
 
 // ─── Stat Card ───────────────────────────────────────────────────────────────
@@ -224,7 +224,7 @@ const s = StyleSheet.create({
   tournamentDates: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: Colors.textMuted },
   tournamentRegistered: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: Colors.textMuted, marginTop: 2 },
   statusBadge: { backgroundColor: Colors.statusSuccessBg, paddingHorizontal: Spacing.sm, paddingVertical: 3, borderRadius: 12 },
-  statusText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 10, color: '#1A6B3A', textTransform: 'uppercase', letterSpacing: 0.5 },
+  statusText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 10, color: Colors.eloPositive, textTransform: 'uppercase', letterSpacing: 0.5 },
   activityItem: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md, paddingVertical: Spacing.sm },
   activityIcon: {
     width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.backgroundAlt,
@@ -234,7 +234,7 @@ const s = StyleSheet.create({
   activityTime: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: Colors.textMuted, marginTop: 2 },
   verifiedBadge: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,
-    backgroundColor: '#FDF5E6', paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: 12,
+    backgroundColor: Colors.statusWarningBg, paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: 12,
   },
   verifiedText: { fontFamily: Typography.fontFamilySemiBold, fontSize: Typography.sizes.xs, color: Colors.gold },
   verifyBanner: {
