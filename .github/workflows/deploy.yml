@@ -42,29 +42,8 @@ jobs:
         run: |
           NGINX_CONF=$(sudo grep -rl "chesstourism" /etc/nginx/sites-enabled/ 2>/dev/null | head -1)
           if [ -n "$NGINX_CONF" ]; then
-            sudo python3 - "$NGINX_CONF" <<'PYEOF'
-import sys, re
-
-path = sys.argv[1]
-with open(path) as f:
-    content = f.read()
-
-# Remove auth_basic directives from /proto location block
-cleaned = re.sub(
-    r'(location\s+/proto[^{]*\{[^}]*?)auth_basic[^\n]*\n[^}]*auth_basic_user_file[^\n]*\n',
-    r'\1',
-    content,
-    flags=re.DOTALL
-)
-
-if cleaned != content:
-    with open(path, 'w') as f:
-        f.write(cleaned)
-    print(f"Removed basic auth from /proto in {path}")
-else:
-    print("No /proto basic auth found — nothing to remove")
-PYEOF
-            sudo nginx -t && sudo nginx -s reload
+            sudo sed -i '/location.*\/proto/,/}/{/auth_basic/d;/auth_basic_user_file/d;}' "$NGINX_CONF"
+            sudo nginx -t && sudo nginx -s reload && echo "Nginx reloaded, basic auth removed from /proto"
           else
             echo "Nginx config for chesstourism not found, skipping"
           fi
