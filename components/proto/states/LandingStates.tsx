@@ -319,7 +319,7 @@ function TournamentsSection() {
       <SectionHeader title="Upcoming Tournaments" sub="Open for registration worldwide" linkLabel="View all" />
       <View style={secS.grid}>
         {mockTournaments.map((t) => (
-          <View key={t.id} style={{ width: cardW, marginBottom: Spacing.md }}>
+          <View key={t.id} style={{ width: cardW as any, marginBottom: Spacing.md }}>
             <TCard t={t} />
           </View>
         ))}
@@ -692,7 +692,7 @@ function LoadingState() {
         <SkeletonBlock h={28} w={240} mb={Spacing.lg} />
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md }}>
           {[1, 2, 3, 4].map((i) => (
-            <View key={i} style={{ width: cardW, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border }}>
+            <View key={i} style={{ width: cardW as any, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border }}>
               <View style={{ height: 150, backgroundColor: '#D8DDE8' }} />
               <View style={{ padding: Spacing.md, gap: Spacing.sm }}>
                 <SkeletonBlock h={16} />

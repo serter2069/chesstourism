@@ -18,6 +18,7 @@ export type MockRatingEntry = {
   name: string;
   country: string;
   rating: number;
+  tournamentCount?: number;
 };
 
 export const mockTournaments: MockTournament[] = [

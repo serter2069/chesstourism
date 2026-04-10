@@ -38,6 +38,37 @@ jobs:
           rsync -av --delete dist/ /var/www/chesstourism/web/
           sudo chown -R www-data:www-data /var/www/chesstourism/web/
 
+      - name: Remove basic auth from /proto in nginx
+        run: |
+          NGINX_CONF=$(sudo grep -rl "chesstourism" /etc/nginx/sites-enabled/ 2>/dev/null | head -1)
+          if [ -n "$NGINX_CONF" ]; then
+            sudo python3 - "$NGINX_CONF" <<'PYEOF'
+import sys, re
+
+path = sys.argv[1]
+with open(path) as f:
+    content = f.read()
+
+# Remove auth_basic directives from /proto location block
+cleaned = re.sub(
+    r'(location\s+/proto[^{]*\{[^}]*?)auth_basic[^\n]*\n[^}]*auth_basic_user_file[^\n]*\n',
+    r'\1',
+    content,
+    flags=re.DOTALL
+)
+
+if cleaned != content:
+    with open(path, 'w') as f:
+        f.write(cleaned)
+    print(f"Removed basic auth from /proto in {path}")
+else:
+    print("No /proto basic auth found — nothing to remove")
+PYEOF
+            sudo nginx -t && sudo nginx -s reload
+          else
+            echo "Nginx config for chesstourism not found, skipping"
+          fi
+
       - name: Install Doppler CLI
         run: (curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sudo sh
 

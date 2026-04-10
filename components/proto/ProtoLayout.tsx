@@ -8,13 +8,12 @@ import { Typography } from '../../constants/typography';
 import { usePlatform } from '../../hooks/usePlatform';
 
 interface ProtoLayoutProps {
-  pagId: string;
   title: string;
   route: string;
   children: React.ReactNode;
 }
 
-export default function ProtoLayout({ pagId, title, route, children }: ProtoLayoutProps) {
+export default function ProtoLayout({ title, route, children }: ProtoLayoutProps) {
   const router = useRouter();
   const { contentMaxWidth } = usePlatform();
 
@@ -33,9 +32,6 @@ export default function ProtoLayout({ pagId, title, route, children }: ProtoLayo
             <Text style={styles.backText}>Proto</Text>
           </TouchableOpacity>
 
-          <View style={styles.pagIdBadge}>
-            <Text style={styles.pagIdText}>{pagId}</Text>
-          </View>
         </View>
 
         {/* Page header */}
@@ -85,19 +81,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     fontFamily: Typography.fontFamilyMedium,
     color: Colors.primary,
-  },
-  pagIdBadge: {
-    backgroundColor: Colors.primary,
-    borderRadius: 4,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-  },
-  pagIdText: {
-    fontSize: Typography.sizes.xs,
-    fontFamily: Typography.fontFamilyBold,
-    fontWeight: Typography.weights.bold,
-    color: Colors.gold,
-    letterSpacing: 0.8,
   },
   pageHeader: {
     marginBottom: Spacing.xl,
