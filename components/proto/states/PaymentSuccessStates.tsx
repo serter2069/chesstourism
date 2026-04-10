@@ -70,7 +70,6 @@ const s = StyleSheet.create({
     backgroundColor: Colors.background,
     minHeight: 600,
     justifyContent: 'center',
-    maxWidth: 430,
   },
   content: {
     alignItems: 'center',

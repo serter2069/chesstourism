@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -53,7 +52,11 @@ function RegistrationRow({ reg, showActions, expanded }: {
   return (
     <View style={[s.regRow, expanded && s.regRowExpanded]}>
       <View style={s.regMain}>
-        <ProtoPlaceholderImage type="avatar" size={32} borderRadius={16} />
+        <Image
+          source={{ uri: 'https://picsum.photos/seed/player-avatar/200/200' }}
+          style={{ width: 32, height: 32, borderRadius: 16 }}
+          resizeMode="cover"
+        />
         <View style={s.regInfo}>
           <Text style={s.regName}>{reg.name}</Text>
           <View style={s.regMeta}>
@@ -239,7 +242,7 @@ export default function TournamentRegistrationsStates() {
 }
 
 const s = StyleSheet.create({
-  page: { backgroundColor: Colors.background, maxWidth: 430 },
+  page: { backgroundColor: Colors.background },
   container: { padding: Spacing.md },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
   heading: { fontFamily: Typography.fontFamilyHeading, fontSize: Typography.sizes['2xl'], color: Colors.text },

@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
@@ -106,7 +105,11 @@ export default function AdminOrganizationsStates() {
                 <Text style={s.modalTitle}>Review Application</Text>
 
                 <View style={s.reviewHeader}>
-                  <ProtoPlaceholderImage type="avatar" size={56} borderRadius={8} label="Logo" />
+                  <Image
+                    source={{ uri: 'https://picsum.photos/seed/chess-board/200/200' }}
+                    style={{ width: 56, height: 56, borderRadius: 8 }}
+                    resizeMode="cover"
+                  />
                   <View style={{ marginLeft: Spacing.md, flex: 1 }}>
                     <Text style={s.reviewName}>Tbilisi Chess Federation</Text>
                     <Text style={s.reviewCountry}>Georgia</Text>

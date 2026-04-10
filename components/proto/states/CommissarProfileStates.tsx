@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -17,7 +16,11 @@ const UPCOMING_TOURNAMENTS = [
 function ProfileHeader() {
   return (
     <View style={s.profileHeader}>
-      <ProtoPlaceholderImage type="avatar" size={96} borderRadius={48} label="Giorgi Beridze" />
+      <Image
+        source={{ uri: 'https://picsum.photos/seed/commissar-giorgi/200/200' }}
+        style={{ width: 96, height: 96, borderRadius: 48 }}
+        resizeMode="cover"
+      />
       <Text style={s.profileName}>Giorgi Beridze</Text>
       <View style={s.countryRow}>
         <Feather name="map-pin" size={14} color={Colors.textMuted} />
@@ -142,7 +145,6 @@ export default function CommissarProfileStates() {
 const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
-    maxWidth: 430,
   },
   profileHeader: {
     alignItems: 'center',

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -32,7 +31,11 @@ function CommissarCard({ c, highlighted }: { c: typeof COMMISSARS[0]; highlighte
   return (
     <TouchableOpacity style={[s.card, highlighted && s.cardHighlighted]} activeOpacity={0.85}>
       <View style={s.cardTop}>
-        <ProtoPlaceholderImage type="avatar" size={56} borderRadius={28} label={c.name} />
+        <Image
+          source={{ uri: `https://picsum.photos/seed/${c.name.toLowerCase().replace(/\s+/g, '-')}/200/200` }}
+          style={{ width: 56, height: 56, borderRadius: 28 }}
+          resizeMode="cover"
+        />
         <View style={s.cardInfo}>
           <Text style={s.cardName}>{c.name}</Text>
           <View style={s.cardCountryRow}>
@@ -188,7 +191,6 @@ const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
     padding: Spacing.lg,
-    maxWidth: 430,
   },
   pageTitle: {
     fontFamily: Typography.fontFamilyHeading,

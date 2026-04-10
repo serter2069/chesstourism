@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -63,7 +62,11 @@ function EditForm({ saving, saved, errors }: { saving?: boolean; saved?: boolean
 
         {/* Avatar */}
         <View style={s.avatarSection}>
-          <ProtoPlaceholderImage type="avatar" size={80} borderRadius={40} />
+          <Image
+            source={{ uri: 'https://picsum.photos/seed/commissar-profile/200/200' }}
+            style={{ width: 80, height: 80, borderRadius: 40 }}
+            resizeMode="cover"
+          />
           <TouchableOpacity style={s.changePhotoBtn} activeOpacity={0.8}>
             <Feather name="camera" size={14} color={Colors.gold} />
             <Text style={s.changePhotoText}>Change Photo</Text>
@@ -175,7 +178,7 @@ export default function CommissionerEditStates() {
 }
 
 const s = StyleSheet.create({
-  page: { backgroundColor: Colors.background, maxWidth: 430 },
+  page: { backgroundColor: Colors.background },
   container: { padding: Spacing.md },
   heading: { fontFamily: Typography.fontFamilyHeading, fontSize: Typography.sizes['2xl'], color: Colors.text, marginBottom: Spacing.lg },
   successBanner: {

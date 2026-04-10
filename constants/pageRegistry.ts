@@ -18,6 +18,8 @@ export interface PageEntry {
   stateCount: number;
   nav: NavVariant;
   activeTab?: string;
+  navFrom?: string[];   // page IDs that navigate TO this page
+  navTo?: string[];     // page IDs this page navigates TO
   notes?: PageNote[];
 }
 
@@ -30,6 +32,7 @@ export const pages: PageEntry[] = [
     route: '/',
     stateCount: 3,
     nav: 'public',
+    navTo: ['tournaments', 'org-apply', 'login', 'commissars', 'ratings'],
     notes: [
       {
         date: '2026-04-10',
@@ -44,6 +47,8 @@ export const pages: PageEntry[] = [
     route: '/tournaments',
     stateCount: 4,
     nav: 'public',
+    navFrom: ['landing', 'dashboard', 'watchlist'],
+    navTo: ['tournament-detail'],
   },
   {
     id: 'tournament-detail',
@@ -52,6 +57,8 @@ export const pages: PageEntry[] = [
     route: '/tournaments/:id',
     stateCount: 9,
     nav: 'public',
+    navFrom: ['tournaments', 'watchlist', 'dashboard', 'notifications'],
+    navTo: ['login', 'payment', 'tournament-schedule', 'tournament-announcements', 'commissar-profile'],
   },
   {
     id: 'commissars',
@@ -60,6 +67,8 @@ export const pages: PageEntry[] = [
     route: '/commissars',
     stateCount: 5,
     nav: 'public',
+    navFrom: ['landing'],
+    navTo: ['commissar-profile'],
   },
   {
     id: 'commissar-profile',
@@ -68,6 +77,8 @@ export const pages: PageEntry[] = [
     route: '/commissars/:id',
     stateCount: 3,
     nav: 'public',
+    navFrom: ['commissars', 'tournament-detail'],
+    navTo: [],
   },
   {
     id: 'user-profile',
@@ -76,6 +87,8 @@ export const pages: PageEntry[] = [
     route: '/users/:id',
     stateCount: 3,
     nav: 'public',
+    navFrom: ['ratings', 'tournament-detail'],
+    navTo: ['elo-history'],
   },
   {
     id: 'ratings',
@@ -84,6 +97,8 @@ export const pages: PageEntry[] = [
     route: '/ratings',
     stateCount: 4,
     nav: 'public',
+    navFrom: ['landing'],
+    navTo: ['elo-history', 'user-profile'],
   },
   {
     id: 'elo-history',
@@ -92,6 +107,8 @@ export const pages: PageEntry[] = [
     route: '/ratings/history',
     stateCount: 5,
     nav: 'public',
+    navFrom: ['ratings', 'user-profile'],
+    navTo: [],
   },
   {
     id: 'org-apply',
@@ -100,6 +117,8 @@ export const pages: PageEntry[] = [
     route: '/organizations/apply',
     stateCount: 5,
     nav: 'public',
+    navFrom: ['landing'],
+    navTo: [],
   },
   {
     id: 'cert-verify',
@@ -108,6 +127,8 @@ export const pages: PageEntry[] = [
     route: '/verify/:id',
     stateCount: 4,
     nav: 'public',
+    navFrom: [],
+    navTo: ['tournament-detail'],
   },
   {
     id: 'payment-success',
@@ -116,6 +137,8 @@ export const pages: PageEntry[] = [
     route: '/payment-success',
     stateCount: 1,
     nav: 'none',
+    navFrom: ['payment'],
+    navTo: ['my-registrations', 'tournament-detail'],
   },
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
@@ -126,6 +149,8 @@ export const pages: PageEntry[] = [
     route: '/(auth)/login',
     stateCount: 5,
     nav: 'auth',
+    navFrom: ['tournament-detail', 'landing'],
+    navTo: ['otp'],
   },
   {
     id: 'otp',
@@ -134,6 +159,8 @@ export const pages: PageEntry[] = [
     route: '/(auth)/otp',
     stateCount: 6,
     nav: 'auth',
+    navFrom: ['login'],
+    navTo: ['dashboard'],
   },
 
   // ─── Dashboard ─────────────────────────────────────────────────────────────
@@ -144,6 +171,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/',
     stateCount: 3,
     nav: 'client',
+    navFrom: ['otp'],
+    navTo: ['my-registrations', 'tournaments', 'watchlist', 'notifications', 'commissioner-cabinet'],
   },
   {
     id: 'profile',
@@ -152,6 +181,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/profile',
     stateCount: 5,
     nav: 'client',
+    navFrom: ['dashboard'],
+    navTo: [],
   },
   {
     id: 'my-registrations',
@@ -160,6 +191,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/my-registrations',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['dashboard', 'payment-success'],
+    navTo: ['tournament-detail'],
   },
   {
     id: 'watchlist',
@@ -168,6 +201,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/watchlist',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['dashboard'],
+    navTo: ['tournaments', 'payment'],
   },
   {
     id: 'notifications',
@@ -176,6 +211,8 @@ export const pages: PageEntry[] = [
     route: '/notifications',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['dashboard'],
+    navTo: ['tournament-detail', 'my-registrations'],
   },
   {
     id: 'payment',
@@ -184,6 +221,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/payment/:id',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['tournament-detail', 'watchlist'],
+    navTo: ['payment-success'],
   },
 
   // ─── Commissioner ──────────────────────────────────────────────────────────
@@ -194,6 +233,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/commissioner',
     stateCount: 3,
     nav: 'client',
+    navFrom: ['dashboard'],
+    navTo: ['create-tournament', 'my-tournaments', 'commissioner-edit'],
   },
   {
     id: 'commissioner-edit',
@@ -202,6 +243,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/commissioner/edit',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['commissioner-cabinet'],
+    navTo: ['commissioner-cabinet'],
   },
   {
     id: 'my-tournaments',
@@ -210,6 +253,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/manage',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['commissioner-cabinet'],
+    navTo: ['tournament-hub', 'create-tournament'],
   },
   {
     id: 'create-tournament',
@@ -218,6 +263,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/create',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['commissioner-cabinet', 'my-tournaments'],
+    navTo: ['tournament-hub'],
   },
   {
     id: 'tournament-hub',
@@ -226,6 +273,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/:id/hub',
     stateCount: 3,
     nav: 'client',
+    navFrom: ['my-tournaments', 'create-tournament'],
+    navTo: ['tournament-registrations', 'tournament-rounds', 'tournament-results', 'tournament-photos', 'tournament-announcements', 'tournament-edit'],
   },
   {
     id: 'tournament-edit',
@@ -234,6 +283,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/:id/edit',
     stateCount: 5,
     nav: 'client',
+    navFrom: ['tournament-hub'],
+    navTo: ['tournament-hub'],
   },
   {
     id: 'tournament-registrations',
@@ -242,6 +293,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/:id/registrations',
     stateCount: 5,
     nav: 'client',
+    navFrom: ['tournament-hub'],
+    navTo: ['tournament-hub'],
   },
   {
     id: 'tournament-results',
@@ -250,6 +303,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/:id/results',
     stateCount: 5,
     nav: 'client',
+    navFrom: ['tournament-hub'],
+    navTo: ['tournament-hub'],
   },
   {
     id: 'tournament-photos',
@@ -258,6 +313,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/:id/photos',
     stateCount: 5,
     nav: 'client',
+    navFrom: ['tournament-hub'],
+    navTo: ['tournament-hub'],
   },
   {
     id: 'tournament-rounds',
@@ -266,6 +323,8 @@ export const pages: PageEntry[] = [
     route: '/(dashboard)/tournaments/:id/rounds',
     stateCount: 4,
     nav: 'client',
+    navFrom: ['tournament-hub'],
+    navTo: ['tournament-results', 'tournament-hub'],
   },
   {
     id: 'tournament-schedule',
@@ -274,6 +333,8 @@ export const pages: PageEntry[] = [
     route: '/tournaments/:id/schedule',
     stateCount: 4,
     nav: 'public',
+    navFrom: ['tournament-detail'],
+    navTo: ['tournament-detail'],
   },
   {
     id: 'tournament-announcements',
@@ -282,6 +343,8 @@ export const pages: PageEntry[] = [
     route: '/tournaments/:id/announcements',
     stateCount: 4,
     nav: 'public',
+    navFrom: ['tournament-detail', 'tournament-hub'],
+    navTo: ['tournament-detail'],
   },
 
   // ─── Admin ─────────────────────────────────────────────────────────────────
@@ -292,6 +355,7 @@ export const pages: PageEntry[] = [
     route: '/(admin)/',
     stateCount: 3,
     nav: 'admin',
+    navTo: ['admin-users', 'admin-tournaments', 'admin-organizations', 'admin-moderation', 'admin-finances', 'admin-disputes', 'admin-webhooks'],
   },
   {
     id: 'admin-users',
@@ -300,6 +364,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/users',
     stateCount: 4,
     nav: 'admin',
+    navFrom: ['admin'],
+    navTo: ['admin'],
   },
   {
     id: 'admin-tournaments',
@@ -308,6 +374,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/tournaments',
     stateCount: 5,
     nav: 'admin',
+    navFrom: ['admin'],
+    navTo: ['admin'],
   },
   {
     id: 'admin-organizations',
@@ -316,6 +384,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/organizations',
     stateCount: 4,
     nav: 'admin',
+    navFrom: ['admin'],
+    navTo: ['admin'],
   },
   {
     id: 'admin-moderation',
@@ -324,6 +394,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/moderation',
     stateCount: 4,
     nav: 'admin',
+    navFrom: ['admin', 'admin-disputes'],
+    navTo: ['admin-disputes'],
   },
   {
     id: 'admin-finances',
@@ -332,6 +404,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/finances',
     stateCount: 4,
     nav: 'admin',
+    navFrom: ['admin'],
+    navTo: ['admin'],
   },
   {
     id: 'admin-disputes',
@@ -340,6 +414,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/disputes',
     stateCount: 4,
     nav: 'admin',
+    navFrom: ['admin', 'admin-moderation'],
+    navTo: ['admin-moderation'],
   },
   {
     id: 'admin-webhooks',
@@ -348,6 +424,8 @@ export const pages: PageEntry[] = [
     route: '/(admin)/webhooks',
     stateCount: 4,
     nav: 'admin',
+    navFrom: ['admin'],
+    navTo: ['admin-webhook-detail'],
   },
   {
     id: 'admin-webhook-detail',
@@ -356,5 +434,7 @@ export const pages: PageEntry[] = [
     route: '/(admin)/webhooks/:id',
     stateCount: 3,
     nav: 'admin',
+    navFrom: ['admin-webhooks'],
+    navTo: ['admin-webhooks'],
   },
 ];

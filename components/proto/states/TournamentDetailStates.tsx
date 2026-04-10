@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -43,7 +42,11 @@ const TABS = ['Overview', 'Players', 'Results', 'Schedule', 'Announcements'];
 function TournamentHero({ status, statusBg, statusFg }: { status: string; statusBg: string; statusFg: string }) {
   return (
     <View>
-      <ProtoPlaceholderImage type="banner" width="100%" height={180} borderRadius={0} label="Tbilisi Open 2025 - tournament venue" />
+      <Image
+        source={{ uri: 'https://picsum.photos/seed/tbilisi-chess/1200/400' }}
+        style={{ width: '100%' as any, height: 180, borderRadius: 0 }}
+        resizeMode="cover"
+      />
       <View style={s.heroContent}>
         <StatusBadge label={status} bg={statusBg} fg={statusFg} />
         <Text style={s.heroTitle}>Tbilisi Open 2025</Text>
@@ -66,7 +69,11 @@ function TournamentDetails() {
   return (
     <View style={s.detailsSection}>
       <View style={s.commissarRow}>
-        <ProtoPlaceholderImage type="avatar" size={36} borderRadius={18} label="Commissar" />
+        <Image
+          source={{ uri: 'https://picsum.photos/seed/commissar-giorgi/200/200' }}
+          style={{ width: 36, height: 36, borderRadius: 18 }}
+          resizeMode="cover"
+        />
         <View>
           <Text style={s.commissarLabel}>Commissar</Text>
           <Text style={s.commissarName}>Giorgi Beridze</Text>
@@ -376,7 +383,6 @@ export default function TournamentDetailStates() {
 const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
-    maxWidth: 430,
   },
   heroContent: {
     padding: Spacing.lg,

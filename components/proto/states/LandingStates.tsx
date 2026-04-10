@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   useWindowDimensions,
+  Image,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -98,9 +98,13 @@ function Hero() {
   return (
     <View style={heroS.root}>
       {/* Hero background */}
-      <ProtoPlaceholderImage type="banner" width="100%" height="100%" borderRadius={0} label="Hero — chess tournament photo" />
+      <Image
+        source={{ uri: 'https://picsum.photos/seed/chess-hero/1200/600' }}
+        style={{ ...StyleSheet.absoluteFillObject } as any}
+        resizeMode="cover"
+      />
       {/* Dark overlay */}
-      <View style={heroS.overlay} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,20,40,0.75)' }} />
       {/* Pattern overlay — thin gold lines */}
       <View style={heroS.patternOverlay} />
 
@@ -150,7 +154,6 @@ function Hero() {
 
 const heroS = StyleSheet.create({
   root: { minHeight: 560, justifyContent: 'flex-end' },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(13,27,62,0.82)' },
   patternOverlay: { ...StyleSheet.absoluteFillObject },
   content: { paddingHorizontal: Spacing.xl, paddingTop: Spacing['3xl'], paddingBottom: Spacing['2xl'] },
   contentWide: { maxWidth: 700 },
@@ -231,7 +234,11 @@ function TCard({ t }: { t: typeof mockTournaments[0] }) {
     <TouchableOpacity style={tS.card} activeOpacity={0.85}>
       {/* Image placeholder */}
       <View style={tS.imgWrap}>
-        <ProtoPlaceholderImage type="photo" width="100%" height={150} borderRadius={0} label="Tournament photo" />
+        <Image
+          source={{ uri: 'https://picsum.photos/seed/chess-tournament/800/400' }}
+          style={{ width: '100%' as any, height: 150 }}
+          resizeMode="cover"
+        />
         <View style={tS.imgOverlay} />
         {/* Date badge */}
         <View style={tS.dateBadge}>
@@ -533,7 +540,11 @@ function CtaSection() {
   const { isWide } = useLayout();
   return (
     <View style={ctaS.section}>
-      <ProtoPlaceholderImage type="banner" width="100%" height="100%" borderRadius={0} label="CTA background" />
+      <Image
+        source={{ uri: 'https://picsum.photos/seed/chess-cta/1200/400' }}
+        style={{ ...StyleSheet.absoluteFillObject } as any}
+        resizeMode="cover"
+      />
       <View style={ctaS.overlay} />
       <View style={[ctaS.inner, isWide && ctaS.innerWide]}>
         <View style={[ctaS.cardDark, isWide && { flex: 1 }]}>
