@@ -4,14 +4,102 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { pages } from '../../../constants/pageRegistry';
 import ProtoLayout from '../../../components/proto/ProtoLayout';
-import LandingStates from '../../../components/proto/states/LandingStates';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
+// ─── State components ─────────────────────────────────────────────────────────
+import LandingStates from '../../../components/proto/states/LandingStates';
+import TournamentsStates from '../../../components/proto/states/TournamentsStates';
+import TournamentDetailStates from '../../../components/proto/states/TournamentDetailStates';
+import CommissarsStates from '../../../components/proto/states/CommissarsStates';
+import CommissarProfileStates from '../../../components/proto/states/CommissarProfileStates';
+import UserProfileStates from '../../../components/proto/states/UserProfileStates';
+import RatingsStates from '../../../components/proto/states/RatingsStates';
+import EloHistoryStates from '../../../components/proto/states/EloHistoryStates';
+import OrgApplyStates from '../../../components/proto/states/OrgApplyStates';
+import CertVerifyStates from '../../../components/proto/states/CertVerifyStates';
+import PaymentSuccessStates from '../../../components/proto/states/PaymentSuccessStates';
+import LoginStates from '../../../components/proto/states/LoginStates';
+import OtpStates from '../../../components/proto/states/OtpStates';
+import DashboardStates from '../../../components/proto/states/DashboardStates';
+import ProfileStates from '../../../components/proto/states/ProfileStates';
+import MyRegistrationsStates from '../../../components/proto/states/MyRegistrationsStates';
+import WatchlistStates from '../../../components/proto/states/WatchlistStates';
+import NotificationsStates from '../../../components/proto/states/NotificationsStates';
+import PaymentStates from '../../../components/proto/states/PaymentStates';
+import CommissionerCabinetStates from '../../../components/proto/states/CommissionerCabinetStates';
+import CommissionerEditStates from '../../../components/proto/states/CommissionerEditStates';
+import MyTournamentsStates from '../../../components/proto/states/MyTournamentsStates';
+import CreateTournamentStates from '../../../components/proto/states/CreateTournamentStates';
+import TournamentHubStates from '../../../components/proto/states/TournamentHubStates';
+import TournamentEditStates from '../../../components/proto/states/TournamentEditStates';
+import TournamentRegistrationsStates from '../../../components/proto/states/TournamentRegistrationsStates';
+import TournamentResultsStates from '../../../components/proto/states/TournamentResultsStates';
+import TournamentPhotosStates from '../../../components/proto/states/TournamentPhotosStates';
+import TournamentRoundsStates from '../../../components/proto/states/TournamentRoundsStates';
+import TournamentScheduleStates from '../../../components/proto/states/TournamentScheduleStates';
+import TournamentAnnouncementsStates from '../../../components/proto/states/TournamentAnnouncementsStates';
+import AdminStates from '../../../components/proto/states/AdminStates';
+import AdminUsersStates from '../../../components/proto/states/AdminUsersStates';
+import AdminTournamentsStates from '../../../components/proto/states/AdminTournamentsStates';
+import AdminOrganizationsStates from '../../../components/proto/states/AdminOrganizationsStates';
+import AdminModerationStates from '../../../components/proto/states/AdminModerationStates';
+import AdminFinancesStates from '../../../components/proto/states/AdminFinancesStates';
+import AdminDisputesStates from '../../../components/proto/states/AdminDisputesStates';
+import AdminWebhooksStates from '../../../components/proto/states/AdminWebhooksStates';
+import AdminWebhookDetailStates from '../../../components/proto/states/AdminWebhookDetailStates';
+
+// ─── Registry ─────────────────────────────────────────────────────────────────
 const STATE_COMPONENTS: Record<string, React.ComponentType> = {
+  // Public
   landing: LandingStates,
+  tournaments: TournamentsStates,
+  'tournament-detail': TournamentDetailStates,
+  commissars: CommissarsStates,
+  'commissar-profile': CommissarProfileStates,
+  'user-profile': UserProfileStates,
+  ratings: RatingsStates,
+  'elo-history': EloHistoryStates,
+  'org-apply': OrgApplyStates,
+  'cert-verify': CertVerifyStates,
+  'payment-success': PaymentSuccessStates,
+  // Auth
+  login: LoginStates,
+  otp: OtpStates,
+  // Dashboard
+  dashboard: DashboardStates,
+  profile: ProfileStates,
+  'my-registrations': MyRegistrationsStates,
+  watchlist: WatchlistStates,
+  notifications: NotificationsStates,
+  payment: PaymentStates,
+  // Commissioner
+  'commissioner-cabinet': CommissionerCabinetStates,
+  'commissioner-edit': CommissionerEditStates,
+  'my-tournaments': MyTournamentsStates,
+  'create-tournament': CreateTournamentStates,
+  'tournament-hub': TournamentHubStates,
+  'tournament-edit': TournamentEditStates,
+  'tournament-registrations': TournamentRegistrationsStates,
+  'tournament-results': TournamentResultsStates,
+  'tournament-photos': TournamentPhotosStates,
+  'tournament-rounds': TournamentRoundsStates,
+  'tournament-schedule': TournamentScheduleStates,
+  'tournament-announcements': TournamentAnnouncementsStates,
+  // Admin
+  admin: AdminStates,
+  'admin-users': AdminUsersStates,
+  'admin-tournaments': AdminTournamentsStates,
+  'admin-organizations': AdminOrganizationsStates,
+  'admin-moderation': AdminModerationStates,
+  'admin-finances': AdminFinancesStates,
+  'admin-disputes': AdminDisputesStates,
+  'admin-webhooks': AdminWebhooksStates,
+  'admin-webhook-detail': AdminWebhookDetailStates,
 };
+
+// ─── WorkInProgress fallback ─────────────────────────────────────────────────
 
 function WorkInProgress({ id, title, route, stateCount, nav }: {
   id: string; title: string; route: string; stateCount: number; nav: string;
@@ -124,6 +212,8 @@ const wip = StyleSheet.create({
     color: Colors.gold,
   },
 });
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function ProtoStatePage() {
   const { page } = useLocalSearchParams<{ page: string }>();

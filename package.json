@@ -7,7 +7,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "proto": "proto-viewer --project . --port 9100 --password Sara@dura!"
+    "proto": "proto-viewer --project . --password \"Sara@dura!\""
+  },
+  "proto": {
+    "viewerPort": 9083,
+    "appPort": 8083
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
