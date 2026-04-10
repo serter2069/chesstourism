@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
@@ -44,11 +44,11 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function FilterTabs({ active }: { active: string }) {
+function FilterTabs({ active, onSelect }: { active: string; onSelect?: (tab: string) => void }) {
   return (
     <View style={s.filterTabs}>
       {FILTER_TABS.map(t => (
-        <TouchableOpacity key={t} style={[s.filterTab, active === t && s.filterTabActive]}>
+        <TouchableOpacity key={t} style={[s.filterTab, active === t && s.filterTabActive]} onPress={() => onSelect?.(t)}>
           <Text style={[s.filterTabText, active === t && s.filterTabTextActive]}>{t}</Text>
         </TouchableOpacity>
       ))}
@@ -107,6 +107,9 @@ function SkeletonRow() {
 }
 
 export default function AdminTournamentsStates() {
+  const [activeFilter, setActiveFilter] = useState('All');
+  const filteredTournaments = activeFilter === 'All' ? TOURNAMENTS : TOURNAMENTS.filter(t => t.status === activeFilter);
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
@@ -115,8 +118,8 @@ export default function AdminTournamentsStates() {
           <ProtoNav variant="admin" activeTab="tournaments" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
-            <FilterTabs active="All" />
-            <TournamentsTable tournaments={TOURNAMENTS} />
+            <FilterTabs active={activeFilter} onSelect={setActiveFilter} />
+            <TournamentsTable tournaments={filteredTournaments} />
           </View>
         </View>
       </StateSection>

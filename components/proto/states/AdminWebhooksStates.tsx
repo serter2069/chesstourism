@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { useRouter } from 'expo-router';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
@@ -41,6 +42,18 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function AdminWebhooksStates() {
+  const router = useRouter();
+  const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set(['registration.created', 'payment.completed']));
+
+  const toggleEvent = (event: string) => {
+    setSelectedEvents(prev => {
+      const next = new Set(prev);
+      if (next.has(event)) next.delete(event);
+      else next.add(event);
+      return next;
+    });
+  };
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
@@ -65,13 +78,13 @@ export default function AdminWebhooksStates() {
                 <Text style={[s.th, { flex: 0.8 }]}>Success %</Text>
               </View>
               {WEBHOOKS.map((w, i) => (
-                <View key={i} style={s.tableRow}>
+                <TouchableOpacity key={i} style={s.tableRow} onPress={() => router.push('/proto/states/admin-webhook-detail' as any)}>
                   <Text style={[s.td, s.mono, { flex: 3 }]} numberOfLines={1}>{w.url}</Text>
                   <Text style={[s.tdMuted, { flex: 2.5 }]} numberOfLines={1}>{w.events}</Text>
                   <View style={{ flex: 0.8 }}><StatusBadge status={w.status} /></View>
                   <Text style={[s.tdMuted, { flex: 1 }]}>{w.lastTriggered}</Text>
                   <Text style={[s.td, { flex: 0.8 }]}>{w.successRate}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
@@ -96,10 +109,10 @@ export default function AdminWebhooksStates() {
 
                 <Text style={s.formLabel}>Events</Text>
                 <View style={s.checkboxList}>
-                  {ALL_EVENTS.map((e, i) => (
-                    <TouchableOpacity key={e} style={s.checkboxRow}>
-                      <View style={[s.checkbox, (i === 0 || i === 2) && s.checkboxChecked]}>
-                        {(i === 0 || i === 2) && <Feather name="check" size={10} color={TEXT} />}
+                  {ALL_EVENTS.map((e) => (
+                    <TouchableOpacity key={e} style={s.checkboxRow} onPress={() => toggleEvent(e)}>
+                      <View style={[s.checkbox, selectedEvents.has(e) && s.checkboxChecked]}>
+                        {selectedEvents.has(e) && <Feather name="check" size={10} color={TEXT} />}
                       </View>
                       <Text style={s.checkboxLabel}>{e}</Text>
                     </TouchableOpacity>

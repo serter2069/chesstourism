@@ -55,7 +55,7 @@ function EditForm({ saving, saved, errors }: { saving?: boolean; saved?: boolean
 
         {saved && (
           <View style={s.successBanner}>
-            <Feather name="check-circle" size={16} color="#1A6B3A" />
+            <Feather name="check-circle" size={16} color={Colors.successGreen} />
             <Text style={s.successText}>Profile updated successfully</Text>
           </View>
         )}
@@ -185,7 +185,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     backgroundColor: Colors.statusSuccessBg, padding: Spacing.md, borderRadius: 8, marginBottom: Spacing.md,
   },
-  successText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: '#1A6B3A' },
+  successText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: Colors.successGreen },
   avatarSection: { alignItems: 'center', marginBottom: Spacing.lg },
   changePhotoBtn: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,

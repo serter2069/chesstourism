@@ -466,7 +466,7 @@ const s = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#2E7D32',
+    backgroundColor: Colors.eloPositive,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.lg,

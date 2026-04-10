@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -27,9 +28,9 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-function CommissarCard({ c, highlighted }: { c: typeof COMMISSARS[0]; highlighted?: boolean }) {
+function CommissarCard({ c, highlighted, onViewProfile }: { c: typeof COMMISSARS[0]; highlighted?: boolean; onViewProfile?: () => void }) {
   return (
-    <TouchableOpacity style={[s.card, highlighted && s.cardHighlighted]} activeOpacity={0.85}>
+    <TouchableOpacity style={[s.card, highlighted && s.cardHighlighted]} activeOpacity={0.85} onPress={onViewProfile}>
       <View style={s.cardTop}>
         <Image
           source={{ uri: `https://picsum.photos/seed/${c.name.toLowerCase().replace(/\s+/g, '-')}/200/200` }}
@@ -52,7 +53,7 @@ function CommissarCard({ c, highlighted }: { c: typeof COMMISSARS[0]; highlighte
           <Text style={s.statLabel}>tournaments</Text>
         </View>
       </View>
-      <TouchableOpacity style={s.viewProfileBtn} activeOpacity={0.7}>
+      <TouchableOpacity style={s.viewProfileBtn} activeOpacity={0.7} onPress={onViewProfile}>
         <Text style={s.viewProfileText}>View Profile</Text>
         <Feather name="chevron-right" size={14} color={Colors.gold} />
       </TouchableOpacity>
@@ -100,6 +101,8 @@ function SkeletonCard() {
 
 export default function CommissarsStates() {
   const [search, setSearch] = useState('');
+  const router = useRouter();
+  const navToProfile = (id: number) => router.push(`/proto/states/commissar-profile` as any);
 
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
@@ -112,7 +115,7 @@ export default function CommissarsStates() {
           <View style={s.grid}>
             {COMMISSARS.map(c => (
               <View key={c.id} style={s.gridItem}>
-                <CommissarCard c={c} />
+                <CommissarCard c={c} onViewProfile={() => navToProfile(c.id)} />
               </View>
             ))}
           </View>
@@ -136,7 +139,7 @@ export default function CommissarsStates() {
           <View style={s.grid}>
             {COMMISSARS.filter(c => c.country === 'Georgia' || c.country === 'Armenia').map(c => (
               <View key={c.id} style={s.gridItem}>
-                <CommissarCard c={c} />
+                <CommissarCard c={c} onViewProfile={() => navToProfile(c.id)} />
               </View>
             ))}
           </View>
@@ -177,7 +180,7 @@ export default function CommissarsStates() {
           <View style={s.grid}>
             {COMMISSARS.slice(0, 3).map((c, i) => (
               <View key={c.id} style={s.gridItem}>
-                <CommissarCard c={c} highlighted={i === 0} />
+                <CommissarCard c={c} highlighted={i === 0} onViewProfile={() => navToProfile(c.id)} />
               </View>
             ))}
           </View>

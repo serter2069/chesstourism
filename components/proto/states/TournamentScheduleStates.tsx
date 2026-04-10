@@ -32,7 +32,7 @@ const PLAYER_ASSIGNMENTS = [
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function Skeleton({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | number; mb?: number }) {
-  return <View style={{ height: h, width: w as any, backgroundColor: '#E8ECF0', borderRadius: 6, marginBottom: mb }} />;
+  return <View style={{ height: h, width: w as any, backgroundColor: Colors.skeleton, borderRadius: 6, marginBottom: mb }} />;
 }
 
 // ─── Schedule Row ────────────────────────────────────────────────────────────
@@ -234,13 +234,13 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: 8,
     borderBottomLeftRadius: 0, borderBottomRightRadius: 0, marginBottom: 1,
   },
-  thText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 0.5 },
+  thText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 11, color: Colors.tableHeaderText, textTransform: 'uppercase', letterSpacing: 0.5 },
   scheduleRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md,
     paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md,
     borderBottomWidth: 1, borderBottomColor: Colors.border,
   },
-  scheduleRowHighlighted: { backgroundColor: '#FDF8F0' },
+  scheduleRowHighlighted: { backgroundColor: Colors.highlightWarm },
   scheduleRowRest: { backgroundColor: Colors.backgroundAlt },
   dateCol: { width: 60 },
   dateText: { fontFamily: Typography.fontFamilySemiBold, fontSize: Typography.sizes.sm, color: Colors.text },

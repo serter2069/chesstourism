@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { useRouter } from 'expo-router';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
@@ -70,6 +71,8 @@ function ConfigSection({ editable }: { editable?: boolean }) {
 }
 
 export default function AdminWebhookDetailStates() {
+  const router = useRouter();
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}

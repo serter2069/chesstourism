@@ -24,7 +24,7 @@ function StatusBadge({ status }: { status: string }) {
   const isConfirmed = status === 'Confirmed';
   return (
     <View style={[s.statusBadge, { backgroundColor: isConfirmed ? Colors.statusSuccessBg : Colors.statusWarningBg }]}>
-      <Text style={[s.statusText, { color: isConfirmed ? '#1A6B3A' : '#7A5C1E' }]}>{status}</Text>
+      <Text style={[s.statusText, { color: isConfirmed ? Colors.successGreen : Colors.statusWarningText }]}>{status}</Text>
     </View>
   );
 }
@@ -76,7 +76,7 @@ function RegistrationRow({ reg, showActions, expanded }: {
       {showActions && reg.status === 'Pending' && (
         <View style={s.regActions}>
           <TouchableOpacity style={s.confirmBtn} activeOpacity={0.8}>
-            <Feather name="check" size={14} color="#1A6B3A" />
+            <Feather name="check" size={14} color={Colors.successGreen} />
             <Text style={s.confirmText}>Confirm</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.rejectBtn} activeOpacity={0.8}>
@@ -112,7 +112,7 @@ function RegistrationRow({ reg, showActions, expanded }: {
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function Skeleton({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | number; mb?: number }) {
-  return <View style={{ height: h, width: w as any, backgroundColor: '#E8ECF0', borderRadius: 6, marginBottom: mb }} />;
+  return <View style={{ height: h, width: w as any, backgroundColor: Colors.skeleton, borderRadius: 6, marginBottom: mb }} />;
 }
 
 // ─── Page Variants ───────────────────────────────────────────────────────────
@@ -187,7 +187,7 @@ function LoadingView() {
         {[1, 2, 3, 4].map((i) => (
           <View key={i} style={s.regRow}>
             <View style={s.regMain}>
-              <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#E8ECF0' }} />
+              <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: Colors.skeleton }} />
               <View style={{ flex: 1, gap: Spacing.xs }}>
                 <Skeleton h={14} w="60%" />
                 <Skeleton h={10} w="40%" />
@@ -278,7 +278,7 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs, borderRadius: 6,
     backgroundColor: Colors.statusSuccessBg,
   },
-  confirmText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.xs, color: '#1A6B3A' },
+  confirmText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.xs, color: Colors.successGreen },
   rejectBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs, borderRadius: 6,

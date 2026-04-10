@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -16,7 +17,7 @@ const TOURNAMENT_HISTORY = [
   { id: 6, name: 'Baku Open', date: 'Jan 2025', result: '4th Place', elo: '+5' },
 ];
 
-function ProfileDefault() {
+function ProfileDefault({ onEloHistory }: { onEloHistory: () => void }) {
   return (
     <View style={s.page}>
       <View style={s.profileHeader}>
@@ -74,17 +75,24 @@ function ProfileDefault() {
             }]}>{t.elo}</Text>
           </TouchableOpacity>
         ))}
+        <TouchableOpacity style={s.viewAllBtn} activeOpacity={0.85} onPress={onEloHistory}>
+          <Text style={s.viewAllText}>View Full ELO History</Text>
+          <Feather name="chevron-right" size={14} color={Colors.gold} />
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 export default function UserProfileStates() {
+  const router = useRouter();
+  const navToEloHistory = () => router.push('/proto/states/elo-history' as any);
+  const navToRatings = () => router.push('/proto/states/ratings' as any);
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Public user profile with ELO, stats, and tournament history">
         <ProtoNav variant="public" />
-        <ProfileDefault />
+        <ProfileDefault onEloHistory={navToEloHistory} />
       </StateSection>
 
       <StateSection title="LOADING" description="Skeleton loading state">
@@ -124,7 +132,7 @@ export default function UserProfileStates() {
             <Feather name="user-x" size={56} color={Colors.border} />
             <Text style={s.notFoundTitle}>Player Not Found</Text>
             <Text style={s.notFoundSubtitle}>This player profile does not exist or has been removed.</Text>
-            <TouchableOpacity style={s.backBtn} activeOpacity={0.85}>
+            <TouchableOpacity style={s.backBtn} activeOpacity={0.85} onPress={navToRatings}>
               <Feather name="arrow-left" size={16} color={Colors.primary} />
               <Text style={s.backBtnText}>Back to Rankings</Text>
             </TouchableOpacity>
@@ -296,5 +304,20 @@ const s = StyleSheet.create({
     fontFamily: Typography.fontFamilySemiBold,
     fontSize: Typography.sizes.sm,
     color: Colors.primary,
+  },
+  viewAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  viewAllText: {
+    fontFamily: Typography.fontFamilySemiBold,
+    fontSize: Typography.sizes.xs,
+    color: Colors.gold,
   },
 });

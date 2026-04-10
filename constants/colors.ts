@@ -36,6 +36,24 @@ export const Colors = {
   silver: '#9EA3A8',
   bronze: '#CD7F32',
 
+  // Semantic success/warning text (used in badges, banners)
+  successGreen: '#1A6B3A',
+  warningBrown: '#7A5C1E',
+
+  // Skeleton placeholder
+  skeleton: '#E8ECF0',
+
+  // Highlight row
+  highlightWarm: '#FDF8F0',
+
+  // Table header text (semi-transparent white on dark bg)
+  tableHeaderText: 'rgba(255,255,255,0.6)',
+  tableHeaderTextFaint: 'rgba(255,255,255,0.1)',
+  lightTextOnDark: 'rgba(255,255,255,0.7)',
+
+  // Modal overlay
+  overlay: 'rgba(0,0,0,0.5)',
+
 } as const
 
 export type Color = keyof typeof Colors

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -58,6 +59,7 @@ function StatsRow() {
 }
 
 export default function CommissarProfileStates() {
+  const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Commissar public profile with bio, stats, tournaments">
@@ -76,7 +78,7 @@ export default function CommissarProfileStates() {
           <View style={s.section}>
             <Text style={s.sectionTitle}>Upcoming Tournaments</Text>
             {UPCOMING_TOURNAMENTS.map(t => (
-              <TouchableOpacity key={t.id} style={s.tournamentRow} activeOpacity={0.8}>
+              <TouchableOpacity key={t.id} style={s.tournamentRow} activeOpacity={0.8} onPress={() => router.push('/proto/states/tournament-detail' as any)}>
                 <View style={s.tournamentInfo}>
                   <Text style={s.tournamentName}>{t.title}</Text>
                   <View style={s.tournamentMeta}>
@@ -131,7 +133,7 @@ export default function CommissarProfileStates() {
             <Feather name="user-x" size={56} color={Colors.border} />
             <Text style={s.notFoundTitle}>Commissar Not Found</Text>
             <Text style={s.notFoundSubtitle}>The commissar profile you're looking for doesn't exist or has been removed.</Text>
-            <TouchableOpacity style={s.backBtn} activeOpacity={0.85}>
+            <TouchableOpacity style={s.backBtn} activeOpacity={0.85} onPress={() => router.push('/proto/states/commissars' as any)}>
               <Feather name="arrow-left" size={16} color={Colors.primary} />
               <Text style={s.backBtnText}>Back to Commissars</Text>
             </TouchableOpacity>

@@ -49,7 +49,7 @@ function ResultRow({ board, white, black, result, editable }: {
 }) {
   const resultDisplay = result === '1/2' ? '\u00BD-\u00BD' : result;
   const resultBg = result === '1-0' ? Colors.statusSuccessBg : result === '0-1' ? Colors.statusErrorBg : Colors.statusWarningBg;
-  const resultColor = result === '1-0' ? '#1A6B3A' : result === '0-1' ? Colors.error : '#7A5C1E';
+  const resultColor = result === '1-0' ? Colors.successGreen : result === '0-1' ? Colors.error : Colors.statusWarningText;
 
   return (
     <View style={s.resultRow}>
@@ -70,7 +70,7 @@ function ResultRow({ board, white, black, result, editable }: {
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 function Skeleton({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | number; mb?: number }) {
-  return <View style={{ height: h, width: w as any, backgroundColor: '#E8ECF0', borderRadius: 6, marginBottom: mb }} />;
+  return <View style={{ height: h, width: w as any, backgroundColor: Colors.skeleton, borderRadius: 6, marginBottom: mb }} />;
 }
 
 // ─── Default View ────────────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ function SavedView() {
       <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.successBanner}>
-          <Feather name="check-circle" size={16} color="#1A6B3A" />
+          <Feather name="check-circle" size={16} color={Colors.successGreen} />
           <Text style={s.successText}>Round 3 results saved and locked</Text>
         </View>
         <Text style={s.heading}>Round 3 Results</Text>
@@ -273,7 +273,7 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: 8,
     borderBottomLeftRadius: 0, borderBottomRightRadius: 0, marginBottom: 1,
   },
-  thText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 0.5 },
+  thText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 11, color: Colors.tableHeaderText, textTransform: 'uppercase', letterSpacing: 0.5 },
   resultRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
@@ -292,7 +292,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     backgroundColor: Colors.statusSuccessBg, padding: Spacing.md, borderRadius: 8, marginBottom: Spacing.md,
   },
-  successText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: '#1A6B3A' },
+  successText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: Colors.successGreen },
   finalizeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm,
     backgroundColor: Colors.gold, borderRadius: 8, paddingVertical: 14, marginTop: Spacing.lg,
@@ -309,7 +309,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.primary, padding: Spacing.md, borderRadius: 12, marginBottom: Spacing.lg,
   },
   finalizedTitle: { fontFamily: Typography.fontFamilySemiBold, fontSize: Typography.sizes.base, color: Colors.gold },
-  finalizedDesc: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
+  finalizedDesc: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: Colors.lightTextOnDark, marginTop: 2 },
   certBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm,
     backgroundColor: Colors.gold, borderRadius: 8, paddingVertical: 14, marginTop: Spacing.lg,

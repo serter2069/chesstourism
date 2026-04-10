@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { useRouter } from 'expo-router';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
@@ -40,6 +41,9 @@ function TypeBadge({ type }: { type: string }) {
 }
 
 export default function AdminDisputesStates() {
+  const router = useRouter();
+  const [replyText, setReplyText] = useState('');
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
@@ -56,7 +60,7 @@ export default function AdminDisputesStates() {
             </View>
 
             {QUEUE.map((d, i) => (
-              <View key={i} style={[s.disputeCard, { borderLeftColor: PriorityBorder({ priority: d.priority }) }]}>
+              <TouchableOpacity key={i} style={[s.disputeCard, { borderLeftColor: PriorityBorder({ priority: d.priority }) }]} onPress={() => router.push('/proto/states/admin-moderation' as any)}>
                 <View style={s.disputeHeader}>
                   <Text style={s.disputeId}>{d.id}</Text>
                   <TypeBadge type={d.type} />
@@ -69,7 +73,7 @@ export default function AdminDisputesStates() {
                   <Text style={s.disputeMetaText}>{d.tournament}</Text>
                   <Text style={s.disputeMetaText}>Opened {d.date}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -131,6 +135,8 @@ export default function AdminDisputesStates() {
               placeholder="Write a message..."
               placeholderTextColor={MUTED}
               multiline
+              value={replyText}
+              onChangeText={setReplyText}
             />
 
             <Text style={s.sectionTitle}>Resolution</Text>

@@ -130,7 +130,7 @@ function ProfileContent({
             />
             {fideLinked && (
               <View style={s.verifiedBadge}>
-                <Feather name="check-circle" size={16} color="#2E7D32" />
+                <Feather name="check-circle" size={16} color={Colors.eloPositive} />
                 <Text style={s.verifiedText}>Verified</Text>
               </View>
             )}
@@ -301,7 +301,7 @@ const s = StyleSheet.create({
   verifiedText: {
     fontFamily: Typography.fontFamilySemiBold,
     fontSize: Typography.sizes.xs,
-    color: '#2E7D32',
+    color: Colors.eloPositive,
   },
   ratingDisplay: {
     flexDirection: 'row',

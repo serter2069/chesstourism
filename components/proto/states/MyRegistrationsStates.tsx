@@ -137,7 +137,7 @@ function UpcomingContent() {
         date="Jun 14-20, 2025"
         city="Tbilisi, Georgia"
         status="Registered"
-        statusColor="#2E7D32"
+        statusColor={Colors.eloPositive}
         statusBg={Colors.statusSuccessBg}
         payment="EUR 50 paid"
       />
@@ -160,7 +160,7 @@ function PastContent() {
     <>
       <PastCard name="Oslo Rapid Cup 2024" date="Jul 3-5, 2024" result="5th Place" resultColor={Colors.primary} />
       <PastCard name="Prague Masters 2024" date="Sep 1-8, 2024" result="12th Place" resultColor={Colors.textMuted} />
-      <PastCard name="Tbilisi Open 2024" date="Jun 14-20, 2024" result="3rd Place" resultColor="#CD7F32" />
+      <PastCard name="Tbilisi Open 2024" date="Jun 14-20, 2024" result="3rd Place" resultColor={Colors.bronze} />
       <PastCard name="Oslo Rapid Cup 2023" date="Jul 5-7, 2023" result="DNF" resultColor={Colors.error} />
       <PastCard name="Budapest Masters 2023" date="Aug 2-9, 2023" result="8th Place" resultColor={Colors.textMuted} />
     </>
