@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
+
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -76,7 +76,11 @@ function ProfileContent({
 
         {/* Avatar section */}
         <View style={s.avatarRow}>
-          <ProtoPlaceholderImage type="avatar" size={80} borderRadius={40} label="MC" />
+          <Image
+            source={{ uri: 'https://picsum.photos/seed/player-magnus/200/200' }}
+            style={{ width: 80, height: 80, borderRadius: 40 }}
+            resizeMode="cover"
+          />
           <View style={s.avatarInfo}>
             <Text style={s.avatarName}>Magnus Carlsen</Text>
             <Text style={s.avatarEmail}>magnus@example.com</Text>
@@ -207,7 +211,7 @@ export default function ProfileStates() {
 const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
-    maxWidth: 430,
+
   },
   content: {
     padding: Spacing.md,

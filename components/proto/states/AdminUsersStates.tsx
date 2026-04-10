@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
@@ -83,7 +82,11 @@ function UsersTable({ users, highlight }: { users: typeof USERS; highlight?: num
       {users.map((u, i) => (
         <View key={i} style={[s.tableRow, highlight === i && s.highlightRow]}>
           <View style={{ flex: 0.5, alignItems: 'center' }}>
-            <ProtoPlaceholderImage type="avatar" size={28} borderRadius={14} />
+            <Image
+              source={{ uri: `https://picsum.photos/seed/admin-user-${i + 1}/200/200` }}
+              style={{ width: 28, height: 28, borderRadius: 14 }}
+              resizeMode="cover"
+            />
           </View>
           <Text style={[s.td, { flex: 2 }]}>{u.name}</Text>
           <Text style={[s.tdMuted, { flex: 2.5 }]}>{u.email}</Text>
@@ -140,7 +143,11 @@ export default function AdminUsersStates() {
 
             <View style={s.detailPanel}>
               <View style={s.detailHeader}>
-                <ProtoPlaceholderImage type="avatar" size={48} borderRadius={24} />
+                <Image
+                  source={{ uri: 'https://picsum.photos/seed/admin-user-1/200/200' }}
+                  style={{ width: 48, height: 48, borderRadius: 24 }}
+                  resizeMode="cover"
+                />
                 <View style={{ marginLeft: Spacing.md, flex: 1 }}>
                   <Text style={s.detailName}>Magnus Eriksson</Text>
                   <Text style={s.detailEmail}>magnus@chess.no</Text>

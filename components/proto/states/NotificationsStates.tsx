@@ -171,7 +171,7 @@ export default function NotificationsStates() {
 const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
-    maxWidth: 430,
+
   },
   content: {
     padding: Spacing.md,

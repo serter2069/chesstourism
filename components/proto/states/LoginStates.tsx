@@ -160,7 +160,7 @@ const s = StyleSheet.create({
     borderRadius: 12,
     padding: Spacing.xl,
     width: '100%',
-    maxWidth: 430,
+
     borderWidth: 1,
     borderColor: Colors.border,
     shadowColor: Colors.primary,

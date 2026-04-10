@@ -175,7 +175,6 @@ const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
     padding: Spacing.lg,
-    maxWidth: 430,
   },
   headerSection: {
     alignItems: 'center',

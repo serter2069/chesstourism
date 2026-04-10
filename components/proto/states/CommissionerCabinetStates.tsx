@@ -199,7 +199,7 @@ export default function CommissionerCabinetStates() {
 }
 
 const s = StyleSheet.create({
-  page: { backgroundColor: Colors.background, maxWidth: 430 },
+  page: { backgroundColor: Colors.background },
   container: { padding: Spacing.md },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.lg },
   heading: { fontFamily: Typography.fontFamilyHeading, fontSize: Typography.sizes['2xl'], color: Colors.text },

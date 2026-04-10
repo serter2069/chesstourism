@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -105,7 +104,11 @@ function ApplicationForm({ errors }: { errors?: Record<string, string> }) {
         <View style={s.formGroup}>
           <Text style={s.formLabel}>Organization Logo</Text>
           <TouchableOpacity style={s.uploadArea} activeOpacity={0.7}>
-            <ProtoPlaceholderImage type="document" width={60} height={60} borderRadius={8} label="Logo" />
+            <Image
+              source={{ uri: 'https://picsum.photos/seed/chess-venue/200/200' }}
+              style={{ width: 60, height: 60, borderRadius: 8 }}
+              resizeMode="cover"
+            />
             <View style={s.uploadInfo}>
               <Text style={s.uploadText}>Upload your logo</Text>
               <Text style={s.uploadHint}>PNG, JPG up to 2MB</Text>
@@ -216,7 +219,6 @@ const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
     padding: Spacing.lg,
-    maxWidth: 430,
   },
   pageTitle: {
     fontFamily: Typography.fontFamilyHeading,

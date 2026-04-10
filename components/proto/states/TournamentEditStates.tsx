@@ -170,7 +170,7 @@ export default function TournamentEditStates() {
 }
 
 const s = StyleSheet.create({
-  page: { backgroundColor: Colors.background, maxWidth: 430, position: 'relative' as any },
+  page: { backgroundColor: Colors.background, position: 'relative' as any },
   container: { padding: Spacing.md },
   heading: { fontFamily: Typography.fontFamilyHeading, fontSize: Typography.sizes['2xl'], color: Colors.text, marginBottom: Spacing.md },
   warningBanner: {

@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -21,7 +20,11 @@ function ProfileDefault() {
   return (
     <View style={s.page}>
       <View style={s.profileHeader}>
-        <ProtoPlaceholderImage type="avatar" size={80} borderRadius={40} label="Magnus Eriksson" />
+        <Image
+          source={{ uri: 'https://picsum.photos/seed/player-magnus/200/200' }}
+          style={{ width: 80, height: 80, borderRadius: 40 }}
+          resizeMode="cover"
+        />
         <View style={s.headerInfo}>
           <Text style={s.playerName}>Magnus Eriksson</Text>
           <View style={s.countryRow}>
@@ -135,7 +138,6 @@ export default function UserProfileStates() {
 const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
-    maxWidth: 430,
   },
   profileHeader: {
     flexDirection: 'row',

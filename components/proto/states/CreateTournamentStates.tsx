@@ -236,7 +236,7 @@ export default function CreateTournamentStates() {
 }
 
 const s = StyleSheet.create({
-  page: { backgroundColor: Colors.background, maxWidth: 430 },
+  page: { backgroundColor: Colors.background },
   container: { padding: Spacing.md },
   heading: { fontFamily: Typography.fontFamilyHeading, fontSize: Typography.sizes['2xl'], color: Colors.text, marginBottom: Spacing.md },
   stepRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.xl, gap: 0 },

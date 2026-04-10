@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -16,7 +15,11 @@ function PhotoGrid({ deleteMode }: { deleteMode?: boolean }) {
     <View style={s.grid}>
       {photos.map((i) => (
         <View key={i} style={s.gridItem}>
-          <ProtoPlaceholderImage type="photo" size={110} borderRadius={8} label={`Photo ${i}`} />
+          <Image
+            source={{ uri: `https://picsum.photos/seed/chess-photo-${i}/800/400` }}
+            style={{ width: 110, height: 110, borderRadius: 8 }}
+            resizeMode="cover"
+          />
           {deleteMode && (
             <TouchableOpacity style={s.deleteBadge} activeOpacity={0.7}>
               <Feather name="x" size={14} color={Colors.background} />
@@ -189,7 +192,7 @@ export default function TournamentPhotosStates() {
 }
 
 const s = StyleSheet.create({
-  page: { backgroundColor: Colors.background, maxWidth: 430 },
+  page: { backgroundColor: Colors.background },
   container: { padding: Spacing.md },
   headerRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: Spacing.lg },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },

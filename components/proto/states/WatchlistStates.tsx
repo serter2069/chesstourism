@@ -223,7 +223,7 @@ export default function WatchlistStates() {
 const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
-    maxWidth: 430,
+
     position: 'relative',
   },
   content: {

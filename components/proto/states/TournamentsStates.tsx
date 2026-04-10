@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -52,7 +51,11 @@ function TournamentCard({ t }: { t: typeof TOURNAMENTS[0] }) {
   return (
     <TouchableOpacity style={s.card} activeOpacity={0.85}>
       <View style={s.cardImageWrap}>
-        <ProtoPlaceholderImage type="photo" width="100%" height={140} borderRadius={0} label={t.title} />
+        <Image
+          source={{ uri: `https://picsum.photos/seed/${t.city.toLowerCase()}-chess/800/400` }}
+          style={{ width: '100%' as any, height: 140, borderRadius: 0 }}
+          resizeMode="cover"
+        />
         <View style={s.statusBadge}>
           <Text style={s.statusText}>{t.status}</Text>
         </View>
@@ -176,7 +179,6 @@ const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
     padding: Spacing.lg,
-    maxWidth: 430,
   },
   pageTitle: {
     fontFamily: Typography.fontFamilyHeading,

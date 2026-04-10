@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
-import ProtoPlaceholderImage from '../ProtoPlaceholderImage';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -30,7 +29,11 @@ const LONG_HISTORY = [
 function ProfileBanner({ name, elo, isMine }: { name: string; elo: number; isMine?: boolean }) {
   return (
     <View style={s.profileBanner}>
-      <ProtoPlaceholderImage type="avatar" size={48} borderRadius={24} label={name} />
+      <Image
+        source={{ uri: `https://picsum.photos/seed/${name.toLowerCase().replace(/\s+/g, '-')}/200/200` }}
+        style={{ width: 48, height: 48, borderRadius: 24 }}
+        resizeMode="cover"
+      />
       <View style={s.profileInfo}>
         <View style={s.nameRow}>
           <Text style={s.profileName}>{name}</Text>
@@ -122,7 +125,11 @@ export default function EloHistoryStates() {
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Magnus Eriksson" elo={2156} isMine />
           <PeriodTabs active={period} onSelect={setPeriod} />
-          <ProtoPlaceholderImage type="illustration" width="100%" height={180} borderRadius={8} label="ELO Rating Chart" />
+          <Image
+            source={{ uri: 'https://picsum.photos/seed/chess-board/800/400' }}
+            style={{ width: '100%' as any, height: 180, borderRadius: 8 }}
+            resizeMode="cover"
+          />
           <View style={s.chartSpacer} />
           <HistoryTable data={HISTORY} />
         </View>
@@ -134,7 +141,11 @@ export default function EloHistoryStates() {
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Fabiano Caruana" elo={2805} />
           <PeriodTabs active={2} onSelect={() => {}} />
-          <ProtoPlaceholderImage type="illustration" width="100%" height={180} borderRadius={8} label="ELO Rating Chart" />
+          <Image
+            source={{ uri: 'https://picsum.photos/seed/chess-players/800/400' }}
+            style={{ width: '100%' as any, height: 180, borderRadius: 8 }}
+            resizeMode="cover"
+          />
           <View style={s.chartSpacer} />
           <HistoryTable data={HISTORY.map(h => ({ ...h, before: h.before + 650, after: h.after + 650 }))} />
         </View>
@@ -198,7 +209,11 @@ export default function EloHistoryStates() {
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Magnus Eriksson" elo={2156} isMine />
           <PeriodTabs active={3} onSelect={() => {}} />
-          <ProtoPlaceholderImage type="illustration" width="100%" height={180} borderRadius={8} label="ELO Rating Chart - All Time" />
+          <Image
+            source={{ uri: 'https://picsum.photos/seed/chess-tournament/800/400' }}
+            style={{ width: '100%' as any, height: 180, borderRadius: 8 }}
+            resizeMode="cover"
+          />
           <View style={s.chartSpacer} />
           <HistoryTable data={LONG_HISTORY} />
           <Pagination current={1} total={4} />
@@ -212,7 +227,6 @@ const s = StyleSheet.create({
   page: {
     backgroundColor: Colors.background,
     padding: Spacing.lg,
-    maxWidth: 430,
   },
   pageTitle: {
     fontFamily: Typography.fontFamilyHeading,
