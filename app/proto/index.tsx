@@ -1,15 +1,17 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { protoPages, ProtoPage } from '../../constants/protoRegistry';
+import { pages, PageEntry, PageGroup } from '../../constants/pageRegistry';
 import ProtoCard from '../../components/proto/ProtoCard';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import { usePlatform } from '../../hooks/usePlatform';
 
-function groupPages(pages: ProtoPage[]): Record<string, ProtoPage[]> {
-  return pages.reduce<Record<string, ProtoPage[]>>((acc, page) => {
+const GROUP_ORDER: PageGroup[] = ['Public', 'Auth', 'Dashboard', 'Commissioner', 'Admin'];
+
+function groupPages(entries: PageEntry[]): Record<string, PageEntry[]> {
+  return entries.reduce<Record<string, PageEntry[]>>((acc, page) => {
     if (!acc[page.group]) acc[page.group] = [];
     acc[page.group].push(page);
     return acc;
@@ -18,25 +20,19 @@ function groupPages(pages: ProtoPage[]): Record<string, ProtoPage[]> {
 
 export default function ProtoDashboard() {
   const { contentMaxWidth, columns } = usePlatform();
-  const grouped = groupPages(protoPages);
-  const groups = Object.keys(grouped).sort();
-  const approvedCount = protoPages.filter((p) => p.status === 'approved').length;
-  const total = protoPages.length;
+  const grouped = groupPages(pages);
+  const orderedGroups = GROUP_ORDER.filter((g) => grouped[g]);
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={[styles.inner, { maxWidth: contentMaxWidth }]}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Proto Dashboard</Text>
-            <Text style={styles.subtitle}>
-              {total} pages · {approvedCount}/{total} approved
-            </Text>
+            <Text style={styles.subtitle}>{pages.length} pages</Text>
           </View>
 
-          {/* Groups */}
-          {groups.map((group) => (
+          {orderedGroups.map((group) => (
             <View key={group} style={styles.groupSection}>
               <View style={styles.groupHeader}>
                 <Text style={styles.groupTitle}>{group}</Text>

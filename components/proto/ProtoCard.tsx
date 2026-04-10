@@ -1,24 +1,26 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ProtoPage, ProtoStatus } from '../../constants/protoRegistry';
+import { PageEntry, NavVariant } from '../../constants/pageRegistry';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 
 interface ProtoCardProps {
-  page: ProtoPage;
+  page: PageEntry;
 }
 
-const statusConfig: Record<ProtoStatus, { label: string; bg: string; text: string }> = {
-  pending: { label: 'Pending', bg: Colors.backgroundAlt, text: Colors.textMuted },
-  proto: { label: 'Proto', bg: Colors.statusWarningBg, text: Colors.statusWarningText },
-  approved: { label: 'Approved', bg: Colors.statusSuccessBg, text: Colors.statusSuccessText },
+const navColors: Record<NavVariant, { bg: string; text: string }> = {
+  none: { bg: Colors.backgroundAlt, text: Colors.textMuted },
+  public: { bg: Colors.statusInfoBg, text: Colors.statusInfoText },
+  auth: { bg: Colors.statusWarningBg, text: Colors.statusWarningText },
+  client: { bg: Colors.statusSuccessBg, text: Colors.statusSuccessText },
+  admin: { bg: '#2d1a1a', text: '#e07070' },
 };
 
 export default function ProtoCard({ page }: ProtoCardProps) {
   const router = useRouter();
-  const status = statusConfig[page.status];
+  const nav = navColors[page.nav];
 
   return (
     <TouchableOpacity
@@ -26,30 +28,17 @@ export default function ProtoCard({ page }: ProtoCardProps) {
       onPress={() => router.push(`/proto/states/${page.id}` as any)}
       activeOpacity={0.7}
       accessibilityRole="button"
-      accessibilityLabel={`${page.pagId} ${page.title}`}
+      accessibilityLabel={page.title}
     >
       <View style={styles.topRow}>
-        <View style={styles.pagIdBadge}>
-          <Text style={styles.pagId}>{page.pagId}</Text>
+        <View style={[styles.navBadge, { backgroundColor: nav.bg }]}>
+          <Text style={[styles.navText, { color: nav.text }]}>{page.nav}</Text>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
-          <Text style={[styles.statusText, { color: status.text }]}>{status.label}</Text>
-        </View>
+        <Text style={styles.statesCount}>{page.stateCount} states</Text>
       </View>
 
       <Text style={styles.title}>{page.title}</Text>
       <Text style={styles.route}>{page.route}</Text>
-
-      <View style={styles.metaRow}>
-        <Text style={styles.statesCount}>{page.states.length} states</Text>
-        <View style={styles.rolesRow}>
-          {page.roles.map((role) => (
-            <View key={role} style={styles.roleBadge}>
-              <Text style={styles.roleText}>{role}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
     </TouchableOpacity>
   );
 }
@@ -73,31 +62,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.sm,
   },
-  pagIdBadge: {
-    backgroundColor: Colors.primary,
+  navBadge: {
     borderRadius: 3,
     paddingVertical: 2,
     paddingHorizontal: Spacing.sm,
   },
-  pagId: {
-    fontSize: Typography.sizes.xs,
-    fontFamily: Typography.fontFamilyBold,
-    fontWeight: Typography.weights.bold,
-    color: Colors.gold,
-    letterSpacing: 0.8,
-  },
-  statusBadge: {
-    borderRadius: 3,
-    paddingVertical: 2,
-    paddingHorizontal: Spacing.sm,
-  },
-  statusText: {
+  navText: {
     fontSize: Typography.sizes.xs,
     fontFamily: Typography.fontFamilySemiBold,
     fontWeight: Typography.weights.semibold,
   },
+  statesCount: {
+    fontSize: Typography.sizes.xs,
+    fontFamily: Typography.fontFamilyMedium,
+    color: Colors.textMuted,
+  },
   title: {
-    fontSize: Typography.sizes.lg,
+    fontSize: Typography.sizes.base,
     fontFamily: Typography.fontFamilyHeading,
     color: Colors.text,
     marginBottom: 2,
@@ -106,32 +87,5 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     fontFamily: Typography.fontFamily,
     color: Colors.textMuted,
-    marginBottom: Spacing.md,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  statesCount: {
-    fontSize: Typography.sizes.xs,
-    fontFamily: Typography.fontFamilyMedium,
-    color: Colors.textMuted,
-  },
-  rolesRow: {
-    flexDirection: 'row',
-    gap: Spacing.xs,
-  },
-  roleBadge: {
-    backgroundColor: Colors.statusInfoBg,
-    borderRadius: 3,
-    paddingVertical: 2,
-    paddingHorizontal: Spacing.sm,
-  },
-  roleText: {
-    fontSize: Typography.sizes.xs,
-    fontFamily: Typography.fontFamilySemiBold,
-    fontWeight: Typography.weights.semibold,
-    color: Colors.statusInfoText,
   },
 });

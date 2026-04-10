@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { protoPages } from '../../../constants/protoRegistry';
+import { pages } from '../../../constants/pageRegistry';
 import ProtoLayout from '../../../components/proto/ProtoLayout';
 import LandingStates from '../../../components/proto/states/LandingStates';
 import { Colors } from '../../../constants/colors';
@@ -14,12 +14,12 @@ const STATE_COMPONENTS: Record<string, React.ComponentType> = {
 
 export default function ProtoStatePage() {
   const { page } = useLocalSearchParams<{ page: string }>();
-  const pageDef = protoPages.find((p) => p.id === page);
+  const pageDef = pages.find((p) => p.id === page);
 
   if (!pageDef) {
     return (
       <View style={styles.notFound}>
-        <Text style={styles.notFoundText}>Page "{page}" not found in proto registry.</Text>
+        <Text style={styles.notFoundText}>Page "{page}" not found in page registry.</Text>
       </View>
     );
   }
@@ -29,13 +29,14 @@ export default function ProtoStatePage() {
   if (!StatesComponent) {
     return (
       <View style={styles.notFound}>
-        <Text style={styles.notFoundText}>No states component for "{pageDef.id}".</Text>
+        <Text style={styles.notFoundText}>No states component for "{pageDef.id}" yet.</Text>
+        <Text style={styles.notFoundSub}>Create components/proto/states/{pageDef.id}States.tsx</Text>
       </View>
     );
   }
 
   return (
-    <ProtoLayout pagId={pageDef.pagId} title={pageDef.title} route={pageDef.route}>
+    <ProtoLayout title={pageDef.title} route={pageDef.route}>
       <StatesComponent />
     </ProtoLayout>
   );
@@ -48,11 +49,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: Colors.backgroundAlt,
     padding: Spacing.xl,
+    gap: Spacing.sm,
   },
   notFoundText: {
     fontSize: Typography.sizes.base,
     fontFamily: Typography.fontFamily,
     color: Colors.textMuted,
     textAlign: 'center',
+  },
+  notFoundSub: {
+    fontSize: Typography.sizes.sm,
+    fontFamily: Typography.fontFamily,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    opacity: 0.6,
   },
 });
