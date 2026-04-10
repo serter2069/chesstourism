@@ -9,6 +9,7 @@ import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
 // ─── State components ─────────────────────────────────────────────────────────
+import OverviewStates from '../../../components/proto/states/OverviewStates';
 import LandingStates from '../../../components/proto/states/LandingStates';
 import TournamentsStates from '../../../components/proto/states/TournamentsStates';
 import TournamentDetailStates from '../../../components/proto/states/TournamentDetailStates';
@@ -52,6 +53,8 @@ import AdminWebhookDetailStates from '../../../components/proto/states/AdminWebh
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 const STATE_COMPONENTS: Record<string, React.ComponentType> = {
+  // Overview (meta)
+  overview: OverviewStates,
   // Public
   landing: LandingStates,
   tournaments: TournamentsStates,

@@ -18,21 +18,32 @@ export default function StateSection({ title, description, children }: StateSect
     const url = window.location.href;
     const pageSlug = url.split('/proto/states/')[1]?.split('?')[0] ?? url;
     const text = `Page: ${pageSlug}\nState: ${title}\nURL: ${url}`;
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    }).catch(() => {
+    const writeClipboard = () => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        }).catch(() => fallbackCopy());
+      } else {
+        fallbackCopy();
+      }
+    };
+    const fallbackCopy = () => {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+      document.body.appendChild(el);
+      el.select();
       try {
-        const el = document.createElement('textarea');
-        el.value = text;
-        document.body.appendChild(el);
-        el.select();
         document.execCommand('copy');
-        document.body.removeChild(el);
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
-      } catch {}
-    });
+      } catch (e) {
+        // silent fail
+      }
+      document.body.removeChild(el);
+    };
+    writeClipboard();
   }, [title]);
 
   return (
