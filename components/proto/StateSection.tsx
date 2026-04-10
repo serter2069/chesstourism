@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: Spacing.md,
     backgroundColor: Colors.backgroundAlt,
     borderRadius: 4,
