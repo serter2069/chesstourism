@@ -30,8 +30,8 @@ function TabBar({ tabs, active, onPress }: { tabs: { key: string; label: string 
 
 function StatusBadge({ status }: { status: string }) {
   const meta: Record<string, { bg: string; color: string }> = {
-    OPEN: { bg: Colors.statusSuccessBg, color: '#1A6B3A' },
-    DRAFT: { bg: Colors.statusWarningBg, color: '#7A5C1E' },
+    OPEN: { bg: Colors.statusSuccessBg, color: Colors.successGreen },
+    DRAFT: { bg: Colors.statusWarningBg, color: Colors.statusWarningText },
     COMPLETED: { bg: Colors.backgroundAlt, color: Colors.textMuted },
   };
   const m = meta[status] || meta.COMPLETED;

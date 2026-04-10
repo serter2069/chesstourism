@@ -17,7 +17,7 @@ function PhotoGrid({ deleteMode }: { deleteMode?: boolean }) {
         <View key={i} style={s.gridItem}>
           <Image
             source={{ uri: `https://picsum.photos/seed/chess-photo-${i}/800/400` }}
-            style={{ width: 110, height: 110, borderRadius: 8 }}
+            style={{ width: '100%', aspectRatio: 1, borderRadius: 8 }}
             resizeMode="cover"
           />
           {deleteMode && (
@@ -110,7 +110,7 @@ function UploadingView() {
         {['round3_game1.jpg', 'opening_ceremony.jpg', 'venue_exterior.jpg'].map((f, i) => (
           <View key={f} style={s.fileRow}>
             <Feather name={i === 0 ? 'check-circle' : i === 1 ? 'loader' : 'clock'} size={16} color={i === 0 ? '#1A6B3A' : Colors.textMuted} />
-            <Text style={[s.fileName, i === 0 && { color: '#1A6B3A' }]}>{f}</Text>
+            <Text style={[s.fileName, i === 0 && { color: Colors.successGreen }]}>{f}</Text>
             <Text style={s.fileStatus}>{i === 0 ? 'Done' : i === 1 ? 'Uploading...' : 'Pending'}</Text>
           </View>
         ))}
@@ -199,7 +199,7 @@ const s = StyleSheet.create({
   heading: { fontFamily: Typography.fontFamilyHeading, fontSize: Typography.sizes['2xl'], color: Colors.text },
   subtext: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.sm, color: Colors.textMuted, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
-  gridItem: { position: 'relative' as any },
+  gridItem: { position: 'relative' as any, width: '31%' as any },
   deleteBadge: {
     position: 'absolute', top: 4, right: 4,
     width: 22, height: 22, borderRadius: 11, backgroundColor: Colors.error,

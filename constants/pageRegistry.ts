@@ -108,7 +108,7 @@ export const pages: PageEntry[] = [
     stateCount: 5,
     nav: 'public',
     navFrom: ['ratings', 'user-profile'],
-    navTo: [],
+    navTo: ['tournaments'],
   },
   {
     id: 'org-apply',
@@ -118,7 +118,7 @@ export const pages: PageEntry[] = [
     stateCount: 5,
     nav: 'public',
     navFrom: ['landing'],
-    navTo: [],
+    navTo: ['landing'],
   },
   {
     id: 'cert-verify',

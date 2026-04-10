@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { useRouter } from 'expo-router';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
@@ -33,11 +34,11 @@ function PriorityBadge({ priority }: { priority: string }) {
   );
 }
 
-function TabBar({ tabs, active }: { tabs: string[]; active: string }) {
+function TabBar({ tabs, active, onSelect }: { tabs: string[]; active: string; onSelect?: (tab: string) => void }) {
   return (
     <View style={s.tabBar}>
       {tabs.map(t => (
-        <TouchableOpacity key={t} style={[s.tab, active === t && s.tabActive]}>
+        <TouchableOpacity key={t} style={[s.tab, active === t && s.tabActive]} onPress={() => onSelect?.(t)}>
           <Text style={[s.tabText, active === t && s.tabTextActive]}>{t}</Text>
         </TouchableOpacity>
       ))}
@@ -46,6 +47,10 @@ function TabBar({ tabs, active }: { tabs: string[]; active: string }) {
 }
 
 export default function AdminModerationStates() {
+  const router = useRouter();
+  const [adminNotes, setAdminNotes] = useState('');
+  const [activeModTab, setActiveModTab] = useState('Disputes (3)');
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
@@ -54,7 +59,7 @@ export default function AdminModerationStates() {
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
-            <TabBar tabs={['Disputes (3)', 'Reports (7)', 'Flags (2)']} active="Disputes (3)" />
+            <TabBar tabs={['Disputes (3)', 'Reports (7)', 'Flags (2)']} active={activeModTab} onSelect={setActiveModTab} />
 
             <View style={s.table}>
               <View style={s.tableHeader}>
@@ -81,7 +86,7 @@ export default function AdminModerationStates() {
                     </View>
                   </View>
                   <View style={{ flex: 0.8 }}>
-                    <TouchableOpacity style={s.openBtn}><Text style={s.openBtnText}>Open</Text></TouchableOpacity>
+                    <TouchableOpacity style={s.openBtn} onPress={() => router.push('/proto/states/admin-disputes' as any)}><Text style={s.openBtnText}>Open</Text></TouchableOpacity>
                   </View>
                 </View>
               ))}
@@ -137,6 +142,8 @@ export default function AdminModerationStates() {
                 numberOfLines={3}
                 placeholder="Add notes about this dispute..."
                 placeholderTextColor={MUTED}
+                value={adminNotes}
+                onChangeText={setAdminNotes}
               />
 
               <Text style={s.sectionTitle}>Resolution</Text>

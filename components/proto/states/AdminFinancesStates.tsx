@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
@@ -116,6 +116,8 @@ function SkeletonRow() {
 }
 
 export default function AdminFinancesStates() {
+  const [exportFormat, setExportFormat] = useState('CSV');
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
@@ -222,9 +224,9 @@ export default function AdminFinancesStates() {
 
                 <Text style={s.modalLabel}>Format</Text>
                 <View style={s.formatOptions}>
-                  {['CSV', 'Excel', 'PDF'].map((f, i) => (
-                    <TouchableOpacity key={f} style={[s.formatBtn, i === 0 && s.formatBtnActive]}>
-                      <Text style={[s.formatBtnText, i === 0 && s.formatBtnTextActive]}>{f}</Text>
+                  {['CSV', 'Excel', 'PDF'].map((f) => (
+                    <TouchableOpacity key={f} style={[s.formatBtn, exportFormat === f && s.formatBtnActive]} onPress={() => setExportFormat(f)}>
+                      <Text style={[s.formatBtnText, exportFormat === f && s.formatBtnTextActive]}>{f}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>

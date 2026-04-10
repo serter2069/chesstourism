@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -116,6 +117,7 @@ function Pagination({ current, total }: { current: number; total: number }) {
 
 export default function EloHistoryStates() {
   const [period, setPeriod] = useState(0);
+  const router = useRouter();
 
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
@@ -171,7 +173,7 @@ export default function EloHistoryStates() {
           <View style={s.chartSpacer} />
           <View style={s.tableWrap}>
             <View style={s.thead}>
-              <View style={{ height: 10, width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
+              <View style={{ height: 10, width: '100%', backgroundColor: Colors.tableHeaderTextFaint, borderRadius: 4 }} />
             </View>
             {[1, 2, 3, 4, 5].map(i => (
               <View key={i} style={[s.row, { gap: Spacing.sm }]}>
@@ -196,7 +198,7 @@ export default function EloHistoryStates() {
             <Feather name="bar-chart-2" size={48} color={Colors.border} />
             <Text style={s.emptyTitle}>No Tournament History</Text>
             <Text style={s.emptySubtitle}>Register for your first tournament to start tracking your ELO rating progress</Text>
-            <TouchableOpacity style={s.browseBtn} activeOpacity={0.85}>
+            <TouchableOpacity style={s.browseBtn} activeOpacity={0.85} onPress={() => router.push('/proto/states/tournaments' as any)}>
               <Text style={s.browseBtnText}>Browse Tournaments</Text>
             </TouchableOpacity>
           </View>
@@ -318,7 +320,7 @@ const s = StyleSheet.create({
   th: {
     fontFamily: Typography.fontFamilySemiBold,
     fontSize: 10,
-    color: 'rgba(255,255,255,0.55)',
+    color: Colors.tableHeaderText,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -362,7 +364,7 @@ const s = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.xs,
     lineHeight: 22,
-    maxWidth: 300,
+    maxWidth: '85%',
   },
   browseBtn: {
     marginTop: Spacing.lg,

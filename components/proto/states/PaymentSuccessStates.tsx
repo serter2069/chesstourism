@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -8,6 +9,7 @@ import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
 export default function PaymentSuccessStates() {
+  const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Full-screen payment success confirmation">
@@ -49,11 +51,11 @@ export default function PaymentSuccessStates() {
             </View>
 
             <View style={s.buttonGroup}>
-              <TouchableOpacity style={s.primaryBtn} activeOpacity={0.85}>
+              <TouchableOpacity style={s.primaryBtn} activeOpacity={0.85} onPress={() => router.push('/proto/states/my-registrations' as any)}>
                 <Feather name="list" size={16} color={Colors.primary} />
                 <Text style={s.primaryBtnText}>View My Registrations</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.secondaryBtn} activeOpacity={0.85}>
+              <TouchableOpacity style={s.secondaryBtn} activeOpacity={0.85} onPress={() => router.push('/proto/states/tournament-detail' as any)}>
                 <Feather name="arrow-left" size={16} color={Colors.text} />
                 <Text style={s.secondaryBtnText}>Back to Tournament</Text>
               </TouchableOpacity>

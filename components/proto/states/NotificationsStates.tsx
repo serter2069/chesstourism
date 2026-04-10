@@ -18,11 +18,11 @@ function Skeleton({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | num
 type NotifType = 'registration' | 'payment' | 'pairing' | 'reminder' | 'elo';
 
 const NOTIF_ICONS: Record<NotifType, { icon: string; bg: string; color: string }> = {
-  registration: { icon: 'check-circle', bg: Colors.statusSuccessBg, color: '#2E7D32' },
+  registration: { icon: 'check-circle', bg: Colors.statusSuccessBg, color: Colors.eloPositive },
   payment:      { icon: 'credit-card', bg: Colors.statusWarningBg, color: Colors.statusWarningText },
   pairing:      { icon: 'grid',        bg: Colors.statusInfoBg,    color: Colors.primary },
   reminder:     { icon: 'bell',        bg: Colors.statusWarningBg, color: Colors.statusWarningText },
-  elo:          { icon: 'trending-up', bg: Colors.statusSuccessBg, color: '#2E7D32' },
+  elo:          { icon: 'trending-up', bg: Colors.statusSuccessBg, color: Colors.eloPositive },
 };
 
 interface Notif {

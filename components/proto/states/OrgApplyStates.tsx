@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -127,6 +128,7 @@ function ApplicationForm({ errors }: { errors?: Record<string, string> }) {
 }
 
 export default function OrgApplyStates() {
+  const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Clean application form with all fields">
@@ -176,7 +178,7 @@ export default function OrgApplyStates() {
               <Feather name="mail" size={14} color={Colors.textMuted} />
               <Text style={s.successInfoText}>A confirmation email has been sent to info@geochess.org</Text>
             </View>
-            <TouchableOpacity style={s.homeBtn} activeOpacity={0.85}>
+            <TouchableOpacity style={s.homeBtn} activeOpacity={0.85} onPress={() => router.push('/proto/states/landing' as any)}>
               <Feather name="arrow-left" size={16} color={Colors.primary} />
               <Text style={s.homeBtnText}>Back to Home</Text>
             </TouchableOpacity>
@@ -338,7 +340,7 @@ const s = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: 22,
-    maxWidth: 320,
+    maxWidth: '85%',
   },
   successInfo: {
     flexDirection: 'row',

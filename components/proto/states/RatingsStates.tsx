@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -51,11 +52,11 @@ function RankBadge({ rank }: { rank: number }) {
   return <Text style={s.rankNum}>{rank}</Text>;
 }
 
-function PlayerRow({ p, highlighted }: { p: typeof PLAYERS[0]; highlighted?: boolean }) {
+function PlayerRow({ p, highlighted, onPress }: { p: typeof PLAYERS[0]; highlighted?: boolean; onPress?: () => void }) {
   const changeColor = p.change > 0 ? Colors.eloPositive : p.change < 0 ? Colors.eloNegative : Colors.textMuted;
   const changeText = p.change > 0 ? `+${p.change}` : p.change < 0 ? `${p.change}` : '0';
   return (
-    <View style={[s.row, highlighted && s.rowHighlighted]}>
+    <TouchableOpacity style={[s.row, highlighted && s.rowHighlighted]} activeOpacity={0.7} onPress={onPress}>
       <View style={s.rankCell}>
         <RankBadge rank={p.rank} />
       </View>
@@ -71,7 +72,7 @@ function PlayerRow({ p, highlighted }: { p: typeof PLAYERS[0]; highlighted?: boo
         <Text style={[s.changeText, { color: changeColor }]}>{changeText}</Text>
       </View>
       <Text style={s.gamesCell}>{p.games}</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -87,12 +88,12 @@ function TableHeader() {
   );
 }
 
-function RatingsTable({ players, highlightRank }: { players: typeof PLAYERS; highlightRank?: number }) {
+function RatingsTable({ players, highlightRank, onPlayerPress }: { players: typeof PLAYERS; highlightRank?: number; onPlayerPress?: (name: string) => void }) {
   return (
     <View style={s.tableWrap}>
       <TableHeader />
       {players.map((p, i) => (
-        <PlayerRow key={p.rank} p={p} highlighted={p.rank === highlightRank} />
+        <PlayerRow key={p.rank} p={p} highlighted={p.rank === highlightRank} onPress={() => onPlayerPress?.(p.name)} />
       ))}
     </View>
   );
@@ -100,6 +101,9 @@ function RatingsTable({ players, highlightRank }: { players: typeof PLAYERS; hig
 
 export default function RatingsStates() {
   const [tab, setTab] = useState(0);
+  const router = useRouter();
+  const navToUserProfile = () => router.push('/proto/states/user-profile' as any);
+  const navToEloHistory = () => router.push('/proto/states/elo-history' as any);
 
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
@@ -109,7 +113,7 @@ export default function RatingsStates() {
           <Text style={s.pageTitle}>World Rankings</Text>
           <Text style={s.pageSubtitle}>Global ELO rating leaderboard</Text>
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={0} onSelect={setTab} />
-          <RatingsTable players={PLAYERS} />
+          <RatingsTable players={PLAYERS} onPlayerPress={navToUserProfile} />
         </View>
       </StateSection>
 
@@ -118,7 +122,7 @@ export default function RatingsStates() {
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={2} onSelect={() => {}} />
-          <RatingsTable players={PLAYERS.map((p, i) => ({ ...p, elo: p.elo - 30 + i * 3, change: p.change + (i % 3 === 0 ? 2 : -1) }))} />
+          <RatingsTable players={PLAYERS.map((p, i) => ({ ...p, elo: p.elo - 30 + i * 3, change: p.change + (i % 3 === 0 ? 2 : -1) }))} onPlayerPress={navToUserProfile} />
         </View>
       </StateSection>
 
@@ -154,16 +158,16 @@ export default function RatingsStates() {
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={0} onSelect={() => {}} />
-          <RatingsTable players={PLAYERS.slice(0, 5)} />
+          <RatingsTable players={PLAYERS.slice(0, 5)} onPlayerPress={navToUserProfile} />
           <View style={s.separator}>
             <View style={s.separatorLine} />
             <Text style={s.separatorText}>Your position</Text>
             <View style={s.separatorLine} />
           </View>
           <View style={s.tableWrap}>
-            <PlayerRow p={{ rank: 155, name: 'Dimitri Volkov', country: 'Ukraine', elo: 2158, change: -1, games: 32 }} />
-            <PlayerRow p={{ rank: 156, name: 'Magnus Eriksson', country: 'Sweden', elo: 2156, change: +12, games: 28 }} highlighted />
-            <PlayerRow p={{ rank: 157, name: 'Carlos Mendez', country: 'Spain', elo: 2154, change: +3, games: 35 }} />
+            <PlayerRow p={{ rank: 155, name: 'Dimitri Volkov', country: 'Ukraine', elo: 2158, change: -1, games: 32 }} onPress={navToUserProfile} />
+            <PlayerRow p={{ rank: 156, name: 'Magnus Eriksson', country: 'Sweden', elo: 2156, change: +12, games: 28 }} highlighted onPress={navToEloHistory} />
+            <PlayerRow p={{ rank: 157, name: 'Carlos Mendez', country: 'Spain', elo: 2154, change: +3, games: 35 }} onPress={navToUserProfile} />
           </View>
         </View>
       </StateSection>
@@ -229,7 +233,7 @@ const s = StyleSheet.create({
   th: {
     fontFamily: Typography.fontFamilySemiBold,
     fontSize: 10,
-    color: 'rgba(255,255,255,0.55)',
+    color: Colors.tableHeaderText,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },

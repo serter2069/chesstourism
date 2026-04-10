@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
@@ -30,6 +31,7 @@ function SearchForm() {
 }
 
 export default function CertVerifyStates() {
+  const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Certificate lookup page with search field">
@@ -70,10 +72,13 @@ export default function CertVerifyStates() {
                 <Text style={s.certValue}>Magnus Eriksson</Text>
               </View>
               <View style={s.certDivider} />
-              <View style={s.certRow}>
+              <TouchableOpacity style={s.certRow} onPress={() => router.push('/proto/states/tournament-detail' as any)} activeOpacity={0.7}>
                 <Text style={s.certLabel}>Tournament</Text>
-                <Text style={s.certValue}>Tbilisi Open 2025</Text>
-              </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={[s.certValue, { color: Colors.gold }]}>Tbilisi Open 2025</Text>
+                  <Feather name="external-link" size={12} color={Colors.gold} />
+                </View>
+              </TouchableOpacity>
               <View style={s.certDivider} />
               <View style={s.certRow}>
                 <Text style={s.certLabel}>Result</Text>
@@ -192,7 +197,7 @@ const s = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: 22,
-    maxWidth: 340,
+    maxWidth: '85%',
   },
   searchSection: {
     gap: Spacing.md,

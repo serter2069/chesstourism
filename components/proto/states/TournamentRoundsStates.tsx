@@ -232,7 +232,7 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: 8,
     borderBottomLeftRadius: 0, borderBottomRightRadius: 0, marginTop: Spacing.lg, marginBottom: 1,
   },
-  thText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 11, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 0.5 },
+  thText: { fontFamily: Typography.fontFamilySemiBold, fontSize: 11, color: Colors.tableHeaderText, textTransform: 'uppercase', letterSpacing: 0.5 },
   pairingRow: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: Spacing.md, paddingVertical: 10,
@@ -255,7 +255,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.primary, padding: Spacing.md, borderRadius: 12, marginBottom: Spacing.lg,
   },
   completedTitle: { fontFamily: Typography.fontFamilySemiBold, fontSize: Typography.sizes.base, color: Colors.gold },
-  completedDesc: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
+  completedDesc: { fontFamily: Typography.fontFamily, fontSize: Typography.sizes.xs, color: Colors.lightTextOnDark, marginTop: 2 },
   finalizeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm,
     backgroundColor: Colors.gold, borderRadius: 8, paddingVertical: 14, marginTop: Spacing.lg,

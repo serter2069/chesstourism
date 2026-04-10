@@ -45,12 +45,12 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function FilterBar() {
+function FilterBar({ searchValue, onSearchChange }: { searchValue?: string; onSearchChange?: (v: string) => void }) {
   return (
     <View style={s.filterBar}>
       <View style={s.searchWrap}>
         <Feather name="search" size={14} color={MUTED} />
-        <TextInput style={s.searchInput} placeholder="Search users..." placeholderTextColor={MUTED} />
+        <TextInput style={s.searchInput} placeholder="Search users..." placeholderTextColor={MUTED} value={searchValue} onChangeText={onSearchChange} />
       </View>
       <View style={s.filterGroup}>
         <View style={s.selectWrap}>
@@ -118,6 +118,8 @@ function SkeletonRow() {
 }
 
 export default function AdminUsersStates() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
@@ -126,7 +128,7 @@ export default function AdminUsersStates() {
           <ProtoNav variant="admin" activeTab="users" />
           <View style={s.content}>
             <Text style={s.heading}>Users Management</Text>
-            <FilterBar />
+            <FilterBar searchValue={searchQuery} onSearchChange={setSearchQuery} />
             <UsersTable users={USERS} />
           </View>
         </View>

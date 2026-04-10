@@ -49,14 +49,14 @@ function EditForm({ activeTournament, saving, saved, showCancel }: {
 
         {activeTournament && (
           <View style={s.warningBanner}>
-            <Feather name="alert-triangle" size={16} color="#7A5C1E" />
+            <Feather name="alert-triangle" size={16} color={Colors.statusWarningText} />
             <Text style={s.warningText}>Editing an active tournament. Some fields are locked.</Text>
           </View>
         )}
 
         {saved && (
           <View style={s.successBanner}>
-            <Feather name="check-circle" size={16} color="#1A6B3A" />
+            <Feather name="check-circle" size={16} color={Colors.successGreen} />
             <Text style={s.successText}>Tournament updated successfully</Text>
           </View>
         )}
@@ -177,12 +177,12 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     backgroundColor: Colors.statusWarningBg, padding: Spacing.md, borderRadius: 8, marginBottom: Spacing.md,
   },
-  warningText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: '#7A5C1E', flex: 1 },
+  warningText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: Colors.statusWarningText, flex: 1 },
   successBanner: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     backgroundColor: Colors.statusSuccessBg, padding: Spacing.md, borderRadius: 8, marginBottom: Spacing.md,
   },
-  successText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: '#1A6B3A' },
+  successText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: Colors.successGreen },
   sectionTitle: {
     fontFamily: Typography.fontFamilySemiBold, fontSize: Typography.sizes.lg, color: Colors.text,
     marginTop: Spacing.lg, marginBottom: Spacing.md, paddingTop: Spacing.md,
@@ -216,7 +216,7 @@ const s = StyleSheet.create({
   cancelBtnText: { fontFamily: Typography.fontFamilyMedium, fontSize: Typography.sizes.sm, color: Colors.error },
   modalOverlay: {
     position: 'absolute' as any, top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: Spacing.xl,
+    backgroundColor: Colors.overlay, justifyContent: 'center', alignItems: 'center', padding: Spacing.xl,
   },
   modal: {
     backgroundColor: Colors.background, borderRadius: 16, padding: Spacing.xl,
