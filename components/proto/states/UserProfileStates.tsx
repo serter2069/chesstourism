@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
@@ -91,11 +91,16 @@ export default function UserProfileStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Public user profile with ELO, stats, and tournament history">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <ProfileDefault onEloHistory={navToEloHistory} />
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton loading state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.profileHeader}>
@@ -123,9 +128,12 @@ export default function UserProfileStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="NOT_FOUND" description="404 - user not found">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.notFoundState}>
@@ -138,7 +146,8 @@ export default function UserProfileStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

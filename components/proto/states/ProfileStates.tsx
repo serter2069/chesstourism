@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -184,24 +184,59 @@ export default function ProfileStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Profile view mode, fields read-only">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <ProfileContent />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="EDITING" description="Fields active and editable">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <ProfileContent editing />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="SAVING" description="Save button with spinner, fields locked">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <ProfileContent saving />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="SAVED" description="Success toast banner after save">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <ProfileContent saved />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="FIDE_LINKED" description="FIDE ID verified with green checkmark badge">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <ProfileContent fideLinked />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

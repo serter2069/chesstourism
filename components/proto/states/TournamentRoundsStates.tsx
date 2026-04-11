@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -31,7 +31,7 @@ const PAIRINGS = [
 
 function StatusBadge({ status }: { status: string }) {
   const meta: Record<string, { bg: string; color: string }> = {
-    Completed: { bg: Colors.statusSuccessBg, color: '#1A6B3A' },
+    Completed: { bg: Colors.statusSuccessBg, color: Colors.successGreen },
     Active: { bg: Colors.statusInfoBg, color: Colors.primary },
     Upcoming: { bg: Colors.backgroundAlt, color: Colors.textMuted },
   };
@@ -184,17 +184,45 @@ export default function TournamentRoundsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Round list with statuses and actions">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="PAIRINGS_VIEW" description="Expanded round showing pairing table">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PairingsView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="GENERATING" description="Generating Swiss pairings spinner">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <GeneratingView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="COMPLETED_ROUND" description="All rounds complete, finalize CTA">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <CompletedView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

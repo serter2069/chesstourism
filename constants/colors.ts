@@ -40,6 +40,24 @@ export const Colors = {
   successGreen: '#1A6B3A',
   warningBrown: '#7A5C1E',
 
+  // Admin dark theme
+  adminBg: '#0f1318',
+  adminCard: '#1a2030',
+  adminText: '#e0e4ef',
+  adminMuted: '#8090a8',
+  adminAccent: '#e07070',
+  adminBorder: '#2a3040',
+  adminGreen: '#4caf50',
+  adminYellow: '#ffc107',
+  adminBlue: '#6b9fd4',
+  adminRed: '#e07070',
+  adminInputBg: '#141a28',
+  adminAlertBg: '#2d2a1a',
+  adminAlertBorder: '#5a4a1a',
+  adminIconBg: '#2a1a2a',
+  adminDangerBg: '#3a1a1a',
+  adminApproveBg: '#1a3a1a',
+
   // Skeleton placeholder
   skeleton: '#E8ECF0',
 

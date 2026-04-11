@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
@@ -35,6 +35,8 @@ export default function CertVerifyStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Certificate lookup page with search field">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.headerSection}>
@@ -46,9 +48,12 @@ export default function CertVerifyStates() {
           </View>
           <SearchForm />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="VALID" description="Certificate found and verified">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.headerSection}>
@@ -115,9 +120,12 @@ export default function CertVerifyStates() {
             </View>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="INVALID" description="Certificate not found or invalid">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.headerSection}>
@@ -139,9 +147,12 @@ export default function CertVerifyStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Verifying certificate with spinner">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.headerSection}>
@@ -171,7 +182,8 @@ export default function CertVerifyStates() {
             <Text style={s.loadingSubtext}>This may take a few seconds</Text>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

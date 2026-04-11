@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -109,7 +109,7 @@ function UploadingView() {
         </View>
         {['round3_game1.jpg', 'opening_ceremony.jpg', 'venue_exterior.jpg'].map((f, i) => (
           <View key={f} style={s.fileRow}>
-            <Feather name={i === 0 ? 'check-circle' : i === 1 ? 'loader' : 'clock'} size={16} color={i === 0 ? '#1A6B3A' : Colors.textMuted} />
+            <Feather name={i === 0 ? 'check-circle' : i === 1 ? 'loader' : 'clock'} size={16} color={i === 0 ? Colors.successGreen : Colors.textMuted} />
             <Text style={[s.fileName, i === 0 && { color: Colors.successGreen }]}>{f}</Text>
             <Text style={s.fileStatus}>{i === 0 ? 'Done' : i === 1 ? 'Uploading...' : 'Pending'}</Text>
           </View>
@@ -173,20 +173,55 @@ export default function TournamentPhotosStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Photo gallery grid with 12 photos">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="UPLOAD_MODE" description="Upload area with selected files list">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <UploadView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="UPLOADING" description="Upload in progress with progress bar">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <UploadingView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="DELETE_MODE" description="Delete mode with X badges on each photo">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DeleteView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="EMPTY" description="No photos uploaded yet">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

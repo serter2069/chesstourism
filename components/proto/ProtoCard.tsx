@@ -15,7 +15,7 @@ const navColors: Record<NavVariant, { bg: string; text: string }> = {
   public: { bg: Colors.statusInfoBg, text: Colors.statusInfoText },
   auth: { bg: Colors.statusWarningBg, text: Colors.statusWarningText },
   client: { bg: Colors.statusSuccessBg, text: Colors.statusSuccessText },
-  admin: { bg: '#2d1a1a', text: '#e07070' },
+  admin: { bg: Colors.adminDangerBg, text: Colors.adminAccent },
 };
 
 export default function ProtoCard({ page }: ProtoCardProps) {

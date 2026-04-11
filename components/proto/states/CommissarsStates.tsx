@@ -107,6 +107,8 @@ export default function CommissarsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Commissar catalog with search and filter">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
@@ -120,9 +122,12 @@ export default function CommissarsStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="FILTERED" description="2 results after filtering by country">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
@@ -144,9 +149,12 @@ export default function CommissarsStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton loading cards">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
@@ -157,9 +165,12 @@ export default function CommissarsStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="EMPTY" description="No commissars found">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
@@ -170,9 +181,12 @@ export default function CommissarsStates() {
             <Text style={s.emptySubtitle}>Try a different search or filter</Text>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="COMMISSAR_DETAIL_HOVER" description="One card highlighted/selected">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
@@ -185,7 +199,8 @@ export default function CommissarsStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

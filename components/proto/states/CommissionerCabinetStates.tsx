@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -186,14 +186,35 @@ export default function CommissionerCabinetStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Commissioner cabinet with stats, tournaments, activity feed, and verification banner">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <CabinetContent />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="VERIFIED" description="Verified commissioner - gold badge visible, no verification banner">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <CabinetContent verified />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="LOADING" description="Skeleton loading state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <LoadingContent />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

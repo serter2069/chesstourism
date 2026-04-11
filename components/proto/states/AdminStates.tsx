@@ -1,19 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const YELLOW = '#ffc107';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const YELLOW = Colors.adminYellow;
 
 function StatCard({ label, value, icon, iconColor }: { label: string; value: string; icon: string; iconColor?: string }) {
   return (
@@ -62,7 +63,7 @@ export default function AdminStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Admin dashboard with stats, activity feed, system status">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <Text style={s.heading}>Admin Dashboard</Text>
@@ -107,11 +108,11 @@ export default function AdminStates() {
 
       {/* STATE: ALERT_STATE */}
       <StateSection title="ALERT_STATE" description="Payment gateway degraded warning">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <View style={s.alertBanner}>
-              <Feather name="alert-triangle" size={16} color="#ffc107" />
+              <Feather name="alert-triangle" size={16} color={Colors.adminYellow} />
               <Text style={s.alertText}>Payment gateway degraded - some transactions may fail</Text>
             </View>
 
@@ -136,7 +137,7 @@ export default function AdminStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <Text style={s.heading}>Admin Dashboard</Text>
@@ -202,7 +203,7 @@ const s = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#2a1a2a',
+    backgroundColor: Colors.adminIconBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -294,21 +295,21 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    backgroundColor: '#2d2a1a',
+    backgroundColor: Colors.adminAlertBg,
     borderRadius: 6,
     padding: Spacing.md,
     marginBottom: Spacing.md,
     borderWidth: 1,
-    borderColor: '#5a4a1a',
+    borderColor: Colors.adminAlertBorder,
   },
   alertText: {
     fontSize: Typography.sizes.sm,
     fontFamily: Typography.fontFamilyMedium,
-    color: '#ffc107',
+    color: Colors.adminYellow,
     flex: 1,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
 });

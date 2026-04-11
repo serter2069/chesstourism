@@ -16,11 +16,11 @@ interface ProtoPlaceholderImageProps {
 }
 
 const typeConfig: Record<PlaceholderType, { icon: string; label: string; bg: string; fg: string }> = {
-  avatar:       { icon: 'user',       label: 'Avatar',       bg: '#1e2a3a', fg: Colors.textMuted },
-  photo:        { icon: 'image',      label: 'Photo',        bg: '#1a2430', fg: Colors.textMuted },
-  document:     { icon: 'file-text',  label: 'Document',     bg: '#1e2535', fg: Colors.textMuted },
-  illustration: { icon: 'aperture',   label: 'Illustration', bg: '#1c2840', fg: Colors.textMuted },
-  banner:       { icon: 'layout',     label: 'Banner',       bg: '#1a2030', fg: Colors.textMuted },
+  avatar:       { icon: 'user',       label: 'Avatar',       bg: Colors.adminInputBg, fg: Colors.textMuted },
+  photo:        { icon: 'image',      label: 'Photo',        bg: Colors.adminInputBg, fg: Colors.textMuted },
+  document:     { icon: 'file-text',  label: 'Document',     bg: Colors.adminInputBg, fg: Colors.textMuted },
+  illustration: { icon: 'aperture',   label: 'Illustration', bg: Colors.adminInputBg, fg: Colors.textMuted },
+  banner:       { icon: 'layout',     label: 'Banner',       bg: Colors.adminCard,    fg: Colors.textMuted },
 };
 
 export default function ProtoPlaceholderImage({

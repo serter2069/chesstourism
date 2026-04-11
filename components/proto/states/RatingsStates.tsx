@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
@@ -108,6 +108,8 @@ export default function RatingsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Full rating table with top 10 players, All category">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
@@ -115,18 +117,24 @@ export default function RatingsStates() {
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={0} onSelect={setTab} />
           <RatingsTable players={PLAYERS} onPlayerPress={navToUserProfile} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="FILTERED_RAPID" description="Rapid category selected">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={2} onSelect={() => {}} />
           <RatingsTable players={PLAYERS.map((p, i) => ({ ...p, elo: p.elo - 30 + i * 3, change: p.change + (i % 3 === 0 ? 2 : -1) }))} onPlayerPress={navToUserProfile} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton table rows">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
@@ -151,9 +159,12 @@ export default function RatingsStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="MY_POSITION" description="User's rank highlighted at #156">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
@@ -170,7 +181,8 @@ export default function RatingsStates() {
             <PlayerRow p={{ rank: 157, name: 'Carlos Mendez', country: 'Spain', elo: 2154, change: +3, games: 35 }} onPress={navToUserProfile} />
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

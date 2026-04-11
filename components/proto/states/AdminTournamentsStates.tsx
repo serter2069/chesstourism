@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const YELLOW = '#ffc107';
-const BLUE = '#6b9fd4';
-const RED = '#e07070';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const YELLOW = Colors.adminYellow;
+const BLUE = Colors.adminBlue;
+const RED = Colors.adminRed;
 
 const TOURNAMENTS = [
   { name: 'Tbilisi Open 2025', commissar: 'Giorgi Beridze', country: 'Georgia', dates: 'Jun 15-22, 2025', participants: '24/32', status: 'Open' },
@@ -114,7 +115,7 @@ export default function AdminTournamentsStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="All tournaments with filter tabs">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="tournaments" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
@@ -126,7 +127,7 @@ export default function AdminTournamentsStates() {
 
       {/* STATE: TOURNAMENT_DETAIL */}
       <StateSection title="TOURNAMENT_DETAIL" description="Expanded tournament info panel">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="tournaments" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
@@ -155,7 +156,7 @@ export default function AdminTournamentsStates() {
 
       {/* STATE: CANCEL_CONFIRM */}
       <StateSection title="CANCEL_CONFIRM" description="Tournament cancellation confirmation modal">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="tournaments" />
           <View style={s.content}>
             <View style={s.modalOverlay}>
@@ -180,7 +181,7 @@ export default function AdminTournamentsStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading for tournaments table">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="tournaments" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
@@ -203,7 +204,7 @@ export default function AdminTournamentsStates() {
 
       {/* STATE: FILTERS_ACTIVE */}
       <StateSection title="FILTERS_ACTIVE" description="Filtered to show only In Progress tournaments">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="tournaments" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
@@ -279,7 +280,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -326,10 +327,10 @@ const s = StyleSheet.create({
   actionLink: {
     fontSize: Typography.sizes.xs,
     fontFamily: Typography.fontFamilyMedium,
-    color: '#6b9fd4',
+    color: Colors.adminBlue,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
   detailPanel: {
@@ -431,7 +432,7 @@ const s = StyleSheet.create({
     color: TEXT,
   },
   btnDanger: {
-    backgroundColor: '#3a1a1a',
+    backgroundColor: Colors.adminDangerBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,

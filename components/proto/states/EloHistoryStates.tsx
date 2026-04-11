@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
@@ -122,6 +122,8 @@ export default function EloHistoryStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="My ELO history with chart placeholder and table">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
@@ -135,9 +137,12 @@ export default function EloHistoryStates() {
           <View style={s.chartSpacer} />
           <HistoryTable data={HISTORY} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="ANOTHER_USER" description="Viewing another player's ELO history">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
@@ -151,9 +156,12 @@ export default function EloHistoryStates() {
           <View style={s.chartSpacer} />
           <HistoryTable data={HISTORY.map(h => ({ ...h, before: h.before + 650, after: h.after + 650 }))} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton loading state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
@@ -186,9 +194,12 @@ export default function EloHistoryStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="NO_HISTORY" description="New player, no tournament history">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
@@ -203,9 +214,12 @@ export default function EloHistoryStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LONG_HISTORY" description="Many rows with pagination">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
@@ -220,7 +234,8 @@ export default function EloHistoryStates() {
           <HistoryTable data={LONG_HISTORY} />
           <Pagination current={1} total={4} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const RED = '#e07070';
-const YELLOW = '#ffc107';
-const BLUE = '#6b9fd4';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const RED = Colors.adminRed;
+const YELLOW = Colors.adminYellow;
+const BLUE = Colors.adminBlue;
 
 const ORGS = [
   { name: 'Tbilisi Chess Federation', country: 'Georgia', contact: 'info@tchess.ge', date: '2026-04-01', status: 'Pending' },
@@ -84,7 +85,7 @@ export default function AdminOrganizationsStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Organizations list with pending applications highlighted">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
@@ -95,7 +96,7 @@ export default function AdminOrganizationsStates() {
 
       {/* STATE: REVIEW_MODAL */}
       <StateSection title="REVIEW_MODAL" description="Full application review modal">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
@@ -128,8 +129,8 @@ export default function AdminOrganizationsStates() {
                 <Text style={s.reviewDesc}>The Tbilisi Chess Federation has been organizing international chess events since 1995. We host annual open tournaments at the Tbilisi Chess Palace with capacity for 200 players across multiple halls.</Text>
 
                 <View style={s.reviewActions}>
-                  <TouchableOpacity style={s.btnApprove}><Feather name="check" size={14} color="#fff" /><Text style={s.btnApproveText}>Approve</Text></TouchableOpacity>
-                  <TouchableOpacity style={s.btnReject}><Feather name="x" size={14} color="#fff" /><Text style={s.btnRejectText}>Reject</Text></TouchableOpacity>
+                  <TouchableOpacity style={s.btnApprove}><Feather name="check" size={14} color={Colors.white} /><Text style={s.btnApproveText}>Approve</Text></TouchableOpacity>
+                  <TouchableOpacity style={s.btnReject}><Feather name="x" size={14} color={Colors.white} /><Text style={s.btnRejectText}>Reject</Text></TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -139,7 +140,7 @@ export default function AdminOrganizationsStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
@@ -160,7 +161,7 @@ export default function AdminOrganizationsStates() {
 
       {/* STATE: EMPTY */}
       <StateSection title="EMPTY" description="No pending applications">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
@@ -196,7 +197,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -216,7 +217,7 @@ const s = StyleSheet.create({
     borderBottomColor: BORDER,
   },
   pendingRow: {
-    backgroundColor: '#1e2535',
+    backgroundColor: Colors.adminInputBg,
   },
   td: {
     fontSize: Typography.sizes.sm,
@@ -246,10 +247,10 @@ const s = StyleSheet.create({
   actionLink: {
     fontSize: Typography.sizes.xs,
     fontFamily: Typography.fontFamilyMedium,
-    color: '#6b9fd4',
+    color: Colors.adminBlue,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
   modalOverlay: {
@@ -324,7 +325,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    backgroundColor: '#1a3a1a',
+    backgroundColor: Colors.adminApproveBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -340,7 +341,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    backgroundColor: '#3a1a1a',
+    backgroundColor: Colors.adminDangerBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,

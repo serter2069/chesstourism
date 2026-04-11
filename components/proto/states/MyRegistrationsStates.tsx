@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -251,20 +251,48 @@ export default function MyRegistrationsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Upcoming tab active with 2 registrations, tabs interactive">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="PAST_TAB" description="Past tab active showing tournament results">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PastTabState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton list placeholders">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <LoadingState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="EMPTY" description="No registrations ever, CTA to browse">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

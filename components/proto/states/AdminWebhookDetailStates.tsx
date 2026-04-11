@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { useRouter } from 'expo-router';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const RED = '#e07070';
-const BLUE = '#6b9fd4';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const RED = Colors.adminRed;
+const BLUE = Colors.adminBlue;
 
 const LOGS = [
   { time: '2026-04-09 14:23', event: 'payment.completed', status: 'success', code: '200 OK', duration: '143ms' },
@@ -77,7 +78,7 @@ export default function AdminWebhookDetailStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Webhook detail with config, stats, and delivery logs">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <View style={s.headerRow}>
@@ -159,7 +160,7 @@ export default function AdminWebhookDetailStates() {
 
       {/* STATE: EDIT_MODE */}
       <StateSection title="EDIT_MODE" description="Configuration section in editable form mode">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <View style={s.headerRow}>
@@ -171,7 +172,7 @@ export default function AdminWebhookDetailStates() {
               </View>
               <View style={s.headerActions}>
                 <TouchableOpacity style={s.btnPrimary}>
-                  <Feather name="save" size={14} color="#fff" />
+                  <Feather name="save" size={14} color={Colors.white} />
                   <Text style={s.btnPrimaryText}>Save</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={s.btnOutline}>
@@ -203,7 +204,7 @@ export default function AdminWebhookDetailStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state for webhook detail">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <View style={[s.skeleton, { width: '60%', height: 24, marginBottom: Spacing.md }]} />
@@ -319,7 +320,7 @@ const s = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: Spacing.sm,
     borderRadius: 4,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderWidth: 1,
     borderColor: BORDER,
   },
@@ -386,7 +387,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -455,7 +456,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    backgroundColor: '#3a1a1a',
+    backgroundColor: Colors.adminDangerBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -479,7 +480,7 @@ const s = StyleSheet.create({
   btnPrimaryText: {
     fontSize: Typography.sizes.sm,
     fontFamily: Typography.fontFamilyMedium,
-    color: '#fff',
+    color: Colors.white,
   },
   editForm: {
     backgroundColor: CARD,
@@ -497,7 +498,7 @@ const s = StyleSheet.create({
   formInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -517,7 +518,7 @@ const s = StyleSheet.create({
     marginTop: Spacing.md,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
 });

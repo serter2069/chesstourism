@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { useRouter } from 'expo-router';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const BLUE = '#6b9fd4';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const BLUE = Colors.adminBlue;
 
 const WEBHOOKS = [
   { url: 'https://api.partner1.com/hooks/chess', events: 'payment.completed, registration.created', status: 'Active', lastTriggered: '2 min ago', successRate: '99.2%' },
@@ -58,7 +59,7 @@ export default function AdminWebhooksStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Webhook endpoints list with status and success rates">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <View style={s.headerRow}>
@@ -93,7 +94,7 @@ export default function AdminWebhooksStates() {
 
       {/* STATE: ADD_WEBHOOK */}
       <StateSection title="ADD_WEBHOOK" description="Add webhook form with URL, events, and secret key">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <Text style={s.heading}>Webhooks</Text>
@@ -137,7 +138,7 @@ export default function AdminWebhooksStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <Text style={s.heading}>Webhooks</Text>
@@ -165,7 +166,7 @@ export default function AdminWebhooksStates() {
 
       {/* STATE: WEBHOOK_TEST */}
       <StateSection title="WEBHOOK_TEST" description="Test panel with event dropdown and request/response preview">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="dashboard" />
           <View style={s.content}>
             <Text style={s.heading}>Webhooks</Text>
@@ -254,7 +255,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -299,7 +300,7 @@ const s = StyleSheet.create({
     fontFamily: Typography.fontFamilyMedium,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
   modalOverlay: {
@@ -333,7 +334,7 @@ const s = StyleSheet.create({
   formInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -361,7 +362,7 @@ const s = StyleSheet.create({
     borderRadius: 3,
     borderWidth: 1,
     borderColor: BORDER,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -401,7 +402,7 @@ const s = StyleSheet.create({
   btnPrimaryText: {
     fontSize: Typography.sizes.sm,
     fontFamily: Typography.fontFamilyMedium,
-    color: '#fff',
+    color: Colors.white,
   },
   testPanel: {
     backgroundColor: CARD,
@@ -420,7 +421,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
@@ -450,7 +451,7 @@ const s = StyleSheet.create({
     color: BLUE,
   },
   codeBlock: {
-    backgroundColor: '#0a0e14',
+    backgroundColor: Colors.adminBg,
     borderRadius: 6,
     padding: Spacing.md,
     borderWidth: 1,

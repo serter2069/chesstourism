@@ -763,14 +763,35 @@ export default function LandingStates() {
   return (
     <>
       <StateSection title="default" description="Full landing page — desktop + mobile responsive">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <FullPage />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="loading" description="Loading state — skeleton placeholders">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <FullPage isLoading />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="empty_tournaments" description="No upcoming tournaments scheduled">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <FullPage isEmpty />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </>
   );
 }

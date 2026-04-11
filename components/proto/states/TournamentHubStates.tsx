@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -11,7 +11,7 @@ import { Typography } from '../../../constants/typography';
 
 function StatusBadge({ status }: { status: string }) {
   const meta: Record<string, { bg: string; color: string }> = {
-    OPEN: { bg: Colors.statusSuccessBg, color: '#1A6B3A' },
+    OPEN: { bg: Colors.statusSuccessBg, color: Colors.successGreen },
     'IN PROGRESS': { bg: Colors.statusInfoBg, color: Colors.primary },
     COMPLETED: { bg: Colors.backgroundAlt, color: Colors.textMuted },
   };
@@ -124,14 +124,35 @@ export default function TournamentHubStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Tournament hub with status OPEN, action cards grid">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <HubContent status="OPEN" currentRound={3} />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="IN_PROGRESS" description="Tournament in progress, Start Next Round button visible">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <HubContent status="IN PROGRESS" currentRound={3} showStartNext />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="COMPLETED" description="Tournament completed, final results and certificates">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <HubContent status="COMPLETED" currentRound={7} showFinalResults />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

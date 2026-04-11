@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { useRouter } from 'expo-router';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const RED = '#e07070';
-const YELLOW = '#ffc107';
-const GREEN = '#4caf50';
-const BLUE = '#6b9fd4';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const RED = Colors.adminRed;
+const YELLOW = Colors.adminYellow;
+const GREEN = Colors.adminGreen;
+const BLUE = Colors.adminBlue;
 
 const DISPUTES = [
   { id: 'DSP-001', title: 'Result Dispute - Oslo Rapid Cup', priority: 'High', complainant: 'Magnus Eriksson', against: 'Erik Halvorsen', tournament: 'Oslo Rapid Cup', admin: 'System Admin', status: 'Open' },
@@ -55,7 +56,7 @@ export default function AdminModerationStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Disputes, reports, flags tabs with open items">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
@@ -97,7 +98,7 @@ export default function AdminModerationStates() {
 
       {/* STATE: DISPUTE_DETAIL */}
       <StateSection title="DISPUTE_DETAIL" description="Dispute detail with timeline, messages, resolution options">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
@@ -160,7 +161,7 @@ export default function AdminModerationStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
@@ -189,7 +190,7 @@ export default function AdminModerationStates() {
 
       {/* STATE: ALL_RESOLVED */}
       <StateSection title="ALL_RESOLVED" description="All tabs showing empty, all clear">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
@@ -259,7 +260,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -314,7 +315,7 @@ const s = StyleSheet.create({
     color: BLUE,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
   detailPanel: {
@@ -348,7 +349,7 @@ const s = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -366,7 +367,7 @@ const s = StyleSheet.create({
     color: TEXT,
   },
   messageCard: {
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
@@ -386,7 +387,7 @@ const s = StyleSheet.create({
     lineHeight: 20,
   },
   textarea: {
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     padding: Spacing.md,
     borderWidth: 1,
@@ -408,7 +409,7 @@ const s = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: BORDER,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
   },
   resolutionText: {
     fontSize: Typography.sizes.sm,

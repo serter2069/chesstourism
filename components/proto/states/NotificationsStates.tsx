@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -148,20 +148,48 @@ export default function NotificationsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Mix of unread (blue border, bold) and read notifications">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="ALL_READ" description="All notifications read, no blue borders">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <AllReadState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton notification rows">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <LoadingState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="EMPTY" description="No notifications yet">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

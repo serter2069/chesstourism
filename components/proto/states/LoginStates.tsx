@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -100,28 +100,28 @@ export default function LoginStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Centered login card with email input, gold CTA, Google sign-in">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="auth" />
           <LoginCard email={email1} onChangeEmail={setEmail1} />
         </View>
       </StateSection>
 
       <StateSection title="EMAIL_ENTERED" description="Email filled, Send Code button highlighted">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="auth" />
           <LoginCard email={email2} onChangeEmail={setEmail2} />
         </View>
       </StateSection>
 
       <StateSection title="LOADING" description="Sending code, spinner in button, fields disabled">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="auth" />
           <LoginCard email="magnus@example.com" onChangeEmail={() => {}} loading />
         </View>
       </StateSection>
 
       <StateSection title="ERROR" description="No account found error below email field">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="auth" />
           <LoginCard
             email="unknown@example.com"
@@ -132,7 +132,7 @@ export default function LoginStates() {
       </StateSection>
 
       <StateSection title="RATE_LIMITED" description="Too many attempts warning with countdown">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="auth" />
           <LoginCard email="magnus@example.com" onChangeEmail={() => {}} rateLimited />
         </View>

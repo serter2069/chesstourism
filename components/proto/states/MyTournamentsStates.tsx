@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -221,17 +221,45 @@ export default function MyTournamentsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Active tab with tournament management cards">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PageContent tab="active" />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="DRAFT_TAB" description="Draft tournaments with Publish and Edit buttons">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PageContent tab="draft" />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="PAST_TAB" description="Past tournaments with final participant counts">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PageContent tab="past" />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="EMPTY" description="No tournaments created yet">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyContent />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

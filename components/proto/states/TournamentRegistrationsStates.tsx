@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -223,20 +223,55 @@ export default function TournamentRegistrationsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="All registrations with search and filter">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="PENDING_FILTER" description="Pending registrations with Confirm/Reject actions">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PendingView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="PLAYER_DETAIL" description="Expanded player detail card">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PlayerDetailView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="LOADING" description="Skeleton loading state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <LoadingView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="EMPTY" description="No registrations yet">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

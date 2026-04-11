@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
 import { useRouter } from 'expo-router';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const YELLOW = '#ffc107';
-const BLUE = '#6b9fd4';
-const RED = '#e07070';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const YELLOW = Colors.adminYellow;
+const BLUE = Colors.adminBlue;
+const RED = Colors.adminRed;
 
 const QUEUE = [
   { id: 'DSP-001', type: 'Result', parties: 'Magnus Eriksson vs Erik Halvorsen', tournament: 'Oslo Rapid Cup', date: '2026-04-07', sla: '14h remaining', priority: 'High' },
@@ -48,7 +49,7 @@ export default function AdminDisputesStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Dispute queue with priority colors and SLA timers">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <View style={s.headerRow}>
@@ -81,7 +82,7 @@ export default function AdminDisputesStates() {
 
       {/* STATE: DISPUTE_OPEN */}
       <StateSection title="DISPUTE_OPEN" description="Conversation thread view with resolution form">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>DSP-001: Result Dispute</Text>
@@ -152,7 +153,7 @@ export default function AdminDisputesStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Dispute Queue</Text>
@@ -171,7 +172,7 @@ export default function AdminDisputesStates() {
 
       {/* STATE: STATS */}
       <StateSection title="STATS" description="Dispute statistics overview">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="moderation" />
           <View style={s.content}>
             <Text style={s.heading}>Dispute Statistics</Text>
@@ -331,7 +332,7 @@ const s = StyleSheet.create({
     color: TEXT,
   },
   messageCard: {
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
@@ -361,7 +362,7 @@ const s = StyleSheet.create({
     lineHeight: 20,
   },
   replyInput: {
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderRadius: 6,
     padding: Spacing.md,
     borderWidth: 1,
@@ -384,7 +385,7 @@ const s = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: BORDER,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
   },
   resBtnActive: {
     borderColor: GREEN + '44',
@@ -396,7 +397,7 @@ const s = StyleSheet.create({
     color: TEXT,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
   statsRow: {

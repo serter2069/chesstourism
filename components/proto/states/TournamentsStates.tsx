@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -112,6 +112,8 @@ export default function TournamentsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Tournament catalog with filter bar and 6 cards">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
@@ -119,9 +121,12 @@ export default function TournamentsStates() {
           <FilterBar searchValue={search} onSearchChange={setSearch} />
           <TournamentsGrid tournaments={TOURNAMENTS} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="FILTERED" description="2 results after applying Georgia filter">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
@@ -134,9 +139,12 @@ export default function TournamentsStates() {
           </View>
           <TournamentsGrid tournaments={TOURNAMENTS.filter(t => t.country === 'Georgia' || t.country === 'Azerbaijan').slice(0, 2)} />
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton cards while loading">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
@@ -154,9 +162,12 @@ export default function TournamentsStates() {
             ))}
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="EMPTY" description="No results after filter, empty state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
@@ -170,7 +181,8 @@ export default function TournamentsStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

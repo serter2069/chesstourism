@@ -3,19 +3,20 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
+import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
-const BG = '#0f1318';
-const CARD = '#1a2030';
-const TEXT = '#e0e4ef';
-const MUTED = '#8090a8';
-const ACCENT = '#e07070';
-const BORDER = '#2a3040';
-const GREEN = '#4caf50';
-const YELLOW = '#ffc107';
-const BLUE = '#6b9fd4';
-const RED = '#e07070';
+const BG = Colors.adminBg;
+const CARD = Colors.adminCard;
+const TEXT = Colors.adminText;
+const MUTED = Colors.adminMuted;
+const ACCENT = Colors.adminAccent;
+const BORDER = Colors.adminBorder;
+const GREEN = Colors.adminGreen;
+const YELLOW = Colors.adminYellow;
+const BLUE = Colors.adminBlue;
+const RED = Colors.adminRed;
 
 function StatCard({ label, value, icon }: { label: string; value: string; icon: string }) {
   return (
@@ -122,7 +123,7 @@ export default function AdminFinancesStates() {
     <ScrollView style={{ backgroundColor: BG }}>
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Finance overview with summary cards and transactions table">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="finances" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
@@ -146,7 +147,7 @@ export default function AdminFinancesStates() {
 
       {/* STATE: PAYOUT_VIEW */}
       <StateSection title="PAYOUT_VIEW" description="Pending payouts list with process button">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="finances" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
@@ -182,7 +183,7 @@ export default function AdminFinancesStates() {
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading for transactions table">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="finances" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
@@ -213,7 +214,7 @@ export default function AdminFinancesStates() {
 
       {/* STATE: EXPORT_MODE */}
       <StateSection title="EXPORT_MODE" description="Export options modal with format and date range">
-        <View style={s.page}>
+        <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
           <ProtoNav variant="admin" activeTab="finances" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
@@ -237,7 +238,7 @@ export default function AdminFinancesStates() {
                 <View style={s.modalActions}>
                   <TouchableOpacity style={s.btnOutline}><Text style={s.btnOutlineText}>Cancel</Text></TouchableOpacity>
                   <TouchableOpacity style={s.btnPrimary}>
-                    <Feather name="download" size={14} color="#fff" />
+                    <Feather name="download" size={14} color={Colors.white} />
                     <Text style={s.btnPrimaryText}>Export</Text>
                   </TouchableOpacity>
                 </View>
@@ -286,7 +287,7 @@ const s = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#2a1a2a',
+    backgroundColor: Colors.adminIconBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -344,7 +345,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
   },
@@ -399,7 +400,7 @@ const s = StyleSheet.create({
     color: GREEN,
   },
   skeleton: {
-    backgroundColor: '#2a3040',
+    backgroundColor: Colors.adminBorder,
     borderRadius: 4,
   },
   modalOverlay: {
@@ -440,7 +441,7 @@ const s = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: BORDER,
-    backgroundColor: '#141a28',
+    backgroundColor: Colors.adminInputBg,
   },
   formatBtnActive: {
     backgroundColor: ACCENT + '22',
@@ -484,6 +485,6 @@ const s = StyleSheet.create({
   btnPrimaryText: {
     fontSize: Typography.sizes.sm,
     fontFamily: Typography.fontFamilyMedium,
-    color: '#fff',
+    color: Colors.white,
   },
 });

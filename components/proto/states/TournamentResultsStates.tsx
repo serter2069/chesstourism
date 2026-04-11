@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -237,20 +237,55 @@ export default function TournamentResultsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Round results entry with editable result badges">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="RESULTS_SAVED" description="Results locked, finalize button visible">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <SavedView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="STANDINGS" description="Standings table with points and Buchholz">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <StandingsView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="LOADING" description="Skeleton loading state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <LoadingView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="FINALIZED" description="All results submitted, certificates available">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <FinalizedView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

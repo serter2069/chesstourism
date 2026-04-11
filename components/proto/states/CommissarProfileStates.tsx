@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
@@ -63,6 +63,8 @@ export default function CommissarProfileStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Commissar public profile with bio, stats, tournaments">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <ProfileHeader />
@@ -99,9 +101,12 @@ export default function CommissarProfileStates() {
             <Text style={s.contactBtnText}>Contact Commissar</Text>
           </TouchableOpacity>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton loading state">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.profileHeader}>
@@ -124,9 +129,12 @@ export default function CommissarProfileStates() {
             <View style={{ height: 14, width: '70%', backgroundColor: Colors.border, borderRadius: 4 }} />
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
 
       <StateSection title="NOT_FOUND" description="404 - commissar not found">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+
         <ProtoNav variant="public" />
         <View style={s.page}>
           <View style={s.notFoundState}>
@@ -139,7 +147,8 @@ export default function CommissarProfileStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+              </View>
+</StateSection>
     </ScrollView>
   );
 }

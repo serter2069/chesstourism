@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -200,20 +200,48 @@ export default function WatchlistStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="3 tournaments in watchlist with Register and Remove actions">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <DefaultState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="REGISTER_MODAL" description="Registration confirmation modal overlay">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <ModalState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="LOADING" description="Skeleton list loading">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <LoadingState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
 
       <StateSection title="EMPTY" description="Empty watchlist with Browse Tournaments CTA">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyState />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

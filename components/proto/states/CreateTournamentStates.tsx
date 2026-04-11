@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -220,17 +220,45 @@ export default function CreateTournamentStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="STEP1_BASICS" description="Step 1 of 3 - Basic tournament info">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <Step1 />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="STEP2_SCHEDULE" description="Step 2 of 3 - Schedule and pricing">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <Step2 />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="STEP3_REVIEW" description="Step 3 of 3 - Summary and publish">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <Step3 />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="PUBLISHING" description="Publishing in progress">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <Publishing />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

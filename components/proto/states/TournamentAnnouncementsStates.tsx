@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
 import ProtoNav from '../ProtoNav';
@@ -181,17 +181,45 @@ export default function TournamentAnnouncementsStates() {
   return (
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT_PUBLIC" description="Public read-only announcements list">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <PublicView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="COMMISSIONER_VIEW" description="Commissioner view with Edit/Delete on each card and New button">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <CommissionerView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="NEW_ANNOUNCEMENT" description="New announcement form with Title and Body">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <NewAnnouncementView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
       <StateSection title="EMPTY" description="No announcements posted yet">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          null
+          <View style={{ flex: 1 }}>
+
         <EmptyView />
-      </StateSection>
+                </View>
+          null
+        </View>
+</StateSection>
     </ScrollView>
   );
 }

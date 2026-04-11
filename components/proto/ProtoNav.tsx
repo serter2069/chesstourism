@@ -134,7 +134,7 @@ function AdminNav({ activeTab }: { activeTab?: string }) {
               <Feather
                 name={tab.icon as any}
                 size={18}
-                color={active ? '#e07070' : Colors.textMuted}
+                color={active ? Colors.adminAccent : Colors.textMuted}
               />
               <Text style={[styles.tabLabel, active && styles.tabLabelAdmin]}>
                 {tab.label}
@@ -217,7 +217,7 @@ export function ProtoBottomNav({ variant, activeTab }: ProtoNavProps) {
           const active = activeTab === tab.key;
           return (
             <TouchableOpacity key={tab.key} style={styles.tabItem} activeOpacity={0.7}>
-              <Feather name={tab.icon as any} size={18} color={active ? '#e07070' : Colors.textMuted} />
+              <Feather name={tab.icon as any} size={18} color={active ? Colors.adminAccent : Colors.textMuted} />
               <Text style={[styles.tabLabel, active && styles.tabLabelAdmin]}>{tab.label}</Text>
             </TouchableOpacity>
           );
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   adminHeader: {
-    backgroundColor: '#0f1318',
+    backgroundColor: Colors.adminBg,
   },
   logoRow: {
     flexDirection: 'row',
@@ -301,10 +301,10 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.base,
     fontFamily: Typography.fontFamilyBold,
     fontWeight: Typography.weights.bold,
-    color: '#e07070',
+    color: Colors.adminAccent,
   },
   adminBadge: {
-    backgroundColor: '#2d1a1a',
+    backgroundColor: Colors.adminDangerBg,
     borderRadius: 3,
     paddingVertical: 2,
     paddingHorizontal: Spacing.sm,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     fontFamily: Typography.fontFamilySemiBold,
     fontWeight: Typography.weights.semibold,
-    color: '#e07070',
+    color: Colors.adminAccent,
     letterSpacing: 0.8,
   },
   bottomTab: {
@@ -338,6 +338,6 @@ const styles = StyleSheet.create({
     color: Colors.gold,
   },
   tabLabelAdmin: {
-    color: '#e07070',
+    color: Colors.adminAccent,
   },
 });
