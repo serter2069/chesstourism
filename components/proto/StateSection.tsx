@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
@@ -11,8 +11,10 @@ interface StateSectionProps {
 }
 
 export default function StateSection({ title, description, children }: StateSectionProps) {
+  const webProps = Platform.OS === 'web' ? { 'data-state-name': title } : {};
+
   return (
-    <View style={styles.wrapper}>
+    <View {...webProps} style={styles.wrapper}>
       <View style={styles.header}>
         <View style={styles.accent} />
         <View style={styles.labelRow}>
