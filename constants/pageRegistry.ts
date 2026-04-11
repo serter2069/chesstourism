@@ -39,6 +39,7 @@ export const pages: PageEntry[] = [
     route: '/proto/states/overview',
     stateCount: 1,
     nav: 'none',
+    qaCycles: 5, qaScore: 10,
   },
   {
     id: 'brand',
@@ -47,6 +48,7 @@ export const pages: PageEntry[] = [
     route: '/proto/states/brand',
     stateCount: 1,
     nav: 'none',
+    qaCycles: 5, qaScore: 10,
   },
 
   // ─── Public ────────────────────────────────────────────────────────────────
@@ -515,5 +517,6 @@ export const pages: PageEntry[] = [
     route: '/proto/states/components',
     stateCount: 1,
     nav: 'none',
+    qaCycles: 5, qaScore: 10,
   },
 ];
