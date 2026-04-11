@@ -2,7 +2,7 @@
 // Agents MUST read notes[] before working on any page.
 
 export type NavVariant = 'none' | 'public' | 'auth' | 'client' | 'admin';
-export type PageGroup = 'Public' | 'Auth' | 'Dashboard' | 'Commissioner' | 'Admin';
+export type PageGroup = 'Public' | 'Auth' | 'Dashboard' | 'Commissioner' | 'Admin' | 'Brand';
 
 export interface PageNote {
   date: string;
@@ -487,5 +487,15 @@ export const pages: PageEntry[] = [
     navFrom: ['admin-webhooks'],
     navTo: ['admin-webhooks'],
     qaCycles: 1, qaScore: 11,
+  },
+
+  // ─── Brand ────────────────────────────────────────────────────────────────
+  {
+    id: 'components',
+    title: 'UI Components',
+    group: 'Brand',
+    route: '/proto/states/components',
+    stateCount: 10,
+    nav: 'none',
   },
 ];
