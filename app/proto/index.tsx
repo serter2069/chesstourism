@@ -19,14 +19,14 @@ function groupPages(entries: PageEntry[]): Record<string, PageEntry[]> {
 }
 
 export default function ProtoDashboard() {
-  const { contentMaxWidth, columns } = usePlatform();
+  const { columns } = usePlatform();
   const grouped = groupPages(pages);
   const orderedGroups = GROUP_ORDER.filter((g) => grouped[g]);
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={[styles.inner, { maxWidth: contentMaxWidth }]}>
+        <View style={styles.inner}>
           <View style={styles.header}>
             <Text style={styles.title}>Proto Dashboard</Text>
             <Text style={styles.subtitle}>{pages.length} pages</Text>

@@ -5,7 +5,6 @@ import { Feather } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
-import { usePlatform } from '../../hooks/usePlatform';
 interface ProtoLayoutProps {
   title: string;
   route: string;
@@ -15,11 +14,10 @@ interface ProtoLayoutProps {
 
 export default function ProtoLayout({ title, route, children }: ProtoLayoutProps) {
   const router = useRouter();
-  const { contentMaxWidth } = usePlatform();
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <View style={[styles.inner, { maxWidth: contentMaxWidth }]}>
+        <View style={styles.inner}>
           {/* Top bar */}
           <View style={styles.topBar}>
             <TouchableOpacity
