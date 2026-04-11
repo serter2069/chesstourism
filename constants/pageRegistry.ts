@@ -58,7 +58,7 @@ export const pages: PageEntry[] = [
     stateCount: 3,
     nav: 'public',
     navTo: ['tournaments', 'org-apply', 'login', 'commissars', 'ratings'],
-    qaCycles: 3, qaScore: 12,
+    qaCycles: 4, qaScore: 12,
     notes: [
       {
         date: '2026-04-10',
@@ -79,7 +79,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['landing', 'dashboard', 'watchlist'],
     navTo: ['tournament-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-detail',
@@ -90,7 +90,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['tournaments', 'watchlist', 'dashboard', 'notifications'],
     navTo: ['login', 'payment', 'tournament-schedule', 'tournament-announcements', 'commissar-profile'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'commissars',
@@ -101,7 +101,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['landing'],
     navTo: ['commissar-profile'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'commissar-profile',
@@ -112,7 +112,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['commissars', 'tournament-detail'],
     navTo: [],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'user-profile',
@@ -123,7 +123,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['ratings', 'tournament-detail'],
     navTo: ['elo-history'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'ratings',
@@ -134,7 +134,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['landing'],
     navTo: ['elo-history', 'user-profile'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'elo-history',
@@ -145,7 +145,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['ratings', 'user-profile'],
     navTo: ['tournaments'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'org-apply',
@@ -156,7 +156,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['landing'],
     navTo: ['landing'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'cert-verify',
@@ -167,7 +167,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: [],
     navTo: ['tournament-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'payment-success',
@@ -178,7 +178,7 @@ export const pages: PageEntry[] = [
     nav: 'none',
     navFrom: ['payment'],
     navTo: ['my-registrations', 'tournament-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
 
   // ─── Auth ──────────────────────────────────────────────────────────────────
@@ -191,7 +191,7 @@ export const pages: PageEntry[] = [
     nav: 'auth',
     navFrom: ['tournament-detail', 'landing'],
     navTo: ['otp'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'otp',
@@ -202,7 +202,7 @@ export const pages: PageEntry[] = [
     nav: 'auth',
     navFrom: ['login'],
     navTo: ['dashboard'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
 
   // ─── Dashboard ─────────────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['otp'],
     navTo: ['my-registrations', 'tournaments', 'watchlist', 'notifications', 'commissioner-cabinet'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'profile',
@@ -226,7 +226,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['dashboard'],
     navTo: [],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'my-registrations',
@@ -237,7 +237,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['dashboard', 'payment-success'],
     navTo: ['tournament-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'watchlist',
@@ -248,7 +248,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['dashboard'],
     navTo: ['tournaments', 'payment'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'notifications',
@@ -259,7 +259,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['dashboard'],
     navTo: ['tournament-detail', 'my-registrations'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'payment',
@@ -270,7 +270,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['tournament-detail', 'watchlist'],
     navTo: ['payment-success'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
 
   // ─── Commissioner ──────────────────────────────────────────────────────────
@@ -283,7 +283,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['dashboard'],
     navTo: ['create-tournament', 'my-tournaments', 'commissioner-edit'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'commissioner-edit',
@@ -294,7 +294,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['commissioner-cabinet'],
     navTo: ['commissioner-cabinet'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'my-tournaments',
@@ -305,7 +305,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['commissioner-cabinet'],
     navTo: ['tournament-hub', 'create-tournament'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'create-tournament',
@@ -316,7 +316,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['commissioner-cabinet', 'my-tournaments'],
     navTo: ['tournament-hub'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-hub',
@@ -327,7 +327,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['my-tournaments', 'create-tournament'],
     navTo: ['tournament-registrations', 'tournament-rounds', 'tournament-results', 'tournament-photos', 'tournament-announcements', 'tournament-edit'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-edit',
@@ -338,7 +338,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['tournament-hub'],
     navTo: ['tournament-hub'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-registrations',
@@ -349,7 +349,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['tournament-hub'],
     navTo: ['tournament-hub'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-results',
@@ -360,7 +360,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['tournament-hub'],
     navTo: ['tournament-hub'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-photos',
@@ -371,7 +371,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['tournament-hub'],
     navTo: ['tournament-hub'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-rounds',
@@ -382,7 +382,7 @@ export const pages: PageEntry[] = [
     nav: 'client',
     navFrom: ['tournament-hub'],
     navTo: ['tournament-results', 'tournament-hub'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-schedule',
@@ -393,7 +393,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['tournament-detail'],
     navTo: ['tournament-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'tournament-announcements',
@@ -404,7 +404,7 @@ export const pages: PageEntry[] = [
     nav: 'public',
     navFrom: ['tournament-detail', 'tournament-hub'],
     navTo: ['tournament-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
 
   // ─── Admin ─────────────────────────────────────────────────────────────────
@@ -416,7 +416,7 @@ export const pages: PageEntry[] = [
     stateCount: 3,
     nav: 'admin',
     navTo: ['admin-users', 'admin-tournaments', 'admin-organizations', 'admin-moderation', 'admin-finances', 'admin-disputes', 'admin-webhooks'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-users',
@@ -427,7 +427,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin'],
     navTo: ['admin'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-tournaments',
@@ -438,7 +438,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin'],
     navTo: ['admin'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-organizations',
@@ -449,7 +449,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin'],
     navTo: ['admin'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-moderation',
@@ -460,7 +460,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin', 'admin-disputes'],
     navTo: ['admin-disputes'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-finances',
@@ -471,7 +471,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin'],
     navTo: ['admin'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-disputes',
@@ -482,7 +482,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin', 'admin-moderation'],
     navTo: ['admin-moderation'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-webhooks',
@@ -493,7 +493,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin'],
     navTo: ['admin-webhook-detail'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
   {
     id: 'admin-webhook-detail',
@@ -504,7 +504,7 @@ export const pages: PageEntry[] = [
     nav: 'admin',
     navFrom: ['admin-webhooks'],
     navTo: ['admin-webhooks'],
-    qaCycles: 2, qaScore: 12,
+    qaCycles: 3, qaScore: 12,
   },
 
   // ─── Brand ────────────────────────────────────────────────────────────────
@@ -513,7 +513,7 @@ export const pages: PageEntry[] = [
     title: 'UI Components',
     group: 'Brand',
     route: '/proto/states/components',
-    stateCount: 10,
+    stateCount: 1,
     nav: 'none',
   },
 ];
