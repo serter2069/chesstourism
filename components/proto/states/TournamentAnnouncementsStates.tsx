@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -63,7 +63,6 @@ function AnnouncementCard({ title, date, body, editable }: {
 function PublicView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="public" />
       <View style={s.container}>
         <Text style={s.heading}>Announcements</Text>
         <Text style={s.subtext}>Tbilisi Open 2025</Text>
@@ -85,7 +84,6 @@ function PublicView() {
 function CommissionerView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.headerRow}>
           <View>
@@ -114,7 +112,6 @@ function NewAnnouncementView() {
 
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.headerRow}>
           <Text style={s.heading}>New Announcement</Text>
@@ -161,7 +158,6 @@ function NewAnnouncementView() {
 function EmptyView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="public" />
       <View style={s.container}>
         <Text style={s.heading}>Announcements</Text>
         <Text style={s.subtext}>Tbilisi Open 2025</Text>
@@ -182,44 +178,38 @@ export default function TournamentAnnouncementsStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT_PUBLIC" description="Public read-only announcements list">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="public" />
           <View style={{ flex: 1 }}>
-
-        <PublicView />
-                </View>
-          null
+            <PublicView />
+          </View>
         </View>
-</StateSection>
+      </StateSection>
       <StateSection title="COMMISSIONER_VIEW" description="Commissioner view with Edit/Delete on each card and New button">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
-
-        <CommissionerView />
-                </View>
-          null
+            <CommissionerView />
+          </View>
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
-</StateSection>
+      </StateSection>
       <StateSection title="NEW_ANNOUNCEMENT" description="New announcement form with Title and Body">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
-
-        <NewAnnouncementView />
-                </View>
-          null
+            <NewAnnouncementView />
+          </View>
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
-</StateSection>
+      </StateSection>
       <StateSection title="EMPTY" description="No announcements posted yet">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="public" />
           <View style={{ flex: 1 }}>
-
-        <EmptyView />
-                </View>
-          null
+            <EmptyView />
+          </View>
         </View>
-</StateSection>
+      </StateSection>
     </ScrollView>
   );
 }

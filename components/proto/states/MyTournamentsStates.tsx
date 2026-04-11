@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -181,7 +181,6 @@ function PageContent({ tab }: { tab: 'active' | 'draft' | 'past' }) {
   ];
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>My Tournaments</Text>
         <TabBar tabs={tabs} active={tab} onPress={() => {}} />
@@ -199,7 +198,6 @@ function PageContent({ tab }: { tab: 'active' | 'draft' | 'past' }) {
 function EmptyContent() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>My Tournaments</Text>
         <View style={s.emptyWrap}>
@@ -222,42 +220,42 @@ export default function MyTournamentsStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Active tab with tournament management cards">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <PageContent tab="active" />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="DRAFT_TAB" description="Draft tournaments with Publish and Edit buttons">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <PageContent tab="draft" />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="PAST_TAB" description="Past tournaments with final participant counts">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <PageContent tab="past" />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="EMPTY" description="No tournaments created yet">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <EmptyContent />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
     </ScrollView>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -78,7 +78,6 @@ function Skeleton({ h = 20, w = '100%', mb = 0 }: { h?: number; w?: string | num
 function DefaultView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>Round 3 Results</Text>
         <RoundTabs active={3} />
@@ -108,7 +107,6 @@ function DefaultView() {
 function SavedView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.successBanner}>
           <Feather name="check-circle" size={16} color={Colors.successGreen} />
@@ -142,7 +140,6 @@ function SavedView() {
 function StandingsView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>Standings</Text>
 
@@ -171,7 +168,6 @@ function StandingsView() {
 function LoadingView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Skeleton h={28} w={200} mb={Spacing.md} />
         <Skeleton h={36} mb={Spacing.lg} />
@@ -194,7 +190,6 @@ function LoadingView() {
 function FinalizedView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.finalizedBanner}>
           <Feather name="award" size={20} color={Colors.gold} />
@@ -238,52 +233,52 @@ export default function TournamentResultsStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Round results entry with editable result badges">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="RESULTS_SAVED" description="Results locked, finalize button visible">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <SavedView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="STANDINGS" description="Standings table with points and Buchholz">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <StandingsView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <LoadingView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="FINALIZED" description="All results submitted, certificates available">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <FinalizedView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
     </ScrollView>

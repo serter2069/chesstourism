@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -124,7 +124,7 @@ export default function AdminFinancesStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Finance overview with summary cards and transactions table">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="finances" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
 
@@ -142,13 +142,14 @@ export default function AdminFinancesStates() {
 
             <TransactionsTable />
           </View>
+          <ProtoBottomNav variant="admin" activeTab="finances" />
         </View>
       </StateSection>
 
       {/* STATE: PAYOUT_VIEW */}
       <StateSection title="PAYOUT_VIEW" description="Pending payouts list with process button">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="finances" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
             <Text style={s.sectionTitle}>Pending Payouts</Text>
@@ -178,13 +179,14 @@ export default function AdminFinancesStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="finances" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading for transactions table">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="finances" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
             <View style={s.statsRow}>
@@ -209,13 +211,14 @@ export default function AdminFinancesStates() {
               {[1, 2, 3, 4, 5].map(i => <SkeletonRow key={i} />)}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="finances" />
         </View>
       </StateSection>
 
       {/* STATE: EXPORT_MODE */}
       <StateSection title="EXPORT_MODE" description="Export options modal with format and date range">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="finances" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Finances</Text>
 
@@ -245,6 +248,7 @@ export default function AdminFinancesStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="finances" />
         </View>
       </StateSection>
     </ScrollView>

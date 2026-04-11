@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -68,7 +68,6 @@ function HubContent({ status, currentRound, showStartNext, showFinalResults }: {
 
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         {/* Header */}
         <View style={s.headerRow}>
@@ -125,32 +124,32 @@ export default function TournamentHubStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Tournament hub with status OPEN, action cards grid">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <HubContent status="OPEN" currentRound={3} />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="IN_PROGRESS" description="Tournament in progress, Start Next Round button visible">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <HubContent status="IN PROGRESS" currentRound={3} showStartNext />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="COMPLETED" description="Tournament completed, final results and certificates">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <HubContent status="COMPLETED" currentRound={7} showFinalResults />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
     </ScrollView>

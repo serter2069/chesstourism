@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
@@ -60,7 +60,7 @@ export default function AdminWebhooksStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Webhook endpoints list with status and success rates">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={s.headerRow}>
               <Text style={s.heading}>Webhooks</Text>
@@ -89,13 +89,14 @@ export default function AdminWebhooksStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: ADD_WEBHOOK */}
       <StateSection title="ADD_WEBHOOK" description="Add webhook form with URL, events, and secret key">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Webhooks</Text>
 
@@ -133,13 +134,14 @@ export default function AdminWebhooksStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Webhooks</Text>
             <View style={s.table}>
@@ -161,13 +163,14 @@ export default function AdminWebhooksStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: WEBHOOK_TEST */}
       <StateSection title="WEBHOOK_TEST" description="Test panel with event dropdown and request/response preview">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Webhooks</Text>
 
@@ -207,6 +210,7 @@ export default function AdminWebhooksStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
     </ScrollView>

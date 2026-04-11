@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -110,7 +110,7 @@ export default function RatingsStates() {
       <StateSection title="DEFAULT" description="Full rating table with top 10 players, All category">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <Text style={s.pageSubtitle}>Global ELO rating leaderboard</Text>
@@ -123,7 +123,7 @@ export default function RatingsStates() {
       <StateSection title="FILTERED_RAPID" description="Rapid category selected">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={2} onSelect={() => {}} />
@@ -135,7 +135,7 @@ export default function RatingsStates() {
       <StateSection title="LOADING" description="Skeleton table rows">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <View style={s.tabRow}>
@@ -165,7 +165,7 @@ export default function RatingsStates() {
       <StateSection title="MY_POSITION" description="User's rank highlighted at #156">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>World Rankings</Text>
           <TabSelector tabs={['All', 'Classical', 'Rapid', 'Blitz']} active={0} onSelect={() => {}} />

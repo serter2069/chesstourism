@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
@@ -57,7 +57,7 @@ export default function AdminModerationStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Disputes, reports, flags tabs with open items">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
             <TabBar tabs={['Disputes (3)', 'Reports (7)', 'Flags (2)']} active={activeModTab} onSelect={setActiveModTab} />
@@ -93,13 +93,14 @@ export default function AdminModerationStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: DISPUTE_DETAIL */}
       <StateSection title="DISPUTE_DETAIL" description="Dispute detail with timeline, messages, resolution options">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
 
@@ -156,13 +157,14 @@ export default function AdminModerationStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
             <TabBar tabs={['Disputes', 'Reports', 'Flags']} active="Disputes" />
@@ -185,13 +187,14 @@ export default function AdminModerationStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: ALL_RESOLVED */}
       <StateSection title="ALL_RESOLVED" description="All tabs showing empty, all clear">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Moderation</Text>
             <TabBar tabs={['Disputes (0)', 'Reports (0)', 'Flags (0)']} active="Disputes (0)" />
@@ -202,6 +205,7 @@ export default function AdminModerationStates() {
               <Text style={s.emptyText}>No open disputes. All moderation items have been resolved.</Text>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
     </ScrollView>

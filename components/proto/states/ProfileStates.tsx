@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
@@ -65,7 +65,6 @@ function ProfileContent({
 
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="profile" />
       <View style={s.content}>
         {saved && (
           <View style={s.successBanner}>
@@ -185,56 +184,56 @@ export default function ProfileStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Profile view mode, fields read-only">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ProfileContent />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="profile" />
         </View>
 </StateSection>
 
       <StateSection title="EDITING" description="Fields active and editable">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ProfileContent editing />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="profile" />
         </View>
 </StateSection>
 
       <StateSection title="SAVING" description="Save button with spinner, fields locked">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ProfileContent saving />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="profile" />
         </View>
 </StateSection>
 
       <StateSection title="SAVED" description="Success toast banner after save">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ProfileContent saved />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="profile" />
         </View>
 </StateSection>
 
       <StateSection title="FIDE_LINKED" description="FIDE ID verified with green checkmark badge">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ProfileContent fideLinked />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="profile" />
         </View>
 </StateSection>
     </ScrollView>

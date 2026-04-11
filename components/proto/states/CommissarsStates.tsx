@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image,
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -109,7 +109,7 @@ export default function CommissarsStates() {
       <StateSection title="DEFAULT" description="Commissar catalog with search and filter">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
           <Text style={s.pageSubtitle}>Certified FIDE commissars managing tournaments worldwide</Text>
@@ -128,7 +128,7 @@ export default function CommissarsStates() {
       <StateSection title="FILTERED" description="2 results after filtering by country">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
           <SearchBar value="" onChange={() => {}} />
@@ -155,7 +155,7 @@ export default function CommissarsStates() {
       <StateSection title="LOADING" description="Skeleton loading cards">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
           <View style={{ height: 40, backgroundColor: Colors.border, borderRadius: 8, marginBottom: Spacing.lg }} />
@@ -171,7 +171,7 @@ export default function CommissarsStates() {
       <StateSection title="EMPTY" description="No commissars found">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
           <SearchBar value="Antarctica" onChange={() => {}} />
@@ -187,7 +187,7 @@ export default function CommissarsStates() {
       <StateSection title="COMMISSAR_DETAIL_HOVER" description="One card highlighted/selected">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Commissars</Text>
           <SearchBar value="" onChange={() => {}} />

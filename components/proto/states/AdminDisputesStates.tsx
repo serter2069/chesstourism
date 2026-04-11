@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
@@ -50,7 +50,7 @@ export default function AdminDisputesStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Dispute queue with priority colors and SLA timers">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={s.headerRow}>
               <Text style={s.heading}>Dispute Queue</Text>
@@ -77,13 +77,14 @@ export default function AdminDisputesStates() {
               </TouchableOpacity>
             ))}
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: DISPUTE_OPEN */}
       <StateSection title="DISPUTE_OPEN" description="Conversation thread view with resolution form">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>DSP-001: Result Dispute</Text>
 
@@ -148,13 +149,14 @@ export default function AdminDisputesStates() {
               <TouchableOpacity style={s.resBtn}><Text style={[s.resBtnText, { color: YELLOW }]}>Escalate</Text></TouchableOpacity>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Dispute Queue</Text>
             {[1, 2, 3].map(i => (
@@ -167,13 +169,14 @@ export default function AdminDisputesStates() {
               </View>
             ))}
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: STATS */}
       <StateSection title="STATS" description="Dispute statistics overview">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Dispute Statistics</Text>
 
@@ -212,6 +215,7 @@ export default function AdminDisputesStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
     </ScrollView>

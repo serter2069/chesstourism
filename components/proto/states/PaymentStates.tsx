@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -141,7 +141,6 @@ function SecurityNote() {
 function DefaultState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.heading}>Payment</Text>
         <TournamentInfo />
@@ -161,7 +160,6 @@ function DefaultState() {
 function ProcessingState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.heading}>Payment</Text>
         <TournamentInfo />
@@ -182,7 +180,6 @@ function ProcessingState() {
 function SuccessState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <View style={s.resultCard}>
           <View style={s.successIcon}>
@@ -225,7 +222,6 @@ function SuccessState() {
 function FailedState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <View style={s.resultCard}>
           <View style={s.failIcon}>
@@ -259,45 +255,45 @@ export default function PaymentStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Payment form with card inputs, tournament info, summary">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="PROCESSING" description="Processing payment, spinner in button, fields disabled">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ProcessingState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="SUCCESS" description="Payment successful with transaction details">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <SuccessState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="FAILED" description="Payment failed, card declined error, try again CTA">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <FailedState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
     </ScrollView>

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -36,7 +36,6 @@ function PhotoGrid({ deleteMode }: { deleteMode?: boolean }) {
 function DefaultView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.headerRow}>
           <View>
@@ -64,7 +63,6 @@ function DefaultView() {
 function UploadView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>Upload Photos</Text>
         <TouchableOpacity style={s.uploadArea} activeOpacity={0.8}>
@@ -98,7 +96,6 @@ function UploadView() {
 function UploadingView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>Uploading...</Text>
         <View style={s.progressWrap}>
@@ -124,7 +121,6 @@ function UploadingView() {
 function DeleteView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.headerRow}>
           <View>
@@ -150,7 +146,6 @@ function DeleteView() {
 function EmptyView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>Photos</Text>
         <View style={s.emptyWrap}>
@@ -174,52 +169,52 @@ export default function TournamentPhotosStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Photo gallery grid with 12 photos">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="UPLOAD_MODE" description="Upload area with selected files list">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <UploadView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="UPLOADING" description="Upload in progress with progress bar">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <UploadingView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="DELETE_MODE" description="Delete mode with X badges on each photo">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DeleteView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="EMPTY" description="No photos uploaded yet">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <EmptyView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
     </ScrollView>

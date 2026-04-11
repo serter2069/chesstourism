@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -74,7 +74,7 @@ function ScheduleRow({ item, highlighted }: { item: typeof SCHEDULE[0]; highligh
 function DefaultView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="public" />
+
       <View style={s.container}>
         <View style={s.tournamentHeader}>
           <Text style={s.heading}>Tbilisi Open 2025</Text>
@@ -105,7 +105,7 @@ function DefaultView() {
 function LoadingView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="public" />
+
       <View style={s.container}>
         <Skeleton h={28} w={220} mb={Spacing.sm} />
         <Skeleton h={14} w={180} mb={Spacing.lg} />
@@ -133,7 +133,7 @@ function LoadingView() {
 function EmptyView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="public" />
+
       <View style={s.container}>
         <View style={s.tournamentHeader}>
           <Text style={s.heading}>Tbilisi Open 2025</Text>
@@ -157,7 +157,6 @@ function EmptyView() {
 function PlayerView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="tournaments" />
       <View style={s.container}>
         <View style={s.tournamentHeader}>
           <Text style={s.heading}>Tbilisi Open 2025</Text>
@@ -207,44 +206,37 @@ export default function TournamentScheduleStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Public schedule view with full event list">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="public" />
           <View style={{ flex: 1 }}>
-
-        <DefaultView />
-                </View>
-          null
+            <DefaultView />
+          </View>
         </View>
-</StateSection>
+      </StateSection>
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="public" />
           <View style={{ flex: 1 }}>
-
-        <LoadingView />
-                </View>
-          null
+            <LoadingView />
+          </View>
         </View>
-</StateSection>
+      </StateSection>
       <StateSection title="EMPTY" description="Schedule not yet published">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="public" />
           <View style={{ flex: 1 }}>
-
-        <EmptyView />
-                </View>
-          null
+            <EmptyView />
+          </View>
         </View>
-</StateSection>
+      </StateSection>
       <StateSection title="PLAYER_VIEW" description="Logged-in player view with board assignments highlighted">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
-
-        <PlayerView />
-                </View>
-          null
+            <PlayerView />
+          </View>
+          <ProtoBottomNav variant="client" activeTab="tournaments" />
         </View>
-</StateSection>
+      </StateSection>
     </ScrollView>
   );
 }

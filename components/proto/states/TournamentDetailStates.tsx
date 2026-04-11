@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -335,7 +335,7 @@ export default function TournamentDetailStates() {
       <StateSection title="DEFAULT" description="Tournament detail page - open for registration">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <DefaultState />
               </View>
 </StateSection>
@@ -343,7 +343,7 @@ export default function TournamentDetailStates() {
       <StateSection title="REGISTERED" description="User is registered, confirmation banner">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <RegisteredState />
               </View>
 </StateSection>
@@ -351,7 +351,7 @@ export default function TournamentDetailStates() {
       <StateSection title="IN_PROGRESS" description="Tournament is live, round 3 of 7">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <InProgressState />
               </View>
 </StateSection>
@@ -359,7 +359,7 @@ export default function TournamentDetailStates() {
       <StateSection title="COMPLETED" description="Tournament finished, winner announced">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <CompletedState />
               </View>
 </StateSection>
@@ -367,7 +367,7 @@ export default function TournamentDetailStates() {
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <LoadingState />
               </View>
 </StateSection>
@@ -375,7 +375,7 @@ export default function TournamentDetailStates() {
       <StateSection title="REGISTRATION_FORM" description="Registration form overlay">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <RegistrationFormState />
               </View>
 </StateSection>
@@ -383,7 +383,7 @@ export default function TournamentDetailStates() {
       <StateSection title="PAYMENT_PENDING" description="Payment form with card fields">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <PaymentPendingState />
               </View>
 </StateSection>
@@ -391,7 +391,7 @@ export default function TournamentDetailStates() {
       <StateSection title="REGISTERED_FULL" description="Capacity reached, registration closed">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <RegisteredFullState />
               </View>
 </StateSection>
@@ -399,7 +399,7 @@ export default function TournamentDetailStates() {
       <StateSection title="CANCELLED" description="Tournament cancelled with refund info">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <CancelledState />
               </View>
 </StateSection>

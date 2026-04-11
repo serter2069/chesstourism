@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -77,7 +77,6 @@ function RoundRow({ round, showActions }: { round: typeof ROUNDS[0]; showActions
 function DefaultView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <Text style={s.heading}>Rounds Management</Text>
         <Text style={s.subtext}>7 rounds total -- 3 completed, 1 active, 3 upcoming</Text>
@@ -98,7 +97,6 @@ function DefaultView() {
 function PairingsView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <TouchableOpacity style={s.backRow} activeOpacity={0.7}>
           <Feather name="arrow-left" size={16} color={Colors.textMuted} />
@@ -139,7 +137,6 @@ function PairingsView() {
 function GeneratingView() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={[s.container, s.centerContent]}>
         <ActivityIndicator size="large" color={Colors.gold} />
         <Text style={s.genTitle}>Generating Swiss Pairings...</Text>
@@ -155,7 +152,6 @@ function CompletedView() {
   const allCompleted = ROUNDS.map((r) => ({ ...r, status: 'Completed', pairings: 44 }));
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="cabinet" />
       <View style={s.container}>
         <View style={s.completedBanner}>
           <Feather name="check-circle" size={20} color={Colors.gold} />
@@ -185,42 +181,42 @@ export default function TournamentRoundsStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Round list with statuses and actions">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="PAIRINGS_VIEW" description="Expanded round showing pairing table">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <PairingsView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="GENERATING" description="Generating Swiss pairings spinner">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <GeneratingView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
       <StateSection title="COMPLETED_ROUND" description="All rounds complete, finalize CTA">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <CompletedView />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="cabinet" />
         </View>
 </StateSection>
     </ScrollView>
