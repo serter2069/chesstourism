@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform }
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -124,7 +124,7 @@ export default function EloHistoryStates() {
       <StateSection title="DEFAULT" description="My ELO history with chart placeholder and table">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Magnus Eriksson" elo={2156} isMine />
@@ -143,7 +143,7 @@ export default function EloHistoryStates() {
       <StateSection title="ANOTHER_USER" description="Viewing another player's ELO history">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Fabiano Caruana" elo={2805} />
@@ -162,7 +162,7 @@ export default function EloHistoryStates() {
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <View style={s.profileBanner}>
@@ -200,7 +200,7 @@ export default function EloHistoryStates() {
       <StateSection title="NO_HISTORY" description="New player, no tournament history">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Niko Tsereteli" elo={1200} isMine />
@@ -220,7 +220,7 @@ export default function EloHistoryStates() {
       <StateSection title="LONG_HISTORY" description="Many rows with pagination">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>ELO Rating History</Text>
           <ProfileBanner name="Magnus Eriksson" elo={2156} isMine />

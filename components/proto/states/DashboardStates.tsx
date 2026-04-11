@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -85,7 +85,6 @@ function WatchCard({ name, date, fee }: { name: string; date: string; fee: strin
 function DashboardDefault() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.greeting}>Hello, Magnus!</Text>
         <Text style={s.greetingSub}>Here is your chess overview</Text>
@@ -127,7 +126,6 @@ function DashboardDefault() {
 function DashboardEmpty() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.greeting}>Welcome, Magnus!</Text>
         <Text style={s.greetingSub}>Your chess journey starts here</Text>
@@ -160,7 +158,6 @@ function DashboardEmpty() {
 function DashboardLoading() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Skeleton h={28} w={200} mb={Spacing.sm} />
         <Skeleton h={14} w={160} mb={Spacing.lg} />
@@ -196,34 +193,34 @@ export default function DashboardStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Greeting, stats, upcoming tournaments, watchlist">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DashboardDefault />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="NO_REGISTRATIONS" description="New user, empty state with CTA to browse tournaments">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DashboardEmpty />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="LOADING" description="Skeleton stats and tournament cards">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DashboardLoading />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
     </ScrollView>

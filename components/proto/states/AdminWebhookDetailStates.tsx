@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
@@ -79,7 +79,7 @@ export default function AdminWebhookDetailStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Webhook detail with config, stats, and delivery logs">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={s.headerRow}>
               <View style={{ flex: 1 }}>
@@ -155,13 +155,14 @@ export default function AdminWebhookDetailStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: EDIT_MODE */}
       <StateSection title="EDIT_MODE" description="Configuration section in editable form mode">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={s.headerRow}>
               <View style={{ flex: 1 }}>
@@ -199,13 +200,14 @@ export default function AdminWebhookDetailStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state for webhook detail">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={[s.skeleton, { width: '60%', height: 24, marginBottom: Spacing.md }]} />
             <View style={[s.skeleton, { width: 60, height: 20, marginBottom: Spacing.lg }]} />
@@ -246,6 +248,7 @@ export default function AdminWebhookDetailStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
     </ScrollView>

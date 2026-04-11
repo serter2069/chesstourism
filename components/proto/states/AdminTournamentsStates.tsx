@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -116,19 +116,20 @@ export default function AdminTournamentsStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="All tournaments with filter tabs">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="tournaments" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
             <FilterTabs active={activeFilter} onSelect={setActiveFilter} />
             <TournamentsTable tournaments={filteredTournaments} />
           </View>
+          <ProtoBottomNav variant="admin" activeTab="tournaments" />
         </View>
       </StateSection>
 
       {/* STATE: TOURNAMENT_DETAIL */}
       <StateSection title="TOURNAMENT_DETAIL" description="Expanded tournament info panel">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="tournaments" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
             <FilterTabs active="All" />
@@ -151,13 +152,14 @@ export default function AdminTournamentsStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="tournaments" />
         </View>
       </StateSection>
 
       {/* STATE: CANCEL_CONFIRM */}
       <StateSection title="CANCEL_CONFIRM" description="Tournament cancellation confirmation modal">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="tournaments" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={s.modalOverlay}>
               <View style={s.modal}>
@@ -176,13 +178,14 @@ export default function AdminTournamentsStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="tournaments" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading for tournaments table">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="tournaments" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
             <FilterTabs active="All" />
@@ -199,18 +202,20 @@ export default function AdminTournamentsStates() {
               {[1, 2, 3, 4, 5].map(i => <SkeletonRow key={i} />)}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="tournaments" />
         </View>
       </StateSection>
 
       {/* STATE: FILTERS_ACTIVE */}
       <StateSection title="FILTERS_ACTIVE" description="Filtered to show only In Progress tournaments">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="tournaments" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Tournaments Management</Text>
             <FilterTabs active="In Progress" />
             <TournamentsTable tournaments={TOURNAMENTS.filter(t => t.status === 'In Progress')} />
           </View>
+          <ProtoBottomNav variant="admin" activeTab="tournaments" />
         </View>
       </StateSection>
     </ScrollView>

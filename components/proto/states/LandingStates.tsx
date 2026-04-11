@@ -25,8 +25,6 @@ function useLayout() {
   return { isWide, cols, maxW, width };
 }
 
-import ProtoNav from '../ProtoNav';
-
 // ─── Chess Logo Mark ──────────────────────────────────────────────────────────
 
 function LogoMark({ size = 28 }: { size?: number }) {

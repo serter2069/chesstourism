@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -126,19 +126,20 @@ export default function AdminUsersStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Users list with search, filters, and data table">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="users" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Users Management</Text>
             <FilterBar searchValue={searchQuery} onSearchChange={setSearchQuery} />
             <UsersTable users={USERS} />
           </View>
+          <ProtoBottomNav variant="admin" activeTab="users" />
         </View>
       </StateSection>
 
       {/* STATE: USER_DETAIL */}
       <StateSection title="USER_DETAIL" description="Expanded user detail view">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="users" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Users Management</Text>
             <FilterBar />
@@ -188,13 +189,14 @@ export default function AdminUsersStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="users" />
         </View>
       </StateSection>
 
       {/* STATE: SUSPEND_CONFIRM */}
       <StateSection title="SUSPEND_CONFIRM" description="Confirmation modal for suspending a user">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="users" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Users Management</Text>
 
@@ -210,13 +212,14 @@ export default function AdminUsersStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="users" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state for users table">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="users" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Users Management</Text>
             <FilterBar />
@@ -234,6 +237,7 @@ export default function AdminUsersStates() {
               {[1, 2, 3, 4, 5, 6].map(i => <SkeletonRow key={i} />)}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="users" />
         </View>
       </StateSection>
     </ScrollView>

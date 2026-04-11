@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -15,7 +15,7 @@ export default function PaymentSuccessStates() {
       <StateSection title="DEFAULT" description="Full-screen payment success confirmation">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="none" />
+        <ProtoNavTop variant="none" />
         <View style={s.page}>
           <View style={s.content}>
             <View style={s.iconCircle}>

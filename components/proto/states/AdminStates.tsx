@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -64,7 +64,7 @@ export default function AdminStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Admin dashboard with stats, activity feed, system status">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Admin Dashboard</Text>
 
@@ -103,13 +103,14 @@ export default function AdminStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: ALERT_STATE */}
       <StateSection title="ALERT_STATE" description="Payment gateway degraded warning">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <View style={s.alertBanner}>
               <Feather name="alert-triangle" size={16} color={Colors.adminYellow} />
@@ -132,13 +133,14 @@ export default function AdminStates() {
               <View style={s.statusItem}><StatusDot color={YELLOW} /><Text style={[s.statusText, { color: YELLOW }]}>Payments: WARNING</Text></View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="dashboard" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Admin Dashboard</Text>
             <View style={s.statsRow}>
@@ -161,6 +163,7 @@ export default function AdminStates() {
               ))}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="dashboard" />
         </View>
       </StateSection>
     </ScrollView>

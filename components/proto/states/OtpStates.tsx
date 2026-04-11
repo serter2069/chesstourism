@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -118,35 +118,35 @@ export default function OtpStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Empty OTP boxes, waiting for user input">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="auth" />
+          <ProtoNavTop variant="auth" />
           <OtpCard digits={['', '', '', '', '', '']} />
         </View>
       </StateSection>
 
       <StateSection title="CODE_ENTERING" description="3 of 6 digits entered">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="auth" />
+          <ProtoNavTop variant="auth" />
           <OtpCard digits={['4', '7', '2', '', '', '']} />
         </View>
       </StateSection>
 
       <StateSection title="CODE_ENTERED" description="All 6 digits filled, Verify button active">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="auth" />
+          <ProtoNavTop variant="auth" />
           <OtpCard digits={['4', '7', '2', '9', '0', '1']} />
         </View>
       </StateSection>
 
       <StateSection title="LOADING" description="Verifying OTP code, spinner in button">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="auth" />
+          <ProtoNavTop variant="auth" />
           <OtpCard digits={['4', '7', '2', '9', '0', '1']} loading />
         </View>
       </StateSection>
 
       <StateSection title="ERROR" description="Invalid code, 2 attempts remaining, red borders">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="auth" />
+          <ProtoNavTop variant="auth" />
           <OtpCard
             digits={['', '', '', '', '', '']}
             error="Invalid code. 2 attempts remaining."
@@ -157,7 +157,7 @@ export default function OtpStates() {
 
       <StateSection title="RESENT" description="New code sent, countdown timer shown">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="auth" />
+          <ProtoNavTop variant="auth" />
           <OtpCard digits={['', '', '', '', '', '']} resent />
         </View>
       </StateSection>

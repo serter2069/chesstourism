@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -173,7 +173,6 @@ function DefaultState() {
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.heading}>My Registrations</Text>
         <TabBar active={tab} onPress={setTab} />
@@ -188,7 +187,6 @@ function DefaultState() {
 function PastTabState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.heading}>My Registrations</Text>
         <TabBar active="past" onPress={() => {}} />
@@ -203,7 +201,6 @@ function PastTabState() {
 function LoadingState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Skeleton h={24} w={200} mb={Spacing.md} />
         <View style={s.tabBar}>
@@ -228,7 +225,6 @@ function LoadingState() {
 function EmptyState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.heading}>My Registrations</Text>
         <View style={s.emptyWrap}>
@@ -252,45 +248,45 @@ export default function MyRegistrationsStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Upcoming tab active with 2 registrations, tabs interactive">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="PAST_TAB" description="Past tab active showing tournament results">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <PastTabState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="LOADING" description="Skeleton list placeholders">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <LoadingState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="EMPTY" description="No registrations ever, CTA to browse">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <EmptyState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
     </ScrollView>

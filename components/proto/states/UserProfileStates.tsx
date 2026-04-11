@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform }
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -93,7 +93,7 @@ export default function UserProfileStates() {
       <StateSection title="DEFAULT" description="Public user profile with ELO, stats, and tournament history">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <ProfileDefault onEloHistory={navToEloHistory} />
               </View>
 </StateSection>
@@ -101,7 +101,7 @@ export default function UserProfileStates() {
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <View style={s.profileHeader}>
             <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: Colors.border }} />
@@ -134,7 +134,7 @@ export default function UserProfileStates() {
       <StateSection title="NOT_FOUND" description="404 - user not found">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <View style={s.notFoundState}>
             <Feather name="user-x" size={56} color={Colors.border} />

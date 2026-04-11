@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -120,7 +120,6 @@ function RegisterModal() {
 function DefaultState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="tournaments" />
       <View style={s.content}>
         <Text style={s.heading}>My Watchlist</Text>
         <Text style={s.subheading}>{WATCHLIST.length} tournaments saved</Text>
@@ -137,7 +136,6 @@ function DefaultState() {
 function ModalState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="tournaments" />
       <View style={s.content}>
         <Text style={s.heading}>My Watchlist</Text>
         <Text style={s.subheading}>{WATCHLIST.length} tournaments saved</Text>
@@ -155,7 +153,6 @@ function ModalState() {
 function LoadingState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="tournaments" />
       <View style={s.content}>
         <Skeleton h={24} w={180} mb={Spacing.sm} />
         <Skeleton h={14} w={140} mb={Spacing.lg} />
@@ -177,7 +174,6 @@ function LoadingState() {
 function EmptyState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="tournaments" />
       <View style={s.content}>
         <Text style={s.heading}>My Watchlist</Text>
         <View style={s.emptyWrap}>
@@ -201,45 +197,45 @@ export default function WatchlistStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="3 tournaments in watchlist with Register and Remove actions">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="tournaments" />
         </View>
 </StateSection>
 
       <StateSection title="REGISTER_MODAL" description="Registration confirmation modal overlay">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <ModalState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="tournaments" />
         </View>
 </StateSection>
 
       <StateSection title="LOADING" description="Skeleton list loading">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <LoadingState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="tournaments" />
         </View>
 </StateSection>
 
       <StateSection title="EMPTY" description="Empty watchlist with Browse Tournaments CTA">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <EmptyState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="tournaments" />
         </View>
 </StateSection>
     </ScrollView>

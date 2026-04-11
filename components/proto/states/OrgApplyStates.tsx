@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Activi
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -134,7 +134,7 @@ export default function OrgApplyStates() {
       <StateSection title="DEFAULT" description="Clean application form with all fields">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <ApplicationForm />
               </View>
 </StateSection>
@@ -142,7 +142,7 @@ export default function OrgApplyStates() {
       <StateSection title="FORM_VALIDATION" description="Validation errors on required fields">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <ApplicationForm errors={{
           orgName: 'Organization name is required',
           country: 'Please select a country',
@@ -156,7 +156,7 @@ export default function OrgApplyStates() {
       <StateSection title="SUBMITTING" description="Submit button with loading spinner">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Apply to Host Tournaments</Text>
           <View style={s.form}>
@@ -175,7 +175,7 @@ export default function OrgApplyStates() {
       <StateSection title="SUCCESS" description="Application submitted successfully">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <View style={s.successState}>
             <View style={s.successIcon}>
@@ -201,7 +201,7 @@ export default function OrgApplyStates() {
       <StateSection title="REJECTED" description="Application rejected with reason and options">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <View style={s.rejectedState}>
             <View style={s.rejectedIcon}>

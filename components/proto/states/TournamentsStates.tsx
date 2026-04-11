@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -114,7 +114,7 @@ export default function TournamentsStates() {
       <StateSection title="DEFAULT" description="Tournament catalog with filter bar and 6 cards">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
           <Text style={s.pageSubtitle}>Discover FIDE-rated chess tournaments worldwide</Text>
@@ -127,7 +127,7 @@ export default function TournamentsStates() {
       <StateSection title="FILTERED" description="2 results after applying Georgia filter">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
           <FilterBar searchValue="Georgia" onSearchChange={() => {}} />
@@ -145,7 +145,7 @@ export default function TournamentsStates() {
       <StateSection title="LOADING" description="Skeleton cards while loading">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
           <View style={s.filterBar}>
@@ -168,7 +168,7 @@ export default function TournamentsStates() {
       <StateSection title="EMPTY" description="No results after filter, empty state">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
 
-        <ProtoNav variant="public" />
+        <ProtoNavTop variant="public" />
         <View style={s.page}>
           <Text style={s.pageTitle}>Tournaments</Text>
           <FilterBar searchValue="Antarctica" onSearchChange={() => {}} />

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -86,18 +86,19 @@ export default function AdminOrganizationsStates() {
       {/* STATE: DEFAULT */}
       <StateSection title="DEFAULT" description="Organizations list with pending applications highlighted">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
             <OrgsTable orgs={ORGS} highlightPending />
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: REVIEW_MODAL */}
       <StateSection title="REVIEW_MODAL" description="Full application review modal">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
 
@@ -135,13 +136,14 @@ export default function AdminOrganizationsStates() {
               </View>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: LOADING */}
       <StateSection title="LOADING" description="Skeleton loading state">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
             <View style={s.table}>
@@ -156,13 +158,14 @@ export default function AdminOrganizationsStates() {
               {[1, 2, 3, 4].map(i => <SkeletonRow key={i} />)}
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
 
       {/* STATE: EMPTY */}
       <StateSection title="EMPTY" description="No pending applications">
         <View style={[s.page, { minHeight: Platform.OS === 'web' ? '100vh' : 844 }]}>
-          <ProtoNav variant="admin" activeTab="moderation" />
+          <ProtoNavTop variant="admin" />
           <View style={s.content}>
             <Text style={s.heading}>Organizations</Text>
             <View style={s.emptyState}>
@@ -171,6 +174,7 @@ export default function AdminOrganizationsStates() {
               <Text style={s.emptyText}>All organization applications have been reviewed. New applications will appear here.</Text>
             </View>
           </View>
+          <ProtoBottomNav variant="admin" activeTab="moderation" />
         </View>
       </StateSection>
     </ScrollView>

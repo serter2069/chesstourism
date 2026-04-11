@@ -6,25 +6,18 @@ import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
 import { Typography } from '../../constants/typography';
 import { usePlatform } from '../../hooks/usePlatform';
-import type { NavVariant } from '../../constants/pageRegistry';
-import { ProtoNavTop, ProtoBottomNav } from './ProtoNav';
-
 interface ProtoLayoutProps {
   title: string;
   route: string;
-  nav?: NavVariant;
+  nav?: string;
   children: React.ReactNode;
 }
 
-export default function ProtoLayout({ title, route, nav, children }: ProtoLayoutProps) {
+export default function ProtoLayout({ title, route, children }: ProtoLayoutProps) {
   const router = useRouter();
   const { contentMaxWidth } = usePlatform();
-  const showNav = nav && nav !== 'none';
-  const hasBottomNav = nav === 'client' || nav === 'admin';
-
   return (
     <View style={styles.container}>
-      {showNav && <ProtoNavTop variant={nav!} />}
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={[styles.inner, { maxWidth: contentMaxWidth }]}>
           {/* Top bar */}
@@ -51,7 +44,6 @@ export default function ProtoLayout({ title, route, nav, children }: ProtoLayout
           {children}
         </View>
       </ScrollView>
-      {showNav && hasBottomNav && <ProtoBottomNav variant={nav!} />}
     </View>
   );
 }

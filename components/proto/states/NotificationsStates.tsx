@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import StateSection from '../StateSection';
-import ProtoNav from '../ProtoNav';
+import { ProtoNavTop, ProtoBottomNav } from '../ProtoNav';
 import { Colors } from '../../../constants/colors';
 import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
@@ -67,7 +67,6 @@ function NotifRow({ notif, allRead }: { notif: Notif; allRead?: boolean }) {
 function DefaultState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <View style={s.headRow}>
           <Text style={s.heading}>Notifications</Text>
@@ -88,7 +87,6 @@ function DefaultState() {
 function AllReadState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <View style={s.headRow}>
           <Text style={s.heading}>Notifications</Text>
@@ -106,7 +104,6 @@ function AllReadState() {
 function LoadingState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Skeleton h={24} w={180} mb={Spacing.lg} />
         {[1, 2, 3, 4, 5].map((i) => (
@@ -129,7 +126,6 @@ function LoadingState() {
 function EmptyState() {
   return (
     <View style={s.page}>
-      <ProtoNav variant="client" activeTab="home" />
       <View style={s.content}>
         <Text style={s.heading}>Notifications</Text>
         <View style={s.emptyWrap}>
@@ -149,45 +145,45 @@ export default function NotificationsStates() {
     <ScrollView style={{ backgroundColor: Colors.backgroundAlt }}>
       <StateSection title="DEFAULT" description="Mix of unread (blue border, bold) and read notifications">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <DefaultState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="ALL_READ" description="All notifications read, no blue borders">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <AllReadState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="LOADING" description="Skeleton notification rows">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <LoadingState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
 
       <StateSection title="EMPTY" description="No notifications yet">
         <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          null
+          <ProtoNavTop variant="client" />
           <View style={{ flex: 1 }}>
 
         <EmptyState />
                 </View>
-          null
+          <ProtoBottomNav variant="client" activeTab="home" />
         </View>
 </StateSection>
     </ScrollView>
