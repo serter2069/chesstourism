@@ -9,6 +9,8 @@ import { Spacing } from '../../../constants/spacing';
 import { Typography } from '../../../constants/typography';
 
 // ─── State components ─────────────────────────────────────────────────────────
+import OverviewStates from '../../../components/proto/states/OverviewStates';
+import BrandStates from '../../../components/proto/states/BrandStates';
 import LandingStates from '../../../components/proto/states/LandingStates';
 import TournamentsStates from '../../../components/proto/states/TournamentsStates';
 import TournamentDetailStates from '../../../components/proto/states/TournamentDetailStates';
@@ -53,6 +55,9 @@ import ComponentsStates from '../../../components/proto/states/ComponentsStates'
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 const STATE_COMPONENTS: Record<string, React.ComponentType> = {
+  // Overview & Brand
+  overview: OverviewStates,
+  brand: BrandStates,
   // Public
   landing: LandingStates,
   tournaments: TournamentsStates,

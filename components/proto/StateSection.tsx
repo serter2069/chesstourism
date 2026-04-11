@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { Spacing } from '../../constants/spacing';
@@ -11,10 +11,17 @@ interface StateSectionProps {
 }
 
 export default function StateSection({ title, description, children }: StateSectionProps) {
-  const webProps = Platform.OS === 'web' ? { 'data-state-name': title } : {};
+  const ref = useRef<View>(null);
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && ref.current) {
+      // Set data attribute directly on DOM element for text/screenshot API
+      (ref.current as unknown as HTMLElement).setAttribute('data-state-name', title);
+    }
+  }, [title]);
 
   return (
-    <View {...webProps} style={styles.wrapper}>
+    <View ref={ref} style={styles.wrapper}>
       <View style={styles.header}>
         <View style={styles.accent} />
         <View style={styles.labelRow}>

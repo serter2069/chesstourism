@@ -2,7 +2,7 @@
 // Agents MUST read notes[] before working on any page.
 
 export type NavVariant = 'none' | 'public' | 'auth' | 'client' | 'admin';
-export type PageGroup = 'Public' | 'Auth' | 'Dashboard' | 'Commissioner' | 'Admin' | 'Brand';
+export type PageGroup = 'Overview' | 'Public' | 'Auth' | 'Dashboard' | 'Commissioner' | 'Admin' | 'Brand';
 
 export interface PageNote {
   date: string;
@@ -31,6 +31,24 @@ export interface PageEntry {
 // Status: [ ] = no qaCycles | [proto] = qaCycles 1-4 | [review] = qaCycles >= 5
 
 export const pages: PageEntry[] = [
+  // ─── Overview & Brand ──────────────────────────────────────────────────────
+  {
+    id: 'overview',
+    title: 'Project Overview',
+    group: 'Overview',
+    route: '/proto/states/overview',
+    stateCount: 1,
+    nav: 'none',
+  },
+  {
+    id: 'brand',
+    title: 'Brand & Styles',
+    group: 'Brand',
+    route: '/proto/states/brand',
+    stateCount: 1,
+    nav: 'none',
+  },
+
   // ─── Public ────────────────────────────────────────────────────────────────
   {
     id: 'landing',
