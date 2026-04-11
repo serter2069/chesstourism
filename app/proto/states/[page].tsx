@@ -49,6 +49,7 @@ import AdminFinancesStates from '../../../components/proto/states/AdminFinancesS
 import AdminDisputesStates from '../../../components/proto/states/AdminDisputesStates';
 import AdminWebhooksStates from '../../../components/proto/states/AdminWebhooksStates';
 import AdminWebhookDetailStates from '../../../components/proto/states/AdminWebhookDetailStates';
+import ComponentsStates from '../../../components/proto/states/ComponentsStates';
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 const STATE_COMPONENTS: Record<string, React.ComponentType> = {
@@ -97,6 +98,7 @@ const STATE_COMPONENTS: Record<string, React.ComponentType> = {
   'admin-disputes': AdminDisputesStates,
   'admin-webhooks': AdminWebhooksStates,
   'admin-webhook-detail': AdminWebhookDetailStates,
+  'components': ComponentsStates,
 };
 
 // ─── WorkInProgress fallback ─────────────────────────────────────────────────
