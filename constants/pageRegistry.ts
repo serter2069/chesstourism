@@ -31,18 +31,6 @@ export interface PageEntry {
 // Status: [ ] = no qaCycles | [proto] = qaCycles 1-4 | [review] = qaCycles >= 5
 
 export const pages: PageEntry[] = [
-  // ─── Overview (meta) ───────────────────────────────────────────────────────
-  {
-    id: 'overview',
-    title: 'Project Overview',
-    group: 'Public',
-    route: '/proto/overview',
-    stateCount: 1,
-    nav: 'none',
-    qaCycles: 5,
-    qaScore: 12,
-  },
-
   // ─── Public ────────────────────────────────────────────────────────────────
   {
     id: 'landing',
